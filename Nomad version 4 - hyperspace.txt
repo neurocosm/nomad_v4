@@ -1,0 +1,28 @@
+Nomad version 4 - hyperspace
+
+-  in nomad road trip version 4 we're going to combine a full screen map with the data previously captured in corners to be in bouncing bubbles squares triangles or whatever shape the user wants it to be. And they will bounce around the screen kind of like a video game 
+-  each piece of data can be whatever shape the user wants to be as long as it's a circle a triangle or a square. Perhaps other shapes won't come about. There is also speed and trajectory features that I can implement from work on the bouncing block coding that I did. 
+-  find bouncing parallelogram app you made in AI a few years ago. 
+-  The bottom half can house the address information. It will be light theme that gradients to the lower 20% to the dark theme. Or the reverse could be. The address space on the bottom can be shifted to the top.
+-  controls for each piece of data that are on the screen can occur when the device is loaded and the data bubbles have not started yet. Long pressing any of the bubbles and choose a shape and perhaps other data like a color. Scheme.
+-  The entire screen is map. There may be four deep nested buttons in the corners for things like freeze the data balls would keep the map going. Or a universal button for all functions. 
+-  another idea for a button would be to reverse the gradient and to reverse where the address data is. So that would be four choices or two choices with two options. The gradient and then the position of the data. This is my greatest work 
+-  so in essence we are combining the best ideas of the map the visualizations arcade and fidgets.
+-  another idea for long pressing any of the data balls is to change the shape change the color and the size slightly so it appears larger to the preference of the user. That can also be a shrink function that allows when they are bouncing around to to your reducing size by percent to make the autonomous animation crazy
+-  another feature would be using landscape. Because all the bubbles are floating around the orientation is fine. But a feature would be to long press on the center of the map and it splits in two. The original map display will be on the right and on the left there will be something else. Maybe points of interest maybe some kind of a visualization arcade evolution!,
+-  another thing to do when long pressing one of the data bubbles you can choose circle oval triangle square squirkle pentagon sectagon and septagon and also octagon and you could also do the three sides of small medium large. Hey Google
+-  
+For the nomad version 4 transformation the Chevron or the Galaga fighter will be in its own sphere or bubble that is a safe zone so the element bubbles cannot pass over it and make it unseeable to the map
+- Long pressing on a data bubble will give you the option to change the color change the edge color change the shape and change whether or not it moves kinetically or stays put. If it's set to staying put you can actually drag it wherever you'd like. Position it
+- Long pressing will allow the positioning of the data bubble. Once the data bubble is positioned there'll be two options place which means it sets the data bubble at your destination on the map grid and also a button to edit it. The editing button will allow the options for it to have kinetic energy set the color of the outside edge change the shape. The shapes will be: round, egg-shaped, triangle, square, Pentagon, sextagon, septagon, octagon.
+- -  in nomad road trip version 4 we're going to combine a full screen map with the data previously captured in corners to be in bouncing bubbles squares triangles or whatever shape the user wants it to be. And they will bounce around the screen kind of like a video game 
+-  each piece of data can be whatever shape the user wants to be as long as it's a circle a triangle or a square. Perhaps other shapes won't come about. There is also speed and trajectory features that I can implement from work on the bouncing block coding that I did. 
+-  find bouncing parallelogram app you made in AI a few years ago. 
+-  The bottom half can house the address information. It will be light theme that gradients to the lower 20% to the dark theme. Or the reverse could be. The address space on the bottom can be shifted to the top.
+-  controls for each piece of data that are on the screen can occur when the device is loaded and the data bubbles have not started yet. Long pressing any of the bubbles and choose a shape and perhaps other data like a color. Scheme.
+-  The entire screen is map. There may be four deep nested buttons in the corners for things like freeze the data balls would keep the map going. Or a universal button for all functions. 
+-  another idea for a button would be to reverse the gradient and to reverse where the address data is. So that would be four choices or two choices with two options. The gradient and then the position of the data. This is my greatest work 
+-  so in essence we are combining the best ideas of the map the visualizations arcade and fidgets. 
+-  another option in the data-bubble long press would be transparency!!!
+-  For the nomad version 4 transformation the Chevron or the Galaga fighter will be in its own sphere or bubble that is a safe zone so the element bubbles cannot pass over it and make it unseeable to the map
+-  
