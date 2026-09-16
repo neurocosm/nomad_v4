@@ -1,0 +1,10 @@
+{
+  "name": "NOMAD: RoadTrip",
+  "description": "NOMAD Version 4 Hyperspace: Real-time Heads-Up GPS Navigation, Telemetry Dashboard, and Kinetic Visualizers",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

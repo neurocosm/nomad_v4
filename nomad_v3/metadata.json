@@ -1,0 +1,10 @@
+{
+  "name": "NOMAD: RoadTrip",
+  "description": "Real-time Heads-Up GPS Navigation, Telemetry Dashboard, and Visualizer Arcade",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

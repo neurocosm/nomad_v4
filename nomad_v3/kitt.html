@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <title>NOMAD // SYNTHOMATIC SENSOR CONSOLE</title>
+
+  <!-- PWA & Mobile Display Metadata -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#020403" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      background-color: #020403;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Courier New", monospace;
+      color: #ffffff;
+      position: relative;
+    }
+
+    #synth-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: auto;
+    }
+
+    /* Top HUD Navigation Bar */
+    .top-hud-bar {
+      position: absolute;
+      top: max(14px, env(safe-area-inset-top));
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 18px;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .nav-btn-hub {
+      pointer-events: auto;
+      background: rgba(4, 18, 10, 0.92);
+      backdrop-filter: blur(10px);
+      color: #4cd964;
+      border: 2px solid #22c55e;
+      padding: 9px 18px;
+      border-radius: 20px;
+      font-size: 0.95rem;
+      font-weight: 900;
+      text-decoration: none;
+      letter-spacing: 1.4px;
+      box-shadow: 0 0 15px rgba(34, 197, 94, 0.4), inset 0 0 8px rgba(34, 197, 94, 0.2);
+      transition: transform 0.15s ease, background 0.15s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-btn-hub:active {
+      transform: scale(0.92);
+      background: rgba(34, 197, 94, 0.35);
+    }
+
+    .hud-status-badge {
+      pointer-events: auto;
+      background: rgba(8, 16, 10, 0.95);
+      border: 2.5px solid #22c55e;
+      color: #4cd964;
+      font-size: 1.15rem;
+      font-weight: 900;
+      padding: 9px 24px;
+      border-radius: 24px;
+      letter-spacing: 2.5px;
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      font-family: "Courier New", Courier, monospace;
+    }
+
+    .hud-status-badge.spm-active {
+      border-color: #ffd700;
+      color: #ffd700;
+      box-shadow: 0 0 28px rgba(255, 215, 0, 0.85);
+      animation: spmGlowPulse 0.4s infinite alternate;
+    }
+
+    @keyframes spmGlowPulse {
+      from { transform: scale(1.0); }
+      to { transform: scale(1.06); }
+    }
+
+    /* Floating Interactive Controls */
+    .interactive-overlay-controls {
+      position: absolute;
+      bottom: max(78px, calc(env(safe-area-inset-bottom) + 72px));
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      z-index: 10;
+      pointer-events: auto;
+      padding: 0 16px;
+    }
+
+    .control-pill-btn {
+      background: rgba(6, 18, 12, 0.92);
+      border: 2px solid #eab308;
+      color: #fef08a;
+      font-size: 0.92rem;
+      font-weight: 900;
+      padding: 10px 20px;
+      border-radius: 22px;
+      letter-spacing: 1.4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 14px rgba(234, 179, 8, 0.35);
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .control-pill-btn:active {
+      transform: scale(0.92);
+      background: rgba(234, 179, 8, 0.35);
+    }
+
+    .control-pill-btn.active-btn {
+      background: rgba(34, 197, 94, 0.45);
+      border-color: #22c55e;
+      color: #ffffff;
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.75);
+    }
+
+    /* Bottom HUD Container */
+    .bottom-hud-container {
+      position: absolute;
+      bottom: max(16px, env(safe-area-inset-bottom));
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      z-index: 10;
+      pointer-events: auto;
+    }
+
+    .btn-back-nomad {
+      background: rgba(0, 0, 0, 0.92);
+      border: 2.5px solid #4cd964;
+      color: #4cd964;
+      font-size: 1.05rem;
+      font-weight: 900;
+      padding: 11px 26px;
+      border-radius: 30px;
+      box-shadow: 0 0 18px rgba(76, 217, 100, 0.5), inset 0 0 10px rgba(76, 217, 100, 0.25);
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1.8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+
+    .btn-back-nomad:active {
+      transform: scale(0.92);
+      background: rgba(76, 217, 100, 0.25);
+    }
+
+    /* Touch Toast Announcement */
+    .synth-toast {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.85);
+      background: rgba(4, 20, 10, 0.96);
+      border: 2.5px solid #22c55e;
+      color: #4cd964;
+      padding: 16px 32px;
+      border-radius: 14px;
+      font-size: 1.25rem;
+      font-weight: 900;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      box-shadow: 0 0 40px rgba(34, 197, 94, 0.9), inset 0 0 20px rgba(34, 197, 94, 0.5);
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      font-family: "Courier New", Courier, monospace;
+      text-align: center;
+    }
+
+    .synth-toast.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="synth-canvas"></canvas>
+
+  <!-- Top Bar -->
+  <div class="top-hud-bar">
+    <a href="visualizer.html" class="nav-btn-hub" onclick="window.location.replace('visualizer.html'); return false;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      ARCADE
+    </a>
+    <div class="hud-status-badge" id="hud-status" onclick="cycleSynthState()">
+      STANDBY
+    </div>
+  </div>
+
+  <!-- Interactive Action Buttons (Pure Internal Sensors) -->
+  <div class="interactive-overlay-controls">
+    <button class="control-pill-btn" id="btn-turbo" onclick="triggerWarpThrust()">
+      ⚡ WARP THRUST
+    </button>
+    <button class="control-pill-btn" id="btn-flux" onclick="triggerSensorFlux()">
+      🔄 SENSOR FLUX
+    </button>
+    <button class="control-pill-btn" id="btn-sweep" onclick="triggerHarmonicSweep()">
+      🔊 HARMONIC SWEEP
+    </button>
+  </div>
+
+  <!-- Bottom Return Button -->
+  <div class="bottom-hud-container">
+    <button class="btn-back-nomad" onclick="returnToDashboard()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4cd964" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      BACK TO NOMAD
+    </button>
+  </div>
+
+  <div class="synth-toast" id="synth-toast">PURSUIT MODE ENGAGED</div>
+
+  <script>
+    let isRunning = true;
+    let wakeLock = null;
+    let currentSpeedMPH = 0;
+    let simulatedSpeedOverride = null;
+    let currentHeading = 0;
+    let currentAltitude = 0;
+    let prevHeading = 0;
+    let compassAngularVelocity = 0;
+    let watchId = null;
+
+    // Device orientation/gyro tilt sensors
+    let tiltGamma = 0; // roll
+    let tiltBeta = 0;  // pitch
+    let fluxSurgeBonus = 0; // triggered on SENSOR FLUX tap
+
+    // Web Audio Synthesizer (for sensory sound feedback)
+    let audioCtx = null;
+
+    // Canvas setup
+    const canvas = document.getElementById('synth-canvas');
+    const ctx = canvas.getContext('2d');
+    const statusBadge = document.getElementById('hud-status');
+    const toastEl = document.getElementById('synth-toast');
+
+    // Perimeter Orbit Scanner State
+    let perimeterOrbitT = 0;
+
+    // Sensor-Driven 3-Bar Stepped Equalizer Columns:
+    // [0] = Lateral Turn & G-Force Channel (Steering & Heading Momentum)
+    // [1] = Velocity & Propulsion Flux Channel (Speed & Acceleration Wave)
+    // [2] = Elevation & Pitch Gradient Channel (Altitude Slope & Road Cadence)
+    let sensorLevels = [0, 0, 0];
+    let sensorTargetLevels = [0, 0, 0];
+    let kineticPhase = 0;
+
+    // Emerald PCB Circuit Traces & Gold Solder Nodes
+    let circuitNodes = [];
+    let circuitTraces = [];
+    let dataPackets = [];
+
+    // Hyper-Drive Effects
+    let spmActiveTime = 0;
+    let turbineAngle = 0;
+    let strobePhase = 0;
+
+    function getEffectiveSpeed() {
+      if (simulatedSpeedOverride !== null) return simulatedSpeedOverride;
+      return currentSpeedMPH;
+    }
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth * window.devicePixelRatio;
+      canvas.height = window.innerHeight * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      buildCircuitSchematic();
+    }
+
+    function buildCircuitSchematic() {
+      circuitNodes = [];
+      circuitTraces = [];
+      dataPackets = [];
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+
+      const cols = 6;
+      const rows = 8;
+      const gridW = w / cols;
+      const gridH = h / rows;
+
+      for (let r = 0; r <= rows; r++) {
+        for (let c = 0; c <= cols; c++) {
+          if (Math.random() > 0.4) {
+            circuitNodes.push({
+              x: c * gridW + (Math.random() * 20 - 10),
+              y: r * gridH + (Math.random() * 20 - 10),
+              radius: Math.random() > 0.7 ? 3.5 : 2,
+              glow: Math.random() * 0.5 + 0.3
+            });
+          }
+        }
+      }
+
+      for (let i = 0; i < circuitNodes.length; i++) {
+        for (let j = i + 1; j < circuitNodes.length; j++) {
+          const dx = circuitNodes[i].x - circuitNodes[j].x;
+          const dy = circuitNodes[i].y - circuitNodes[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < gridW * 1.3 && (Math.abs(dx) < 15 || Math.abs(dy) < 15 || Math.random() > 0.6)) {
+            circuitTraces.push({
+              p1: circuitNodes[i],
+              p2: circuitNodes[j],
+              alpha: Math.random() * 0.18 + 0.05
+            });
+          }
+        }
+      }
+
+      for (let k = 0; k < 20; k++) {
+        if (circuitTraces.length > 0) {
+          const trace = circuitTraces[Math.floor(Math.random() * circuitTraces.length)];
+          dataPackets.push({
+            trace: trace,
+            t: Math.random(),
+            speed: (Math.random() * 0.015 + 0.005)
+          });
+        }
+      }
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function triggerSensorFlux() {
+      fluxSurgeBonus = 1.0;
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.18);
+        osc.frequency.exponentialRampToValueAtTime(587.33, now + 0.35);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.45);
+      } catch (e) {}
+      showToast('SENSOR FLUX // MULTI-AXIS SYNESTHESIA');
+    }
+
+    function triggerHarmonicSweep() {
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+
+        // Dual resonant filter pulse
+        for (let i = 0; i < 2; i++) {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          const filter = ctx.createBiquadFilter();
+
+          osc.type = 'sawtooth';
+          filter.type = 'bandpass';
+          filter.Q.value = 8;
+
+          const startFreq = i === 0 ? 800 : 1200;
+          const endFreq = i === 0 ? 320 : 480;
+
+          osc.frequency.setValueAtTime(startFreq, now);
+          osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.35);
+          filter.frequency.setValueAtTime(startFreq * 1.5, now);
+          filter.frequency.exponentialRampToValueAtTime(endFreq * 1.2, now + 0.35);
+
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+
+          osc.connect(filter);
+          filter.connect(gain);
+          gain.connect(ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + 0.4);
+        }
+        showToast('PERIMETER HARMONIC PULSE');
+      } catch (e) {}
+    }
+
+    function triggerWarpThrust() {
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.exponentialRampToValueAtTime(1800, now + 0.45);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.6);
+
+        simulatedSpeedOverride = 88;
+        showToast('WARP THRUST // 88 MPH');
+        setTimeout(() => {
+          simulatedSpeedOverride = null;
+          updateStatusBadge();
+        }, 5000);
+      } catch (e) {}
+    }
+
+    function showToast(msg) {
+      toastEl.innerText = msg;
+      toastEl.classList.add('show');
+      setTimeout(() => {
+        toastEl.classList.remove('show');
+      }, 1600);
+    }
+
+    function cycleSynthState() {
+      const cur = getEffectiveSpeed();
+      if (cur === 0) simulatedSpeedOverride = 22; // Cruise
+      else if (cur <= 25) simulatedSpeedOverride = 54; // Pursuit
+      else if (cur <= 64) simulatedSpeedOverride = 92; // Hyper-Drive
+      else simulatedSpeedOverride = 0; // Standby
+      updateStatusBadge();
+      const stateName = getSynthStateName(getEffectiveSpeed());
+      showToast(`${stateName.mode} ENGAGED`);
+    }
+
+    function getSynthStateName(speed) {
+      if (speed === 0) {
+        return { mode: 'STANDBY', sub: 'SYSTEMS NOMINAL // IDLE FLUX', color: '#22c55e', spm: false };
+      } else if (speed <= 25) {
+        return { mode: 'CRUISE VECTOR', sub: 'CRUISE VECTOR ACTIVE', color: '#eab308', spm: false };
+      } else if (speed <= 64) {
+        return { mode: 'PURSUIT MODE', sub: 'KINETIC TRAJECTORY LOCKED', color: '#ff3344', spm: false };
+      } else {
+        return { mode: 'HYPER-DRIVE', sub: 'HYPER THRUST 100% // WARP SYNC', color: '#ffd700', spm: true };
+      }
+    }
+
+    function updateStatusBadge() {
+      const speed = getEffectiveSpeed();
+      const state = getSynthStateName(speed);
+      statusBadge.innerText = state.mode;
+      if (state.spm) {
+        statusBadge.classList.add('spm-active');
+      } else {
+        statusBadge.classList.remove('spm-active');
+      }
+    }
+
+    function initGPS() {
+      if ('geolocation' in navigator) {
+        watchId = navigator.geolocation.watchPosition(
+          (pos) => {
+            if (pos.coords.speed !== null && !isNaN(pos.coords.speed)) {
+              currentSpeedMPH = Math.max(0, Math.round(pos.coords.speed * 2.23694));
+            }
+            if (pos.coords.heading !== null && !isNaN(pos.coords.heading)) {
+              let diff = pos.coords.heading - prevHeading;
+              if (diff > 180) diff -= 360;
+              if (diff < -180) diff += 360;
+              compassAngularVelocity = diff; // positive = turning right/clockwise
+              prevHeading = pos.coords.heading;
+              currentHeading = pos.coords.heading;
+            }
+            if (pos.coords.altitude !== null && !isNaN(pos.coords.altitude)) {
+              currentAltitude = Math.round(pos.coords.altitude * 3.28084);
+            }
+            updateStatusBadge();
+          },
+          (err) => {},
+          { enableHighAccuracy: true, maximumAge: 1000 }
+        );
+      }
+    }
+
+    // Gyroscope / device orientation
+    window.addEventListener('deviceorientation', (e) => {
+      if (e.gamma !== null && !isNaN(e.gamma)) tiltGamma = e.gamma;
+      if (e.beta !== null && !isNaN(e.beta)) tiltBeta = e.beta;
+      if (e.alpha !== null && !isNaN(e.alpha)) {
+        let heading = 360 - e.alpha;
+        let diff = heading - prevHeading;
+        if (diff > 180) diff -= 360;
+        if (diff < -180) diff += 360;
+        if (Math.abs(diff) > 0.5) {
+          compassAngularVelocity = diff;
+        }
+        prevHeading = heading;
+        currentHeading = heading;
+      }
+    }, { passive: true });
+
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator && document.visibilityState === 'visible' && (wakeLock === null || wakeLock.released)) {
+          wakeLock = await navigator.wakeLock.request('screen');
+        }
+      } catch (err) {}
+    }
+
+    window.addEventListener('load', () => {
+      initGPS();
+      requestWakeLock();
+      renderLoop();
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') requestWakeLock();
+    });
+    window.addEventListener('focus', requestWakeLock);
+    window.addEventListener('touchstart', () => {
+      getAudioContext();
+      requestWakeLock();
+    }, { passive: true });
+    setInterval(requestWakeLock, 15000);
+
+    /* ------------------------------------------------------------- */
+    /* MAIN RENDER LOOP                                              */
+    /* ------------------------------------------------------------- */
+    function renderLoop() {
+      if (!isRunning) return;
+      requestAnimationFrame(renderLoop);
+
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const centerX = width / 2;
+      const centerY = height / 2 - 10;
+      const speed = getEffectiveSpeed();
+      const state = getSynthStateName(speed);
+
+      // Background clearing
+      ctx.fillStyle = '#020403';
+      ctx.fillRect(0, 0, width, height);
+
+      // 1. Render Emerald Green & Gold Circuit Schematics
+      renderCircuitSchematics(width, height, speed);
+
+      // 2. Render Hyper-Drive Warp Streaks (if 65+ MPH)
+      if (state.spm) {
+        renderSuperPursuitEffects(width, height, centerX, centerY);
+      }
+
+      // 3. Update & Render SYNTHOMATIC Console + Traveling Compass Halo
+      updateSensorEqualizer(speed);
+      renderSynthomaticConsole(centerX, centerY, width, height, state, speed);
+
+      // 4. Render HUD Tactical Gauges & Telemetry Panels
+      renderTacticalPanels(width, height, centerX, centerY, speed, state);
+    }
+
+    /* ------------------------------------------------------------- */
+    /* 1. EMERALD & GOLD CIRCUIT SCHEMATICS                          */
+    /* ------------------------------------------------------------- */
+    function renderCircuitSchematics(width, height, speed) {
+      ctx.save();
+      ctx.lineWidth = 1.2;
+
+      // Draw traces in cyber emerald green
+      circuitTraces.forEach(t => {
+        ctx.beginPath();
+        ctx.moveTo(t.p1.x, t.p1.y);
+        ctx.lineTo(t.p2.x, t.p2.y);
+        ctx.strokeStyle = `rgba(34, 197, 94, ${t.alpha * (speed > 25 ? 1.6 : 1.1)})`;
+        ctx.stroke();
+      });
+
+      // Draw solder nodes in gold
+      circuitNodes.forEach(n => {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(234, 179, 8, ${n.glow * 1.2})`;
+        ctx.shadowColor = '#eab308';
+        ctx.shadowBlur = 4;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+
+      // Animate and draw gold micro data packets
+      dataPackets.forEach(p => {
+        p.t += p.speed * (1 + speed * 0.05);
+        if (p.t > 1) p.t = 0;
+        const px = p.trace.p1.x + (p.trace.p2.x - p.trace.p1.x) * p.t;
+        const py = p.trace.p1.y + (p.trace.p2.y - p.trace.p1.y) * p.t;
+
+        ctx.beginPath();
+        ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffd700';
+        ctx.shadowColor = '#eab308';
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+
+      ctx.restore();
+    }
+
+    /* ------------------------------------------------------------- */
+    /* 2. HYPER-DRIVE SPEED STREAKS & TURBINES                       */
+    /* ------------------------------------------------------------- */
+    function renderSuperPursuitEffects(width, height, centerX, centerY) {
+      spmActiveTime += 0.05;
+      strobePhase += 0.2;
+
+      ctx.save();
+      const numRays = 16;
+      ctx.lineWidth = 2.0;
+      for (let i = 0; i < numRays; i++) {
+        const angle = (i / numRays) * Math.PI * 2 + spmActiveTime * 0.2;
+        const dist1 = 150 + ((spmActiveTime * 80 + i * 25) % (Math.max(width, height) * 0.7));
+        const dist2 = dist1 + 60;
+        const x1 = centerX + Math.cos(angle) * dist1;
+        const y1 = centerY + Math.sin(angle) * dist1;
+        const x2 = centerX + Math.cos(angle) * dist2;
+        const y2 = centerY + Math.sin(angle) * dist2;
+
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.strokeStyle = `rgba(255, 215, 0, ${0.15 + (Math.sin(strobePhase + i) * 0.1)})`;
+        ctx.stroke();
+      }
+
+      // Left & Right Turbine Warning Strobes
+      const strobeGlow = Math.abs(Math.sin(strobePhase));
+      ctx.fillStyle = `rgba(234, 179, 8, ${strobeGlow * 0.5})`;
+      ctx.fillRect(0, 0, 8, height);
+      ctx.fillRect(width - 8, 0, 8, height);
+
+      ctx.restore();
+    }
+
+    /* ------------------------------------------------------------- */
+    /* 3. SENSOR-REACTIVE SYNTHOMATIC ENGINE (NO MIC REQUIRED)        */
+    /* ------------------------------------------------------------- */
+    function updateSensorEqualizer(speed) {
+      kineticPhase += 0.07 + (speed > 25 ? 0.06 : 0.02);
+
+      // Decay bonus flux surge
+      if (fluxSurgeBonus > 0.01) {
+        fluxSurgeBonus *= 0.92;
+      } else {
+        fluxSurgeBonus = 0;
+      }
+
+      // 1. Column 0: Lateral Turn & G-Force Channel (Steering & Heading Momentum)
+      const turnForce = Math.min(1.0, Math.abs(compassAngularVelocity) * 0.25 + Math.abs(tiltGamma) * 0.02);
+      const turnCadence = Math.sin(kineticPhase * 2.8) * 0.2;
+      const c0Base = speed > 0 ? 0.25 : 0.12;
+      sensorTargetLevels[0] = Math.max(0.1, Math.min(1.0, c0Base + turnForce * 0.7 + turnCadence + fluxSurgeBonus * 0.8));
+
+      // 2. Column 1: Velocity & Propulsion Flux Channel (Speed & Acceleration Energy)
+      const speedRatio = Math.min(1.0, speed / 75.0);
+      const pulseWave = Math.pow(Math.abs(Math.sin(kineticPhase * 3.2)), 1.4);
+      const c1Base = speed > 0 ? 0.35 + speedRatio * 0.45 : 0.18;
+      sensorTargetLevels[1] = Math.max(0.15, Math.min(1.0, c1Base + pulseWave * (speed > 0 ? 0.35 : 0.15) + fluxSurgeBonus));
+
+      // 3. Column 2: Elevation Gradient & Pitch Channel (Altitude Slope & Road Cadence)
+      const pitchForce = Math.min(1.0, Math.abs(tiltBeta) * 0.02);
+      const altOscillation = Math.cos(kineticPhase * 2.5) * 0.22;
+      const c2Base = speed > 0 ? 0.25 : 0.12;
+      sensorTargetLevels[2] = Math.max(0.1, Math.min(1.0, c2Base + pitchForce * 0.6 + altOscillation + fluxSurgeBonus * 0.8));
+
+      for (let c = 0; c < 3; c++) {
+        sensorLevels[c] += (sensorTargetLevels[c] - sensorLevels[c]) * 0.32;
+      }
+    }
+
+    // Helper: Returns {x, y, angle} along a rounded rectangle perimeter
+    function getPointOnRoundedRectPerimeter(t, x, y, w, h, r) {
+      t = ((t % 1) + 1) % 1;
+      const straightW = w - 2 * r;
+      const straightH = h - 2 * r;
+      const cornerArc = 0.5 * Math.PI * r;
+      const totalPerimeter = 2 * straightW + 2 * straightH + 4 * cornerArc;
+
+      const topSeg = straightW / totalPerimeter;
+      const trCornerSeg = cornerArc / totalPerimeter;
+      const rightSeg = straightH / totalPerimeter;
+      const brCornerSeg = cornerArc / totalPerimeter;
+      const botSeg = straightW / totalPerimeter;
+      const blCornerSeg = cornerArc / totalPerimeter;
+      const leftSeg = straightH / totalPerimeter;
+      const tlCornerSeg = cornerArc / totalPerimeter;
+
+      let cur = 0;
+
+      if (t < cur + topSeg) {
+        const u = (t - cur) / topSeg;
+        return { x: x + r + u * straightW, y: y };
+      }
+      cur += topSeg;
+
+      if (t < cur + trCornerSeg) {
+        const u = (t - cur) / trCornerSeg;
+        const theta = -Math.PI / 2 + u * (Math.PI / 2);
+        return { x: x + w - r + Math.cos(theta) * r, y: y + r + Math.sin(theta) * r };
+      }
+      cur += trCornerSeg;
+
+      if (t < cur + rightSeg) {
+        const u = (t - cur) / rightSeg;
+        return { x: x + w, y: y + r + u * straightH };
+      }
+      cur += rightSeg;
+
+      if (t < cur + brCornerSeg) {
+        const u = (t - cur) / brCornerSeg;
+        const theta = 0 + u * (Math.PI / 2);
+        return { x: x + w - r + Math.cos(theta) * r, y: y + h - r + Math.sin(theta) * r };
+      }
+      cur += brCornerSeg;
+
+      if (t < cur + botSeg) {
+        const u = (t - cur) / botSeg;
+        return { x: x + w - r - u * straightW, y: y + h };
+      }
+      cur += botSeg;
+
+      if (t < cur + blCornerSeg) {
+        const u = (t - cur) / blCornerSeg;
+        const theta = Math.PI / 2 + u * (Math.PI / 2);
+        return { x: x + r + Math.cos(theta) * r, y: y + h - r + Math.sin(theta) * r };
+      }
+      cur += blCornerSeg;
+
+      if (t < cur + leftSeg) {
+        const u = (t - cur) / leftSeg;
+        return { x: x, y: y + h - r - u * straightH };
+      }
+      cur += leftSeg;
+
+      const u = (t - cur) / tlCornerSeg;
+      const theta = Math.PI + u * (Math.PI / 2);
+      return { x: x + r + Math.cos(theta) * r, y: y + r + Math.sin(theta) * r };
+    }
+
+    function renderSynthomaticConsole(centerX, centerY, width, height, state, speed) {
+      ctx.save();
+
+      // Increased scale & prominence for big monitors and mobile cockpit displays
+      const boxW = Math.min(420, width * 0.90);
+      const boxH = Math.min(260, height * 0.44);
+      const boxX = centerX - boxW / 2;
+      const boxY = centerY - boxH / 2;
+      const cornerR = 18;
+
+      // Update Traveling Orbit Halo around the frame
+      let travelDirection = 1;
+      if (compassAngularVelocity < -0.3) {
+        travelDirection = -1; // Counter-clockwise (turning left)
+      } else if (compassAngularVelocity > 0.3) {
+        travelDirection = 1;  // Clockwise (turning right)
+      }
+
+      const orbitSpeed = (0.005 + Math.min(0.015, speed * 0.0003) + Math.abs(compassAngularVelocity) * 0.002) * travelDirection;
+      perimeterOrbitT = ((perimeterOrbitT + orbitSpeed) % 1 + 1) % 1;
+
+      // Outer Bezel Shadow
+      ctx.shadowColor = state.spm ? '#ffd700' : '#ff0033';
+      ctx.shadowBlur = 26;
+      ctx.fillStyle = 'rgba(6, 10, 8, 0.96)';
+      ctx.beginPath();
+      ctx.roundRect(boxX, boxY, boxW, boxH, cornerR);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Outer Structural Frame Border
+      ctx.strokeStyle = state.spm ? 'rgba(255, 215, 0, 0.45)' : 'rgba(255, 0, 51, 0.45)';
+      ctx.lineWidth = 3.2;
+      ctx.stroke();
+
+      // --- TRAVELING PERIMETER COMPASS HALO ---
+      const numHaloBeads = 38;
+      for (let b = 0; b < numHaloBeads; b++) {
+        const beadT = b / numHaloBeads;
+        let diff = Math.abs(beadT - perimeterOrbitT);
+        if (diff > 0.5) diff = 1.0 - diff;
+
+        const beadPt = getPointOnRoundedRectPerimeter(beadT, boxX, boxY, boxW, boxH, cornerR);
+
+        if (diff < 0.12) {
+          const intensity = 1.0 - (diff / 0.12);
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(beadPt.x, beadPt.y, 4.8, 0, Math.PI * 2);
+          ctx.fillStyle = state.spm ? '#ffd700' : '#ff3344';
+          ctx.shadowColor = state.spm ? '#ffd700' : '#ff0033';
+          ctx.shadowBlur = intensity * 16;
+          ctx.fill();
+
+          if (intensity > 0.7) {
+            ctx.beginPath();
+            ctx.arc(beadPt.x, beadPt.y, 2.2, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+          }
+          ctx.restore();
+        } else {
+          ctx.beginPath();
+          ctx.arc(beadPt.x, beadPt.y, 1.8, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(34, 197, 94, 0.25)';
+          ctx.fill();
+        }
+      }
+
+      // --- LARGE RETRO TITLE: SYNTHOMATIC ---
+      ctx.save();
+      ctx.font = '900 20px "Courier New", monospace';
+      ctx.fillStyle = state.spm ? '#ffd700' : '#ffffff';
+      ctx.shadowColor = state.spm ? '#ffd700' : '#22c55e';
+      ctx.shadowBlur = 12;
+      ctx.textAlign = 'center';
+      ctx.fillText('SYNTHOMATIC', centerX, boxY + 30);
+      ctx.restore();
+
+      // Sub-caption: Compass Orbit & Sensor Track
+      const dirText = travelDirection === 1 ? 'CW ORBIT // EAST' : 'CCW ORBIT // WEST';
+      ctx.font = '700 11px "Courier New", monospace';
+      ctx.fillStyle = '#a7f3d0';
+      ctx.textAlign = 'center';
+      ctx.fillText(`BEARING ${Math.round(currentHeading)}° // ${dirText}`, centerX, boxY + 47);
+
+      // 3 High-Visibility Segmented Equalizer Columns (Left, Center, Right)
+      const numCols = 3;
+      const colWidth = (boxW - 90) / numCols;
+      const colGap = 18;
+      const leftStartX = centerX - (numCols * colWidth + (numCols - 1) * colGap) / 2;
+
+      const segmentsPerCol = [12, 14, 12];
+      const segH = 8.5;
+      const segGap = 3.5;
+
+      for (let c = 0; c < numCols; c++) {
+        const colX = leftStartX + c * (colWidth + colGap);
+        const totalSegs = segmentsPerCol[c];
+        const activeCount = Math.round(sensorLevels[c] * (totalSegs / 2));
+        const midIndex = totalSegs / 2;
+
+        const colTotalHeight = totalSegs * segH + (totalSegs - 1) * segGap;
+        const colStartY = boxY + 58 + (boxH - 105 - colTotalHeight) / 2;
+
+        for (let s = 0; s < totalSegs; s++) {
+          const sy = colStartY + s * (segH + segGap);
+          const distFromMid = Math.abs(s - (midIndex - 0.5));
+          const isActive = distFromMid < activeCount;
+
+          if (isActive) {
+            ctx.fillStyle = state.spm ? '#ffd700' : '#ff0033';
+            ctx.shadowColor = state.spm ? '#ffd700' : '#ff0033';
+            ctx.shadowBlur = 12;
+            ctx.fillRect(colX, sy, colWidth, segH);
+
+            // Hot White Core
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(colX + 5, sy + 2, colWidth - 10, segH - 4);
+            ctx.shadowBlur = 0;
+          } else {
+            ctx.fillStyle = 'rgba(50, 6, 12, 0.45)';
+            ctx.fillRect(colX, sy, colWidth, segH);
+          }
+        }
+      }
+
+      // --- PROMINENT, LARGE MODE STATUS (STANDBY, CRUISE VECTOR, ETC) ---
+      ctx.save();
+      ctx.font = '900 17px "Courier New", monospace';
+      ctx.fillStyle = state.color;
+      ctx.shadowColor = state.color;
+      ctx.shadowBlur = 14;
+      ctx.textAlign = 'center';
+      ctx.fillText(state.mode, centerX, boxY + boxH - 24);
+
+      // Sub-status line
+      ctx.font = '700 10.5px "Courier New", monospace';
+      ctx.fillStyle = '#bbf7d0';
+      ctx.shadowBlur = 0;
+      ctx.fillText(state.sub, centerX, boxY + boxH - 10);
+      ctx.restore();
+
+      ctx.restore();
+    }
+
+    /* ------------------------------------------------------------- */
+    /* 4. TACTICAL GAUGES & TELEMETRY PANELS                          */
+    /* ------------------------------------------------------------- */
+    function renderTacticalPanels(width, height, centerX, centerY, speed, state) {
+      ctx.save();
+      turbineAngle += 0.05 + speed * 0.005;
+
+      const panelY = centerY + Math.min(150, height * 0.24);
+      const panelH = 92;
+      const panelW = Math.min(180, (width - 48) / 2);
+
+      // Left Panel: Turbine RPM & Kinetic Diagnostics
+      const rpm = speed === 0 ? 850 : Math.round(850 + speed * 88);
+      ctx.fillStyle = 'rgba(8, 16, 10, 0.92)';
+      ctx.strokeStyle = '#15803d';
+      ctx.lineWidth = 1.6;
+      const leftPanelX = 18;
+
+      ctx.beginPath();
+      ctx.roundRect(leftPanelX, panelY, panelW, panelH, 10);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.font = '900 11px "Courier New", monospace';
+      ctx.fillStyle = '#4cd964';
+      ctx.textAlign = 'left';
+      ctx.fillText('TURBINE OUTPUT', leftPanelX + 10, panelY + 20);
+
+      ctx.font = '900 24px "Courier New", monospace';
+      ctx.fillStyle = state.spm ? '#ffd700' : '#ffffff';
+      ctx.fillText(`${rpm}`, leftPanelX + 10, panelY + 48);
+
+      ctx.font = '800 10px "Courier New", monospace';
+      ctx.fillStyle = '#86efac';
+      ctx.fillText('RPM // KINETIC FLUX', leftPanelX + 10, panelY + 64);
+
+      const rpmRatio = Math.min(1.0, rpm / 8000);
+      ctx.fillStyle = '#064e3b';
+      ctx.fillRect(leftPanelX + 10, panelY + 72, panelW - 20, 7);
+      ctx.fillStyle = state.spm ? '#ffd700' : '#22c55e';
+      ctx.fillRect(leftPanelX + 10, panelY + 72, (panelW - 20) * rpmRatio, 7);
+
+      // Right Panel: Velocity & Altitude
+      const rightPanelX = width - panelW - 18;
+      ctx.beginPath();
+      ctx.roundRect(rightPanelX, panelY, panelW, panelH, 10);
+      ctx.fillStyle = 'rgba(8, 16, 10, 0.92)';
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.font = '900 11px "Courier New", monospace';
+      ctx.fillStyle = '#4cd964';
+      ctx.fillText('PRIMARY VELOCITY', rightPanelX + 10, panelY + 20);
+
+      ctx.font = '900 28px "Courier New", monospace';
+      ctx.fillStyle = state.spm ? '#ffd700' : '#ff3344';
+      ctx.fillText(`${speed}`, rightPanelX + 10, panelY + 50);
+
+      ctx.font = '900 11px "Courier New", monospace';
+      ctx.fillStyle = '#fca5a5';
+      ctx.fillText('MPH', rightPanelX + 65, panelY + 48);
+
+      const cardDirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+      const card = cardDirs[Math.round(currentHeading / 45) % 8] || 'N';
+      ctx.font = '800 10px "Courier New", monospace';
+      ctx.fillStyle = '#86efac';
+      ctx.fillText(`HDG ${Math.round(currentHeading)}° ${card} | ${currentAltitude}FT`, rightPanelX + 10, panelY + 74);
+
+      ctx.restore();
+    }
+
+    function returnToDashboard() {
+      isRunning = false;
+      if (watchId !== null && navigator.geolocation) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+      window.location.replace('index.html');
+    }
+  </script>
+  <script src="version.js"></script>
+</body>
+</html>

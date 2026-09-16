@@ -1,0 +1,697 @@
+<!--
+ ====================================================================
+ NOMAD HUD & Telemetry Navigation System
+ 
+ Proprietary & Created by BostonyFX
+ Instagram: https://instagram.com/neurocosm
+ All rights reserved.
+ ====================================================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>NOMAD: RoadTrip - Features &amp; Guide</title>
+
+  <!-- Version Single Source of Truth -->
+  <script src="version.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-touch-callout: none;
+    }
+
+    body {
+      background-color: #0b0c10;
+      color: #e0e6ed;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      padding: 16px;
+      padding-top: max(16px, env(safe-area-inset-top));
+      padding-bottom: max(32px, env(safe-area-inset-bottom));
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* Top Navigation Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #1f2937;
+      margin-bottom: 20px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .header-title-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header-title {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: 1px;
+    }
+
+    .header-tagline {
+      font-size: 0.85rem;
+      color: #00d4ff;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .header-nav-btns {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-back {
+      background: #1f2937;
+      color: #4cd964;
+      border: 1px solid #374151;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s ease, transform 0.1s ease;
+      cursor: pointer;
+    }
+
+    .btn-back:active {
+      transform: scale(0.94);
+      background: #374151;
+    }
+
+    .btn-terminal-header {
+      background: rgba(255, 176, 0, 0.12);
+      color: #ffb000;
+      border: 1px solid #ffb000;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: "Courier New", Courier, monospace;
+      transition: background 0.15s ease, transform 0.1s ease;
+      cursor: pointer;
+    }
+
+    .btn-terminal-header:active {
+      transform: scale(0.94);
+      background: #ffb000;
+      color: #000000;
+    }
+
+    /* GPS Quick Help Banner */
+    .gps-guide-banner {
+      background: #161b22;
+      border: 1px solid #00d4ff;
+      box-shadow: 0 0 14px rgba(0, 212, 255, 0.12);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .gps-guide-text {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-gps-guide {
+      color: #000000;
+      background: #00d4ff;
+      font-weight: 900;
+      font-size: 0.82rem;
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 14px;
+      white-space: nowrap;
+      letter-spacing: 0.5px;
+      transition: background 0.15s ease, transform 0.1s ease;
+      cursor: pointer;
+    }
+
+    .btn-gps-guide:active {
+      transform: scale(0.94);
+      background: #4cd964;
+    }
+
+    /* Feature Category Card */
+    .feature-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    }
+
+    .feature-card.highlight {
+      border-color: #00d4ff;
+      box-shadow: 0 0 16px rgba(0, 212, 255, 0.15);
+    }
+
+    .feature-card.arcade-suite {
+      border-color: #ff007f;
+      background: linear-gradient(180deg, #161b22 0%, #170b1c 100%);
+      box-shadow: 0 0 18px rgba(255, 0, 127, 0.18);
+    }
+
+    .feature-card.terminal-suite {
+      border-color: #ffb000;
+      background: linear-gradient(180deg, #161b22 0%, #1c1407 100%);
+      box-shadow: 0 0 18px rgba(255, 176, 0, 0.15);
+    }
+
+    .card-heading {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+
+    .badge-core { background: rgba(0, 212, 255, 0.15); color: #00d4ff; }
+    .badge-weather { background: rgba(76, 217, 100, 0.15); color: #4cd964; }
+    .badge-secret { background: rgba(255, 0, 127, 0.15); color: #ff007f; }
+    .badge-amber { background: rgba(255, 176, 0, 0.15); color: #ffb000; }
+
+    /* Key-Value Feature Matrix */
+    .feature-row {
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .feature-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .feature-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      gap: 8px;
+    }
+
+    .feature-action-pill {
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: #21262d;
+      color: #a5d6ff;
+      border: 1px solid #30363d;
+      white-space: nowrap;
+    }
+
+    .feature-action-pill.secret {
+      background: rgba(255, 0, 127, 0.2);
+      color: #ff79c6;
+      border-color: #ff007f;
+    }
+
+    .feature-action-pill.amber {
+      background: rgba(255, 176, 0, 0.18);
+      color: #ffb000;
+      border-color: #ffb000;
+    }
+
+    .feature-desc {
+      font-size: 0.9rem;
+      color: #8b949e;
+      line-height: 1.45;
+    }
+
+    /* Secret Vault Highlight Box */
+    .secret-box {
+      background: rgba(255, 0, 127, 0.08);
+      border: 1px dashed #ff007f;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-top: 12px;
+    }
+
+    .secret-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #ff007f;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .secret-desc {
+      font-size: 0.85rem;
+      color: #f1f1f1;
+      line-height: 1.4;
+    }
+
+    /* Visualizer Cards Grid Inside Guide */
+    .vis-guide-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .vis-guide-item {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .vis-guide-header {
+      font-size: 0.92rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .vis-guide-desc {
+      font-size: 0.8rem;
+      color: #aaaaaa;
+      line-height: 1.35;
+    }
+
+    /* Action Buttons in Cards */
+    .btn-card-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      text-decoration: none;
+      margin-top: 12px;
+      transition: transform 0.1s ease, background 0.15s ease;
+      cursor: pointer;
+    }
+
+    .btn-card-action:active {
+      transform: scale(0.96);
+    }
+
+    .btn-vis-hub {
+      background: linear-gradient(90deg, rgba(255, 0, 127, 0.25), rgba(0, 212, 255, 0.25));
+      border: 1.5px solid #ff007f;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(255, 0, 127, 0.3);
+    }
+
+    .btn-term-hub {
+      background: rgba(255, 176, 0, 0.15);
+      border: 1.5px solid #ffb000;
+      color: #ffb000;
+      font-family: "Courier New", Courier, monospace;
+      box-shadow: 0 0 10px rgba(255, 176, 0, 0.25);
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 32px;
+      font-size: 0.85rem;
+      color: #6e7681;
+    }
+
+    .footer a {
+      color: #00d4ff;
+      text-decoration: none;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-title-group">
+        <div class="header-title">NOMAD: RoadTrip</div>
+        <div class="header-tagline">Telemetry &amp; Navigation HUD</div>
+      </div>
+      <div class="header-nav-btns">
+        <a href="geek-stats.html" class="btn-terminal-header" onclick="window.location.replace('geek-stats.html'); return false;">&gt;_ VT220</a>
+        <a href="index.html" class="btn-back" onclick="window.location.replace('index.html'); return false;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4cd964" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          DASHBOARD
+        </a>
+      </div>
+    </div>
+
+    <!-- GPS Troubleshooting Link Banner -->
+    <div class="gps-guide-banner">
+      <div class="gps-guide-text">
+        <span>🛰️</span>
+        <span>Need help locking GPS on iOS or Android?</span>
+      </div>
+      <a href="gps-setup.html" class="btn-gps-guide" onclick="window.location.replace('gps-setup.html'); return false;">GPS GUIDE &rarr;</a>
+    </div>
+
+    <!-- 1. CORE TELEMETRY & MEGA-HUD DISPLAY MODES -->
+    <div class="feature-card highlight">
+      <div class="card-heading">
+        <span class="badge-icon badge-core">📡</span>
+        Mega-HUD Telemetry &amp; Navigation
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-name">
+          <span>High-Visibility Address Stack</span>
+          <span class="feature-action-pill">Auto-Shrink</span>
+        </div>
+        <div class="feature-desc">
+          Context-aware reverse-geocoding displays full street numbers, standard abbreviations, town, state code, and county zip. Dynamic font sizing prevents long street names from clipping.
+        </div>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-name">
+          <span>Corridor-Aware Universal Geocoding Engine</span>
+          <span class="feature-action-pill">Auto-Hysteresis</span>
+        </div>
+        <div class="feature-desc">
+          Spatial highway filter activates strictly at <strong>&gt;40 MPH</strong> or freeway lock, querying at zoom 15 with OpenStreetMap taxonomy metadata to eliminate median dropouts and unmapped road gaps. Preserves route titles across brief gaps with a 15-second smoothing memory buffer. Transitions to residential addresses at &le;40 MPH (zoom 17).
+        </div>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-name">
+          <span>Google Maps Link Sharing</span>
+          <span class="feature-action-pill">Single Tap</span>
+        </div>
+        <div class="feature-desc">
+          Tap the top Location Card to copy a direct Google Maps GPS coordinate link to your clipboard with an instant confirmation badge.
+        </div>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-name">
+          <span>Tactical Corner Badges, 5-Tier Scaling &amp; Transparency</span>
+          <span class="feature-action-pill">Tap / Hold Telem (500ms)</span>
+        </div>
+        <div class="feature-desc">
+          Tap the top-left squircle pod to cycle between <strong>Heading &amp; Bearing</strong> (e.g., 0° NORTH or 338° NW), <strong>GPS Altitude</strong> in feet (FT ALT), and real-time <strong>GPS Accuracy Margin</strong> (±ft FT GPS). Long-press (500ms) to open the <strong>Corner Badges &amp; HUD</strong> configurator: adjust between <strong>5 proportional size tiers</strong> (Small, Small-Med, Medium, Med-Large, Large Quad) and fine-tune <strong>Transparency</strong> with smooth real-time background &amp; border alpha sliders.
+        </div>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-name">
+          <span>Chronometer Squircle Compass &amp; 3D POV Pitch</span>
+          <span class="feature-action-pill">Tap / Hold Compass</span>
+        </div>
+        <div class="feature-desc">
+          Precision squircle compass with borderless dial face, dynamic light/dark theme contrast, dual-taper needle, and 30° tactile tick marks. Tap to toggle <strong>Heading-Up</strong> vs. <strong>North-Up</strong> navigation. Long-press (500ms) to toggle between <strong>3D 58° Take-Off Pitch</strong> and flat 2D bird's-eye view.
+        </div>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-name">
+          <span>Universal 50-State Route Shields &amp; Dual Concurrency</span>
+          <span class="feature-action-pill">Automatic Cycling</span>
+        </div>
+        <div class="feature-desc">
+          State-agnostic shield parsing engine extracts Interstate, US Highway, and State Highway designations across all 50 states (e.g. Route 2A, 62, 4, US-3, CA-1, SR-114). On concurrent highways, an automatic 4-second alternating flipper smoothly cycles between primary and secondary designations.
+        </div>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-name">
+          <span>Smart Speed-Adaptive Auto-Scale &amp; Multi-Tap Zoom</span>
+          <span class="feature-action-pill">Double / Triple Tap</span>
+        </div>
+        <div class="feature-desc">
+          Intelligent camera automatically adapts to travel velocity: <strong>17.2 Tactical Zoom</strong> for parking &amp; neighborhood speeds (&le;15 MPH), <strong>16.4 Urban Zoom</strong> for city traffic, and <strong>15.2 Expressway Zoom</strong> for highway cruising (&gt;55 MPH). <strong>Double-tap the map</strong> to cycle through 3 elevated zoom override tiers (+0.8, +1.5, +2.2), and <strong>triple-tap</strong> to restore Smart Auto-Scale.
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. SPEED SIGN, MAP PALETTES & WEATHER CONFIG -->
+    <div class="feature-card">
+      <div class="card-heading">
+        <span class="badge-icon badge-weather">⚡</span>
+        Dash Customization &amp; Weather Engine
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-name">
+          <span>High-Contrast Speed Sign</span>
+          <span class="feature-action-pill">Tap Speed</span>
+        </div>
+        <div class="feature-desc">
+          Authentic highway regulatory sign styling. Tap to instantly toggle between <strong>MPH</strong> and <strong>KM/H</strong>.
+        </div>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-name">
+          <span>Cinematic Maps &amp; Kinetic Sensory Consoles</span>
+          <span class="feature-action-pill">Chevron &amp; Die Icons</span>
+        </div>
+        <div class="feature-desc">
+          Dual-mode split navigation separates live cartography from kinetic sensory fidget consoles:
+          <ul style="margin: 6px 0 6px 18px; font-size: 0.85rem; line-height: 1.5; color: #b0b8c4;">
+            <li><strong>Map Mode (Vehicle Chevron)</strong>: Tap the GPS vehicle chevron marker in the center of the map to cycle between <em>Natural Dark Navigation</em> and <em>Natural Light Navigation</em>. Continuing forward steps directly into the sensory consoles.</li>
+            <li><strong>Fidget Mode (Far Lower-Right Die Button 🎲)</strong>: When enjoying a sensory console, tap the rolling Die button in the bottom-right corner to cycle continuously between all kinetic fidget consoles without leaving fidget mode.</li>
+            <li><strong>Instant Return to Map (Far Lower-Left Map Button 🗺️)</strong>: Tap the folded map icon in the bottom-left corner to immediately escape back to your active live map navigation theme without having to cycle through remaining consoles.</li>
+          </ul>
+          <div style="margin-top: 8px; font-size: 0.82rem; color: #8ea0b4;">
+            <strong>Available Kinetic Consoles:</strong>
+            <ul style="margin: 4px 0 4px 18px; line-height: 1.45;">
+              <li><strong>Amber Cosmic Starfield</strong>: Interactive kinetic space-flight console with velocity warp vectors, rotating celestial rings, and temperature-reactive nebular blooms.</li>
+              <li><strong>Underwater Ocean Deep</strong>: Relaxing marine simulation featuring caustic sunlight beams, reactive swimming aquatic life, rising bubbles, and hydrodynamic shockwaves.</li>
+              <li><strong>Synthomatic Sensory Console</strong>: Retro-futuristic kinetic synesthesia console featuring multi-axis internal sensor feedback across a 3-bar stepped equalizer, emerald green &amp; gold PCB circuit traces, and dynamic orbital scanner bezel.</li>
+              <li><strong>Stampede Canyon Charge (Ark Stampede)</strong>: Scenic kinetic canyon and prairie sanctuary celebration featuring pairs of diverse fauna racing in high spirits—Towering Giraffes, Slithering Desert Snakes, American Bison, Wild Mustangs, Pronghorn Antelopes, Majestic Elk, Bighorn Rams, and soaring Eagles beneath a starlit night sky and crescent moon, racing toward the illuminated Ark beacon.</li>
+            </ul>
+          </div>
+          Your active theme preference is remembered across sessions.
+        </div>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-name">
+          <span>Live Weather &amp; UV Telemetry</span>
+          <span class="feature-action-pill">Tap Temp</span>
+        </div>
+        <div class="feature-desc">
+          Real-time conditions from Open-Meteo including dynamic weather icons, relative humidity percentage, and color-graded UV index warnings. Tap temperature to toggle between <strong>°F</strong> and <strong>°C</strong>.
+        </div>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-name">
+          <span>Weather Refresh Configuration</span>
+          <span class="feature-action-pill">Hold Temp (500ms)</span>
+        </div>
+        <div class="feature-desc">
+          Long-press temperature to set your custom update polling: Time intervals (10m, 20m, 30m, 60m) or Distance triggers (15mi, 30mi, 50mi, or Off).
+        </div>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-name">
+          <span>Fullscreen &amp; Screen Wake Lock</span>
+          <span class="feature-action-pill">Tap Top Icon</span>
+        </div>
+        <div class="feature-desc">
+          Locks your phone display awake during long road trips and triggers native borderless immersive fullscreen navigation.
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. VISUALIZER ARCADE SUITE -->
+    <div class="feature-card arcade-suite">
+      <div class="card-heading">
+        <span class="badge-icon badge-secret">✨</span>
+        Visualizer Arcade Suite
+      </div>
+      <div class="feature-desc" style="color: #cccccc;">
+        Full-screen, motion-reactive visualizers driven by real-time GPS speed, heading vectors, and device gyroscope telemetry with standard HUD scaffolding and persistent screen wake locks.
+      </div>
+
+      <div class="vis-guide-grid">
+        <!-- 0. K.I.T.T. Pursuit -->
+        <div class="vis-guide-item" style="border-color: #ff0033;">
+          <div class="vis-guide-header" style="color: #ff3344;">
+            <span>🎙️</span> K.I.T.T. Pursuit HUD
+          </div>
+          <div class="vis-guide-desc">
+            Iconic 3-bar stepped red LED voice synthesizer, bidirectional halogen scanner sweep, cabin mic reactivity, and 4 dynamic velocity modes (Standby, Cruise, Pursuit, and Super Pursuit Mode).
+          </div>
+        </div>
+
+        <!-- 1. Panic Disco -->
+        <div class="vis-guide-item" style="border-color: #ff007f;">
+          <div class="vis-guide-header" style="color: #ff007f;">
+            <span>🤩</span> Panic: Disco
+          </div>
+          <div class="vis-guide-desc">
+            Neon spectrum tunnel with speed-reactive radial light beams, dual EQ towers, and star-eyed mascot.
+          </div>
+        </div>
+
+        <!-- 2. Festival of Joy -->
+        <div class="vis-guide-item" style="border-color: #00f0ff;">
+          <div class="vis-guide-header" style="color: #00f0ff;">
+            <span>🍄</span> Festival of Joy
+          </div>
+          <div class="vis-guide-desc">
+            360° kaleidoscope sacred geometry, shades-wearing mushroom mascot, and exploding musical notes.
+          </div>
+        </div>
+
+        <!-- 3. The Slam Dance -->
+        <div class="vis-guide-item" style="border-color: #39ff14;">
+          <div class="vis-guide-header" style="color: #39ff14;">
+            <span>🤘</span> The Slam Dance
+          </div>
+          <div class="vis-guide-desc">
+            Headbanging punk skull with hot mohawk spikes, rock horns, crossed sticks, lightning bolts, and flying instrument emojis on pitch-black void.
+          </div>
+        </div>
+
+        <!-- 4. Seasons -->
+        <div class="vis-guide-item" style="border-color: #ffbb00;">
+          <div class="vis-guide-header" style="color: #ffbb00;">
+            <span>☀️</span> Seasons
+          </div>
+          <div class="vis-guide-desc">
+            Auto-detects Spring, Summer, Autumn, or Winter calendar dates with custom dynamic horizons, seasonal mascots, and manual override pills.
+          </div>
+        </div>
+      </div>
+
+      <a href="visualizer.html" class="btn-card-action btn-vis-hub" onclick="window.location.replace('visualizer.html'); return false;">
+        OPEN VISUALIZER ARCADE &rarr;
+      </a>
+    </div>
+
+    <!-- 4. RETRO VT220 GEEK STATS TERMINAL -->
+    <div class="feature-card terminal-suite">
+      <div class="card-heading">
+        <span class="badge-icon badge-amber">&gt;_</span>
+        VT220 Amber Phosphor Terminal
+      </div>
+      <div class="feature-desc" style="color: #cccccc;">
+        A DEC VT220-inspired retro CRT terminal running live GPS telemetry, coordinate stream logging, and diagnostic vehicle stats.
+      </div>
+
+      <div class="feature-row" style="margin-top: 10px;">
+        <div class="feature-name">
+          <span style="color: #ffb000;">Amber CRT Phosphor Glow</span>
+          <span class="feature-action-pill amber">VT220 Scanlines</span>
+        </div>
+        <div class="feature-desc">
+          Monospace typography with hardware CRT scanline overlays and amber phosphor persistent illumination.
+        </div>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-name">
+          <span style="color: #ffb000;">Raw Telemetry Stream</span>
+          <span class="feature-action-pill amber">Real-Time</span>
+        </div>
+        <div class="feature-desc">
+          Live streaming logs for GPS Fix, Velocity Vectors, True Bearing, Barometric/GPS Altitude, Sat Accuracy, and Trip Coordinates.
+        </div>
+      </div>
+
+      <a href="geek-stats.html" class="btn-card-action btn-term-hub" onclick="window.location.replace('geek-stats.html'); return false;">
+        &gt; LAUNCH GEEK-STATS.HTML _
+      </a>
+    </div>
+
+    <!-- 5. SECRET CHEATS & EASTER EGGS -->
+    <div class="feature-card vault">
+      <div class="card-heading">
+        <span class="badge-icon badge-secret">👾</span>
+        Secret Cheats &amp; Arcade Vault
+      </div>
+
+      <!-- Secret 1: Dixie Horn -->
+      <div class="secret-box">
+        <div class="secret-title">🎺 General Lee "Dixie" Air Horn &amp; Scaled 01</div>
+        <div class="secret-desc">
+          <strong>Trigger:</strong> Press and hold the <strong>Vehicle Arrow</strong> for 500ms in normal cruise mode.<br />
+          <strong>Effect:</strong> Synthesizes the authentic 12-note <em>Dixie</em> phrase via dual harmonic oscillators while the car swells to <strong>2× size with a pulsing orange glow</strong> and the telemetry badge flashes the scaled <strong>"01"</strong> livery insignia.
+        </div>
+      </div>
+
+      <!-- Secret 2: Galaga Mode -->
+      <div class="secret-box">
+        <div class="secret-title">👾 8-Bit Galaga Mode &amp; Triple Blaster Lasers</div>
+        <div class="secret-desc">
+          <strong>Trigger:</strong> Press and hold the <strong>SPEED Sign</strong> for 600ms.<br />
+          <strong>Effect:</strong> Morphs the dashboard into an OutRun neon arcade cockpit (magenta/cyan glow), turns the speed sign into an arcade cabinet, and swaps your car for an 8-bit Galaga Fighter craft. Long-press the Galaga ship to fire <strong>three dual-laser salvos (pew-pew ... pew-pew ... pew-pew!)</strong> with 2× recoil pulsing.
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      [merge_footer]
+      <div id="features-version" class="nomad-version" style="margin-top: 6px; font-size: 0.72rem; font-family: 'Courier New', Courier, monospace; color: #555555; letter-spacing: 0.5px;"></div>
+    </div>
+  </div>
+
+</body>
+</html>
