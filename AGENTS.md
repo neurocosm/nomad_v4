@@ -226,5 +226,38 @@
   - **Generous Air-Gap Clearances**: Widened the open perimeter notches on all 8 shapes (Triangle, Square, Squirkle, Hexagon, Octagon, Pentagon, Circle, Egg) to a 38–40 unit gap (e.g. from $x=30$ to $x=70$), providing a minimum 3.5–4.5 unit empty safety buffer between the rounded stroke caps (`stroke-linecap="round"`) and the text.
   - **All Dimension Presets Tested**: Verified that the vector viewBox scales seamlessly across all preset dimensions (`90px Compact`, `125px Standard`, `160px Hero`) and granular slider ranges (`80px–180px`), guaranteeing the structural label is never cut off, encroached upon, or clipped during dynamic rotation.
 
+### v4 Step 16: Cockpit Layout Inversion & Long-Press Flip Trigger [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **Long-Press Layout Inversion Trigger (700ms)**: Implemented deliberate 700ms long-press handling on the center Min/Max button (`#fullscreen-btn`), complete with multi-pulse haptic vibration (`[30, 40, 60]`) and visual confirmation toast ("Layout: Location Top • Controls Bottom" / "Layout: Location Bottom • Controls Top").
+  - **Normal Tap Preservation**: Standard short taps continue to toggle browser fullscreen seamlessly without false trigger interference.
+  - **Synchronized Top/Bottom Transposition**: Toggling inversion smoothly swaps the location plaque to the top deck (`top: max(12px, env(safe-area-inset-top))`) and simultaneously brings the 3 minimal controls (Map style toggle, Fullscreen/Min-Max, and Vehicle switcher) to the bottom dock (`bottom: max(16px, env(safe-area-inset-bottom))`) via 0.4s cubic-bezier animations.
+  - **Adaptive 3D Camera Perspective & Map Padding**: `syncMapPadding()` dynamically shifts camera center padding to the bottom (`bottom: containerHeight * 0.24`) when inverted in 3D Take-Off mode, maintaining clear vehicle tracking along the highway.
+  - **Kinetic Physics Boundary Safety**: Kinetic bubble collision engine dynamically updates wall deflection boundaries (`topLimit: 88px`, `bottomLimit: vh - 68px`), preventing floating telemetry from colliding with the relocated location block or control pods.
+  - **Full Persistence Across Sessions**: Saves and restores layout configuration in `localStorage ('nomad_layout_inverted')` upon startup.
+
+### v4 Step 17: Universal Kinetic Data Bubble Architecture & Multi-Tab Configuration Modal [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **Universal 6-Bubble Telemetry Roster**: Expanded the kinetic engine from a single speed bubble to 6 independent telemetry bubbles:
+    - `speed`: Live GPS speed with unit switching (MPH/KMH).
+    - `compass`: Vehicle heading bearing with degree indicator.
+    - `altitude`: Real-time elevation in feet/meters.
+    - `temp`: Ambient temperature with °F / °C unit toggle.
+    - `atmo`: Unified atmospheric triad (Humidity %, UV Index, Barometric Pressure in/hPa) with customizable metric toggles.
+    - `coords`: GPS coordinates truncated to 3 decimal places (e.g. `42.360° N`, `71.058° W`) for clean on-screen readability while preserving full precision for records.
+  - **Universal Multi-Tab Configuration Modal**: Replaced single-bubble settings with a universal panel featuring 6 horizontal tabs (`SPEED`, `COMPASS`, `ALTITUDE`, `TEMP`, `ATMO`, `COORDS`). Long-pressing *any* bubble immediately opens the modal configured directly to that bubble, while allowing seamless tab switching between all telemetry elements.
+  - **Atmospheric Triad Sub-Selector**: Interactive multi-select button group allowing users to choose any combination (1, 2, or all 3) of Humidity, UV, and Barometric Pressure with automatic layout balance and empty-bubble protection.
+  - **Independent Geometry, Motion & Pinned States**: Each of the 6 bubbles independently retains its own geometric shape (8 choices), color accent (7 swatches), glass transparency (0%–80%), preset dimensions, rotation dynamics (Keel, Off, GPS, Gyro), and motion physics (Kinetic Bounce vs. Stationary Pinned).
+  - **Generalized Physics & Interaction Engine**: Refactored pointer event bindings, collision avoidance, and hover catch logic to operate universally across all active bubbles, with unified persistence to `localStorage ('nomad_v4_bubbles')`.
+
+### v4 Step 18: Zero Horizontal Scroll Modal Architecture & Full Dashboard Fit [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **Zero Horizontal Overflow**: Fully contained the Hyperspace configuration modal inside the viewport and dashboard container bounds with strict `overflow-x: hidden !important;`, `box-sizing: border-box;`, and dynamic `max-width: min(400px, calc(100vw - 20px))` and `width: calc(100% - 24px)`.
+  - **Vertical-Only Scroll Stream**: Preserved seamless, smooth vertical scrolling (`overflow-y: auto; -webkit-overflow-scrolling: touch; max-height: calc(100dvh - 32px)`) while completely eliminating any lateral movement or horizontal scrollbars.
+  - **Flexible CSS Grid Systems**: Upgraded segmented controls to fluid responsive grids (`repeat(3, minmax(0, 1fr))` for tabs, presets, and atmo triad; `repeat(2, minmax(0, 1fr))` for spin/keel dynamics; `repeat(4, minmax(0, 1fr))` for shapes) with `min-width: 0` on button children, preventing text or icon blowout on narrow mobile screens.
+  - **Concise Button Labels & Compact Ticks**: Refined button copy and slider ticks (`Compact/Standard/Hero`, `0% Clear/18% Sheer/45% Frost/80% Tint`, `Keel/Off/Speed/Gyro`, `Deflect/Glide Under`, `Bounce Walls/Wrap Edge`) to fit single-line presentation without word wrapping or button clipping.
+
 ### Post-v4 Wishlist / Deferred
 - **Map Feature Legend & POI Essential Services Filter**: Deferred until after Version 4. Since NOMAD functions as a telemetry and kinetic road-trip HUD rather than a turn-by-turn POI directory, POI clutter filtering will be revisited in future phases.

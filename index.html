@@ -108,13 +108,13 @@
     /* GALAGA EASTER EGG THEME OVERRIDES */
     .dashboard.galaga-theme .card {
       border-color: #00d4ff;
-      box-shadow: 0 0 12px rgba(0, 212, 255, 0.4);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
     }
 
     .dashboard.galaga-theme #speed-sign-box {
       background-color: #0b001a !important;
       border-color: #ff0055 !important;
-      box-shadow: 0 0 12px rgba(255, 0, 85, 0.4);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
     }
 
     .dashboard.galaga-theme #speed-sign-box::after {
@@ -123,23 +123,23 @@
 
     .dashboard.galaga-theme #speed-sign-box .speed-sign-title {
       color: #00d4ff !important;
-      text-shadow: 0 0 6px #00d4ff;
+      text-shadow: none;
     }
 
     .dashboard.galaga-theme #speed-sign-box .speed-sign-value {
       color: #ffe600 !important;
-      text-shadow: 0 0 10px #ff0055, 0 0 20px #ffe600;
+      text-shadow: none;
     }
 
     .dashboard.galaga-theme #speed-sign-box .speed-sign-unit {
       color: #ff0055 !important;
-      text-shadow: 0 0 6px #ff0055;
+      text-shadow: none;
     }
 
     .dashboard.galaga-theme .map-overlay-heading {
       border-color: #00d4ff !important;
       color: #00d4ff !important;
-      box-shadow: 0 0 10px rgba(0, 212, 255, 0.45);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
     }
 
     /* NOMAD V4 HYPERSPACE: MINIMALIST TOP TOGGLES (SHARING THE CHEVRON/CIRCLE GLASSY PERSONALITY) */
@@ -147,6 +147,7 @@
     .map-overlay-fullscreen {
       position: absolute;
       top: max(12px, env(safe-area-inset-top));
+      bottom: auto;
       z-index: 25;
       width: 36px;
       height: 36px;
@@ -162,8 +163,8 @@
       color: #00d4ff;
       cursor: pointer;
       user-select: none;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45), 0 0 14px rgba(0, 212, 255, 0.18), inset 0 0 10px rgba(0, 212, 255, 0.08);
-      transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      transition: top 0.4s cubic-bezier(0.25, 1, 0.5, 1), bottom 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.15s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
       -webkit-tap-highlight-color: transparent;
       outline: none;
       padding: 0;
@@ -171,12 +172,19 @@
       opacity: var(--hud-badge-opacity, 1);
     }
 
+    /* Inverted Cockpit Layout: Controls docked at bottom */
+    .dashboard.layout-inverted .top-corner-btn,
+    .dashboard.layout-inverted .map-overlay-fullscreen {
+      top: auto;
+      bottom: max(16px, env(safe-area-inset-bottom));
+    }
+
     .top-corner-btn:active,
     .map-overlay-fullscreen:active {
       transform: scale(0.90);
       background: rgba(14, 22, 38, 0.65);
       border-color: rgba(0, 212, 255, 0.85);
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 212, 255, 0.4);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
     }
 
     .map-overlay-fullscreen {
@@ -204,11 +212,11 @@
       pointer-events: none;
     }
 
-    /* Galaga Fighter Toggle Active Neon Styling */
+    /* Galaga Fighter Toggle Active Neon Styling (No Glow Box-Shadow) */
     .top-corner-right.active-fighter,
     .dashboard.galaga-theme .top-corner-right {
       border: 1.5px solid rgba(255, 0, 85, 0.8) !important;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45), 0 0 18px rgba(255, 0, 85, 0.55), inset 0 0 10px rgba(0, 212, 255, 0.2) !important;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45) !important;
     }
 
     /* Light Theme Top Corner & Fullscreen Buttons */
@@ -219,7 +227,7 @@
       background: rgba(255, 255, 255, 0.52) !important;
       border: 1px solid rgba(0, 122, 255, 0.45) !important;
       color: #007aff !important;
-      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12), 0 0 10px rgba(0, 122, 255, 0.18), inset 0 0 8px rgba(0, 122, 255, 0.06) !important;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12) !important;
     }
 
     #map-card.theme-light-active .top-corner-btn:active,
@@ -257,12 +265,12 @@
     }
     .kinetic-bubble:hover,
     .kinetic-bubble.is-hovered {
-      filter: drop-shadow(0 0 10px var(--bubble-accent, #00d4ff)) drop-shadow(0 0 20px var(--bubble-accent, #00d4ff));
+      filter: none !important;
     }
     .kinetic-bubble:active,
     .kinetic-bubble.is-dragging {
       cursor: grabbing;
-      filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 16px var(--bubble-accent, #00d4ff));
+      filter: none !important;
     }
     .kinetic-bubble.is-longpressing {
       transform: scale(0.96);
@@ -284,7 +292,7 @@
       border-radius: 0 !important;
       clip-path: none !important;
       -webkit-clip-path: none !important;
-      transition: transform 0.15s ease-out, filter 0.25s ease;
+      transition: transform 0.15s ease-out;
       will-change: transform;
     }
 
@@ -302,7 +310,7 @@
       line-height: 1;
       width: 100%;
       height: 100%;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 12px rgba(0, 0, 0, 0.85);
+      text-shadow: none !important;
     }
 
     /* Perimeter Structural Label: Replaces legacy interior floating title */
@@ -313,9 +321,10 @@
     .kinetic-bubble-value {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       font-weight: 300; /* Sleek, elegant, unbolded modern telemetry typography */
-      font-size: 2.5rem;
+      font-size: 2.75rem; /* Upgraded 10% from 2.5rem */
       line-height: 1;
       letter-spacing: -0.03em;
+      text-shadow: none !important;
     }
 
     .kinetic-bubble-unit {
@@ -324,29 +333,128 @@
 
     /* 3 Preset Sizes Segmented Control */
     .bubble-size-preset-group {
-      display: flex;
-      gap: 8px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
       margin-top: 6px;
+      width: 100%;
+      box-sizing: border-box;
     }
     .bubble-size-btn {
-      flex: 1;
-      padding: 9px 4px;
-      border-radius: 12px;
+      padding: 7px 2px;
+      border-radius: 10px;
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.16);
       color: #e2e8f0;
-      font-size: 0.78rem;
+      font-size: 0.74rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.15s ease;
       text-align: center;
+      min-width: 0;
+      box-sizing: border-box;
     }
     .bubble-size-btn.is-selected {
       background: #00d4ff !important;
       color: #040914 !important;
       border-color: #00d4ff !important;
       font-weight: 700;
-      box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Universal Bubble Tabs: 2-Row 3x2 Segmented Glass Grid */
+    .bubble-tabs-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 5px;
+      margin-top: 10px;
+      margin-bottom: 12px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .bubble-tab-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 7px 2px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 10px;
+      color: #cbd5e1;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      user-select: none;
+      -webkit-user-select: none;
+      box-sizing: border-box;
+      min-width: 0;
+    }
+    .bubble-tab-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+    }
+    .bubble-tab-btn.is-active {
+      background: rgba(0, 212, 255, 0.18) !important;
+      border-color: #00d4ff !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 10px rgba(0, 212, 255, 0.35);
+    }
+    .bubble-tab-status {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.25);
+      flex-shrink: 0;
+      transition: background 0.2s ease, box-shadow 0.2s ease;
+    }
+    .bubble-tab-status.is-active {
+      background: #30d158;
+      box-shadow: 0 0 6px rgba(48, 209, 88, 0.85);
+    }
+    .bubble-tab-icon {
+      font-size: 0.85rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .bubble-tab-label {
+      font-size: 0.72rem;
+      letter-spacing: -0.01em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Coords and Atmospherics Telemetry Typography */
+    .coords-line {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      font-size: 0.82rem;
+      font-weight: 400;
+      line-height: 1.28;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      text-shadow: none !important;
+    }
+    .atmo-metric-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      text-shadow: none !important;
+    }
+    .atmo-metric-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.76rem;
+      font-weight: 500;
+      line-height: 1.22;
+      white-space: nowrap;
+      text-shadow: none !important;
     }
 
     /* Pinned Indicator Badge */
@@ -362,28 +470,32 @@
     /* Shape & Color Pill Selectors in Modal */
     .bubble-shape-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 5px;
       margin-top: 6px;
+      width: 100%;
+      box-sizing: border-box;
     }
     .bubble-shape-btn {
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.16);
       color: #cbd5e1;
-      padding: 8px 4px;
+      padding: 7px 2px;
       border-radius: 10px;
-      font-size: 0.72rem;
+      font-size: 0.70rem;
       font-weight: 600;
       text-align: center;
       cursor: pointer;
       transition: all 0.15s ease;
+      min-width: 0;
+      box-sizing: border-box;
     }
     .bubble-shape-btn.is-selected {
       background: #00d4ff !important;
       color: #040914 !important;
       border-color: #00d4ff !important;
       font-weight: 700;
-      box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
     }
     .shape-btn-icon {
       display: block;
@@ -401,6 +513,9 @@
       gap: 8px;
       margin-top: 6px;
       flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      box-sizing: border-box;
     }
     .bubble-color-swatch {
       width: 28px;
@@ -414,32 +529,62 @@
     .bubble-color-swatch.is-selected {
       transform: scale(1.15);
       border-color: #ffffff !important;
-      box-shadow: 0 0 10px rgba(255,255,255,0.6);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
     }
 
     .bubble-mode-toggle-group {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       margin-top: 6px;
+      width: 100%;
+      box-sizing: border-box;
     }
     .bubble-mode-btn {
-      flex: 1;
-      padding: 9px 12px;
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 8px 4px;
       border-radius: 12px;
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.16);
       color: #e2e8f0;
-      font-size: 0.78rem;
+      font-size: 0.74rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.15s ease;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      box-sizing: border-box;
+      gap: 4px;
     }
     .bubble-mode-btn.is-selected {
       background: #00d4ff !important;
       color: #040914 !important;
       border-color: #00d4ff !important;
       font-weight: 700;
-      box-shadow: 0 0 12px rgba(0, 212, 255, 0.4);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    }
+
+    /* 3-Column Grid for Atmospheric Triad */
+    .atmo-metric-toggle-group {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      gap: 6px;
+      margin-top: 6px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* 2x2 Grid for Spin & Keel Dynamics */
+    .bubble-spin-grid {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 6px;
+      margin-top: 6px;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     /* NOMAD V4 HYPERSPACE: FLOATING ROUNDED LOCATION PILL WITH 1PX ORANGE BORDER & GLASSY TRANSPARENCY */
@@ -448,6 +593,7 @@
       left: 50%;
       transform: translateX(-50%);
       bottom: max(16px, env(safe-area-inset-bottom));
+      top: auto;
       width: calc(100% - 28px);
       max-width: 540px;
       z-index: 30;
@@ -457,7 +603,13 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
+      transition: top 0.4s cubic-bezier(0.25, 1, 0.5, 1), bottom 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
+    }
+
+    /* Inverted Cockpit Layout: Location docked at top */
+    .dashboard.layout-inverted .location-channel-bar {
+      bottom: auto;
+      top: max(12px, env(safe-area-inset-top));
     }
 
     /* The Floating Rounded Location Pill Body with 1px Orange Border & Semi-Transparent Glass */
@@ -469,7 +621,7 @@
       background: rgba(8, 14, 26, 0.44);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 0 0 12px rgba(255, 119, 0, 0.18);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
       padding: 6px 16px 7px 16px;
       box-sizing: border-box;
       cursor: pointer;
@@ -484,7 +636,7 @@
     .location-pill-card:active {
       transform: scale(0.985);
       background: rgba(14, 22, 38, 0.65);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 18px rgba(255, 119, 0, 0.32);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
     }
 
     /* Light Theme Pill Body */
@@ -493,14 +645,14 @@
     .location-channel-bar.theme-light-active .location-pill-card {
       background: rgba(255, 255, 255, 0.52) !important;
       border-color: rgba(255, 119, 0, 0.85) !important;
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12), 0 0 10px rgba(255, 119, 0, 0.15) !important;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12) !important;
     }
 
     .theme-light-active .location-pill-card:active,
     #map-card.theme-light-active ~ .location-channel-bar .location-pill-card:active,
     .location-channel-bar.theme-light-active .location-pill-card:active {
       background: rgba(255, 255, 255, 0.78) !important;
-      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.2), 0 0 16px rgba(255, 119, 0, 0.28) !important;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18) !important;
     }
 
     .location-channel-content {
@@ -523,7 +675,7 @@
       letter-spacing: 0.01em;
       margin-bottom: 2px;
       white-space: nowrap;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95), 0 0 16px rgba(0, 0, 0, 0.8);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
       transition: font-size 0.15s ease, color 0.3s ease;
     }
 
@@ -531,7 +683,7 @@
     #map-card.theme-light-active ~ .location-channel-bar .street-value,
     .location-channel-bar.theme-light-active .street-value {
       color: #0f172a !important;
-      text-shadow: 0 1px 3px rgba(255, 255, 255, 0.95), 0 0 10px rgba(255, 255, 255, 0.8) !important;
+      text-shadow: none !important;
     }
 
     .location-sub-row {
@@ -545,7 +697,7 @@
       line-height: 1.15;
       color: #cbd5e1;
       letter-spacing: 0.01em;
-      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
       transition: color 0.3s ease;
       white-space: nowrap;
       overflow: hidden;
@@ -557,7 +709,7 @@
     #map-card.theme-light-active ~ .location-channel-bar .location-sub-row,
     .location-channel-bar.theme-light-active .location-sub-row {
       color: #334155 !important;
-      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+      text-shadow: none !important;
     }
 
     .loc-divider {
@@ -566,7 +718,7 @@
       font-weight: 800;
       font-size: 0.9em;
       margin: 0 2px;
-      text-shadow: 0 0 6px rgba(255, 119, 0, 0.5);
+      text-shadow: none;
     }
 
     .theme-light-active .loc-divider,
@@ -579,15 +731,15 @@
     /* Galaga Theme Overrides */
     .dashboard.galaga-theme .location-channel-bar .street-value {
       color: #00d4ff !important;
-      text-shadow: 0 0 12px rgba(0, 212, 255, 0.85), 0 0 22px rgba(0, 212, 255, 0.5) !important;
+      text-shadow: none !important;
     }
     .dashboard.galaga-theme .location-sub-row {
       color: #ffe600 !important;
-      text-shadow: 0 0 8px rgba(255, 0, 85, 0.8) !important;
+      text-shadow: none !important;
     }
     .dashboard.galaga-theme .loc-divider {
       color: #ff0055 !important;
-      text-shadow: 0 0 8px #ff0055 !important;
+      text-shadow: none !important;
     }
 
     .copy-toast-badge {
@@ -601,7 +753,7 @@
       font-weight: 800;
       padding: 4px 14px;
       border-radius: 14px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55), 0 0 12px rgba(76, 217, 100, 0.6);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
       opacity: 0;
       transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
       pointer-events: none;
@@ -624,7 +776,7 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border: 1.5px solid rgba(255, 255, 255, 0.25);
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.05);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
       color: #ffffff;
       font-size: 0.78rem;
       font-weight: 700;
@@ -646,7 +798,7 @@
     .map-theme-toast.is-starfield {
       background: rgba(18, 9, 4, 0.94);
       border: 1.5px solid rgba(255, 183, 3, 0.7);
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.9), 0 0 14px rgba(251, 133, 0, 0.35);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
       color: #ffe8d6;
     }
 
@@ -858,8 +1010,8 @@
       max-height: 24px;
       display: block;
       color: rgba(241, 245, 249, 0.85);
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 5px rgba(0, 0, 0, 0.7));
-      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.18s ease, filter 0.18s ease, opacity 0.18s ease;
+      filter: none !important;
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.18s ease, opacity 0.18s ease;
       pointer-events: none;
     }
 
@@ -867,25 +1019,25 @@
     .map-overlay-route:not(.has-shield):hover .corner-pod-dice-svg {
       color: #ffffff;
       transform: scale(1.15);
-      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.7));
+      filter: none !important;
     }
 
     .map-overlay-interstate:not(.has-shield):active .corner-pod-map-svg {
       color: #ffb703;
       transform: scale(0.88);
-      filter: drop-shadow(0 0 10px rgba(255, 183, 3, 0.95));
+      filter: none !important;
     }
 
     .map-overlay-route:not(.has-shield):not(.auto-cycling):active .corner-pod-dice-svg {
       color: #ffffff;
       transform: scale(0.88);
-      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9));
+      filter: none !important;
     }
 
     .map-overlay-route:not(.has-shield).auto-cycling:active .corner-pod-dice-svg {
       color: #ffb703;
       transform: scale(0.88);
-      filter: drop-shadow(0 0 10px rgba(255, 183, 3, 0.95));
+      filter: none !important;
     }
 
     .corner-pod-dice-svg.rolling {
@@ -939,7 +1091,7 @@
     #map-card.theme-light-active .map-overlay-route:not(.has-shield) .corner-pod-dice-svg {
       color: #1e293b !important;
       stroke: #1e293b !important;
-      filter: drop-shadow(0 1px 3px rgba(255, 255, 255, 0.95)) !important;
+      filter: none !important;
     }
 
     #map-card.theme-light-active .map-overlay-interstate:not(.has-shield):hover .corner-pod-map-svg,
@@ -977,7 +1129,7 @@
       color: #ffffff !important;
       line-height: 1 !important;
       letter-spacing: 0.5px !important;
-      text-shadow: 0 1px 6px rgba(0,0,0,0.9);
+      text-shadow: none !important;
     }
 
     #map-card.is-starfield-mode .telemetry-circle-label {
@@ -999,7 +1151,7 @@
       height: 15px !important;
       stroke: #ffffff !important;
       opacity: 0.85;
-      filter: drop-shadow(0 1px 4px rgba(0,0,0,0.9));
+      filter: none !important;
     }
 
     /* Top-Right: Clean lightweight white cardinal letter perfectly in corner */
@@ -1032,7 +1184,7 @@
       letter-spacing: 0.5px;
       line-height: 1;
       color: #ffffff;
-      text-shadow: 0 1px 6px rgba(0,0,0,0.9);
+      text-shadow: none !important;
       text-transform: uppercase;
     }
 
@@ -1406,12 +1558,12 @@
       border-radius: 50%;
       border: 1.5px dashed rgba(0, 212, 255, 0.45);
       background: radial-gradient(circle, rgba(0, 212, 255, 0.07) 0%, rgba(0, 212, 255, 0.01) 55%, transparent 72%);
-      box-shadow: 0 0 24px rgba(0, 212, 255, 0.2), inset 0 0 20px rgba(0, 212, 255, 0.08);
+      box-shadow: none !important;
       pointer-events: none;
       user-select: none;
       transform-origin: center center;
       transform: perspective(600px) rotateX(42deg);
-      transition: top 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+      transition: top 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1), border-color 0.3s ease;
     }
 
     .vehicle-safe-zone-bubble.mode-heading-up,
@@ -1429,16 +1581,11 @@
     .dashboard.galaga-theme .vehicle-safe-zone-bubble {
       border: 2px dashed rgba(255, 0, 85, 0.65);
       background: radial-gradient(circle, rgba(255, 0, 85, 0.1) 0%, rgba(0, 212, 255, 0.03) 60%, transparent 75%);
-      box-shadow: 0 0 30px rgba(255, 0, 85, 0.4), inset 0 0 22px rgba(0, 212, 255, 0.2);
+      box-shadow: none !important;
     }
 
     .safe-zone-pulse-ring {
-      position: absolute;
-      inset: -6px;
-      border-radius: 50%;
-      border: 1px solid rgba(0, 212, 255, 0.25);
-      animation: safeZonePulse 3.5s ease-out infinite;
-      pointer-events: none;
+      display: none !important;
     }
 
     @keyframes safeZonePulse {
@@ -1517,7 +1664,7 @@
     }
 
     .vehicle-overlay-marker.vehicle-pulsing-horn #vehicle-overlay-svg {
-      filter: drop-shadow(0 0 16px rgba(255, 85, 0, 1)) drop-shadow(0 0 28px rgba(255, 150, 0, 0.8)) !important;
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.65)) !important;
     }
 
     .vehicle-overlay-marker.vehicle-pulsing-horn #vehicle-overlay-svg polygon,
@@ -1533,7 +1680,7 @@
     }
 
     .vehicle-overlay-marker.vehicle-pulsing-laser #vehicle-overlay-svg {
-      filter: drop-shadow(0 0 18px #00d4ff) drop-shadow(0 0 30px #ff0044) !important;
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.65)) !important;
     }
 
     .card-content-body {
@@ -1803,17 +1950,29 @@
       background: #1e1e1e;
       border: 1px solid #444444;
       border-radius: 16px;
-      padding: 20px 18px;
-      width: 88%;
+      padding: 18px 16px;
+      width: calc(100% - 24px);
       max-width: 380px;
-      max-height: 85dvh;
-      max-height: 85vh;
+      max-height: calc(100dvh - 32px);
+      max-height: calc(100vh - 32px);
       overflow-y: auto;
+      overflow-x: hidden !important;
       text-align: center;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
       transform: scale(0.9);
       transition: transform 0.25s ease;
       -webkit-overflow-scrolling: touch;
+      box-sizing: border-box;
+    }
+
+    #kinetic-bubble-modal {
+      overflow-x: hidden !important;
+    }
+
+    #kinetic-bubble-modal .modal-box {
+      max-width: min(400px, calc(100vw - 20px));
+      padding: 16px 12px;
+      overflow-x: hidden !important;
     }
 
     .modal-overlay.active .modal-box {
@@ -2207,15 +2366,65 @@
         </svg>
       </div>
 
-      <!-- NOMAD v4 Hyperspace: Kinetic Telemetry Speed Bubble -->
-      <div class="kinetic-bubble" id="speed-bubble" style="width: 104px; height: 104px; left: 24px; top: 110px; color: #00d4ff;" title="Drag to flick • Long-press to configure">
-        <!-- Outer Rotating Geometric Shape Frame (Rotates with Gyro/GPS Speed while text stays upright) -->
+      <!-- NOMAD v4 Hyperspace: 6 Kinetic Telemetry Data Bubbles -->
+      <!-- 1. Speed Telemetry Bubble -->
+      <div class="kinetic-bubble" id="speed-bubble" style="width: 90px; height: 90px; left: 24px; top: 110px; color: #00d4ff;" title="Drag to flick • Long-press to configure">
         <div class="kinetic-bubble-shape-wrap kinetic-shape-circle" id="speed-bubble-shape-frame"></div>
         <div class="kinetic-pin-indicator" id="speed-bubble-pin" style="display: none; z-index: 3;">📌</div>
         <div class="kinetic-bubble-inner">
           <div class="kinetic-bubble-title" id="speed-bubble-title" style="display: none;">SPEED</div>
           <div class="kinetic-bubble-value" id="speed-bubble-value">0</div>
           <div class="kinetic-bubble-unit" id="speed-bubble-unit" style="display: none;">MPH</div>
+        </div>
+      </div>
+
+      <!-- 2. Compass & Heading Bubble -->
+      <div class="kinetic-bubble" id="compass-bubble" style="width: 90px; height: 90px; left: 130px; top: 110px; color: #ffb703; display: none;" title="Drag to flick • Long-press to configure">
+        <div class="kinetic-bubble-shape-wrap kinetic-shape-circle" id="compass-bubble-shape-frame"></div>
+        <div class="kinetic-pin-indicator" id="compass-bubble-pin" style="display: none; z-index: 3;">📌</div>
+        <div class="kinetic-bubble-inner">
+          <div class="kinetic-bubble-value" id="compass-bubble-value">0°</div>
+        </div>
+      </div>
+
+      <!-- 3. Altitude / Elevation Bubble -->
+      <div class="kinetic-bubble" id="altitude-bubble" style="width: 90px; height: 90px; left: 236px; top: 110px; color: #30d158; display: none;" title="Drag to flick • Long-press to configure">
+        <div class="kinetic-bubble-shape-wrap kinetic-shape-hexagon" id="altitude-bubble-shape-frame"></div>
+        <div class="kinetic-pin-indicator" id="altitude-bubble-pin" style="display: none; z-index: 3;">📌</div>
+        <div class="kinetic-bubble-inner">
+          <div class="kinetic-bubble-value" id="altitude-bubble-value">--</div>
+        </div>
+      </div>
+
+      <!-- 4. Outdoor Temperature Bubble -->
+      <div class="kinetic-bubble" id="temp-bubble" style="width: 90px; height: 90px; left: 24px; top: 220px; color: #ff7700; display: none;" title="Drag to flick • Long-press to configure">
+        <div class="kinetic-bubble-shape-wrap kinetic-shape-egg" id="temp-bubble-shape-frame"></div>
+        <div class="kinetic-pin-indicator" id="temp-bubble-pin" style="display: none; z-index: 3;">📌</div>
+        <div class="kinetic-bubble-inner">
+          <div class="kinetic-bubble-value" id="temp-bubble-value">--°</div>
+        </div>
+      </div>
+
+      <!-- 5. Atmospheric Triad Bubble (Humidity, UV, Barometer) -->
+      <div class="kinetic-bubble" id="atmo-bubble" style="width: 95px; height: 95px; left: 130px; top: 220px; color: #bf5af2; display: none;" title="Drag to flick • Long-press to configure">
+        <div class="kinetic-bubble-shape-wrap kinetic-shape-squirkle" id="atmo-bubble-shape-frame"></div>
+        <div class="kinetic-pin-indicator" id="atmo-bubble-pin" style="display: none; z-index: 3;">📌</div>
+        <div class="kinetic-bubble-inner" id="atmo-bubble-content" style="padding: 6px;">
+          <div class="atmo-metric-stack" id="atmo-stack-inner">
+            <div class="atmo-metric-row" id="atmo-row-humidity"><span>💧</span> <span id="atmo-val-humidity">--%</span></div>
+            <div class="atmo-metric-row" id="atmo-row-uv"><span>☀️</span> <span id="atmo-val-uv">UV --</span></div>
+            <div class="atmo-metric-row" id="atmo-row-pressure"><span>⏲️</span> <span id="atmo-val-pressure">--</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. GPS Coordinates Vault Bubble (Truncated to 3 Decimals) -->
+      <div class="kinetic-bubble" id="coords-bubble" style="width: 95px; height: 95px; left: 236px; top: 220px; color: #ffffff; display: none;" title="Drag to flick • Long-press to configure">
+        <div class="kinetic-bubble-shape-wrap kinetic-shape-square" id="coords-bubble-shape-frame"></div>
+        <div class="kinetic-pin-indicator" id="coords-bubble-pin" style="display: none; z-index: 3;">📌</div>
+        <div class="kinetic-bubble-inner" id="coords-bubble-content" style="padding: 4px;">
+          <div class="coords-line" id="coords-lat">--.---° N</div>
+          <div class="coords-line" id="coords-lon">--.---° W</div>
         </div>
       </div>
 
@@ -2427,44 +2636,107 @@
 
   <!-- NOMAD V4 HYPERSPACE: KINETIC BUBBLE CONFIGURATION MODAL -->
   <div class="modal-overlay" id="kinetic-bubble-modal" onclick="closeKineticBubbleModal(event)">
-    <div class="modal-box" onclick="event.stopPropagation()" style="max-width: 440px;">
+    <div class="modal-box" onclick="event.stopPropagation()">
       <div class="modal-title" id="bubble-modal-title">Speed Bubble Config</div>
-      <div class="modal-body" style="margin-bottom: 12px;">
-        Customize kinetic bounce physics, geometric shape, color, and transparency.
+      <div class="modal-body" style="margin-bottom: 8px;">
+        Customize kinetic bounce physics, geometric shape, color, and telemetry.
+      </div>
+
+      <!-- Universal Bubble Tabs: 2-Row 3x2 Segmented Glass Grid -->
+      <div class="bubble-tabs-grid" id="bubble-tabs-grid">
+        <button class="bubble-tab-btn is-active" id="bubble-tab-speed" data-tab="speed" onclick="switchBubbleTab('speed')">
+          <span class="bubble-tab-status is-active" id="bubble-tab-status-speed"></span>
+          <span class="bubble-tab-icon">⚡</span>
+          <span class="bubble-tab-label">Speed</span>
+        </button>
+        <button class="bubble-tab-btn" id="bubble-tab-compass" data-tab="compass" onclick="switchBubbleTab('compass')">
+          <span class="bubble-tab-status" id="bubble-tab-status-compass"></span>
+          <span class="bubble-tab-icon">🧭</span>
+          <span class="bubble-tab-label">Compass</span>
+        </button>
+        <button class="bubble-tab-btn" id="bubble-tab-altitude" data-tab="altitude" onclick="switchBubbleTab('altitude')">
+          <span class="bubble-tab-status" id="bubble-tab-status-altitude"></span>
+          <span class="bubble-tab-icon">⛰️</span>
+          <span class="bubble-tab-label">Altitude</span>
+        </button>
+        <button class="bubble-tab-btn" id="bubble-tab-temp" data-tab="temp" onclick="switchBubbleTab('temp')">
+          <span class="bubble-tab-status" id="bubble-tab-status-temp"></span>
+          <span class="bubble-tab-icon">☀️</span>
+          <span class="bubble-tab-label">Temp</span>
+        </button>
+        <button class="bubble-tab-btn" id="bubble-tab-atmo" data-tab="atmo" onclick="switchBubbleTab('atmo')">
+          <span class="bubble-tab-status" id="bubble-tab-status-atmo"></span>
+          <span class="bubble-tab-icon">🌤️</span>
+          <span class="bubble-tab-label">Atmo</span>
+        </button>
+        <button class="bubble-tab-btn" id="bubble-tab-coords" data-tab="coords" onclick="switchBubbleTab('coords')">
+          <span class="bubble-tab-status" id="bubble-tab-status-coords"></span>
+          <span class="bubble-tab-icon">📍</span>
+          <span class="bubble-tab-label">Coords</span>
+        </button>
+      </div>
+
+      <!-- Bubble Active / Visible Status -->
+      <div class="config-section-label">Bubble Status</div>
+      <div class="bubble-mode-toggle-group" id="bubble-active-group">
+        <button class="bubble-mode-btn is-selected" id="bubble-status-active" onclick="setBubbleActive(true)">👁️ Active</button>
+        <button class="bubble-mode-btn" id="bubble-status-inactive" onclick="setBubbleActive(false)">💤 Inactive</button>
+      </div>
+
+      <!-- Atmospheric Triad Selector: Visible ONLY when Atmo tab is active -->
+      <div id="atmo-options-section" style="display: none; margin-top: 14px;">
+        <div class="config-section-label">Atmospheric Stats to Display</div>
+        <div class="bubble-mode-toggle-group atmo-metric-toggle-group">
+          <button class="bubble-mode-btn is-selected" id="atmo-btn-humidity" onclick="toggleAtmoMetric('humidity')">💧 Humidity</button>
+          <button class="bubble-mode-btn is-selected" id="atmo-btn-uv" onclick="toggleAtmoMetric('uv')">☀️ UV</button>
+          <button class="bubble-mode-btn is-selected" id="atmo-btn-pressure" onclick="toggleAtmoMetric('pressure')">⏲️ Baro</button>
+        </div>
+      </div>
+
+      <!-- Coords Information Tip: Visible ONLY when Coords tab is active -->
+      <div id="coords-options-section" style="display: none; margin-top: 14px; padding: 9px 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); font-size: 0.74rem; color: #94a3b8; line-height: 1.45;">
+        📍 GPS Coordinates are truncated to 3 decimal places in the floating bubble for clear legibility. Full-precision coordinates are preserved in the background telemetry vault for records and sharing.
       </div>
 
       <!-- Kinetic Motion vs Stationary Mode -->
-      <div class="config-section-label">Movement Mode</div>
+      <div class="config-section-label" style="margin-top: 14px;">Movement Mode</div>
       <div class="bubble-mode-toggle-group">
-        <button class="bubble-mode-btn is-selected" id="bubble-mode-kinetic" onclick="setBubbleMotionMode('kinetic')">🚀 Kinetic Bounce</button>
-        <button class="bubble-mode-btn" id="bubble-mode-stationary" onclick="setBubbleMotionMode('stationary')">📌 Stationary Pinned</button>
+        <button class="bubble-mode-btn is-selected" id="bubble-mode-kinetic" onclick="setBubbleMotionMode('kinetic')">🚀 Bounce</button>
+        <button class="bubble-mode-btn" id="bubble-mode-stationary" onclick="setBubbleMotionMode('stationary')">📌 Stationary</button>
       </div>
 
       <!-- Vehicle Safe Zone Options: Bounce OFF vs Pass Underneath -->
       <div class="config-section-label" style="margin-top: 14px;" id="bubble-safezone-title">Vehicle Safe Zone Interaction</div>
       <div class="bubble-mode-toggle-group" id="bubble-safezone-group">
-        <button class="bubble-mode-btn is-selected" id="bubble-safezone-bounce" onclick="setBubbleSafeZoneBehavior('bounce')">🛡️ Bounce Off</button>
-        <button class="bubble-mode-btn" id="bubble-safezone-under" onclick="setBubbleSafeZoneBehavior('under')">🌌 Pass Underneath</button>
+        <button class="bubble-mode-btn is-selected" id="bubble-safezone-bounce" onclick="setBubbleSafeZoneBehavior('bounce')">🛡️ Deflect</button>
+        <button class="bubble-mode-btn" id="bubble-safezone-under" onclick="setBubbleSafeZoneBehavior('under')">🌌 Glide Under</button>
       </div>
 
-      <!-- 3 Preset Sizes: Compact (80px), Standard (104px), Hero (140px) -->
+      <!-- Screen Wall Barrier Interaction: Bounce Off Walls vs Pass Through & Wrap -->
+      <div class="config-section-label" style="margin-top: 14px;" id="bubble-wall-title">Screen Wall Barrier Interaction</div>
+      <div class="bubble-mode-toggle-group" id="bubble-wall-group">
+        <button class="bubble-mode-btn is-selected" id="bubble-wall-bounce" onclick="setBubbleWallBehavior('bounce')">🧱 Bounce Walls</button>
+        <button class="bubble-mode-btn" id="bubble-wall-wrap" onclick="setBubbleWallBehavior('wrap')">🌀 Wrap Edge</button>
+      </div>
+
+      <!-- 3 Preset Sizes: Compact (90px), Standard (125px), Hero (160px) -->
       <div class="slider-config-container" style="margin-top: 14px;">
         <div class="slider-header-row">
           <span class="config-section-label" style="margin:0;">Preset Dimensions</span>
-          <span class="slider-val-badge" id="bubble-size-val-label">104px (Standard)</span>
+          <span class="slider-val-badge" id="bubble-size-val-label">90px (Compact)</span>
         </div>
         <div class="bubble-size-preset-group">
-          <button class="bubble-size-btn" id="bubble-size-opt-90" onclick="setBubbleSize(90)">Compact<br><span style="font-size:0.65rem; opacity:0.8;">90px</span></button>
-          <button class="bubble-size-btn is-selected" id="bubble-size-opt-125" onclick="setBubbleSize(125)">Standard<br><span style="font-size:0.65rem; opacity:0.8;">125px</span></button>
+          <button class="bubble-size-btn is-selected" id="bubble-size-opt-90" onclick="setBubbleSize(90)">Compact<br><span style="font-size:0.65rem; opacity:0.8;">90px</span></button>
+          <button class="bubble-size-btn" id="bubble-size-opt-125" onclick="setBubbleSize(125)">Standard<br><span style="font-size:0.65rem; opacity:0.8;">125px</span></button>
           <button class="bubble-size-btn" id="bubble-size-opt-160" onclick="setBubbleSize(160)">Hero<br><span style="font-size:0.65rem; opacity:0.8;">160px</span></button>
         </div>
         <div class="slider-track-wrap" style="margin-top: 10px;">
-          <input type="range" min="80" max="180" step="5" id="bubble-size-slider" class="hud-range-slider" oninput="onBubbleSizeSliderChange(this.value)">
+          <input type="range" min="80" max="180" step="5" value="90" id="bubble-size-slider" class="hud-range-slider" oninput="onBubbleSizeSliderChange(this.value)">
         </div>
         <div class="slider-ticks-row">
-          <span>80px Compact</span>
-          <span>125px Standard</span>
-          <span>180px Hero</span>
+          <span>80px</span>
+          <span>125px</span>
+          <span>180px</span>
         </div>
       </div>
 
@@ -2527,10 +2799,10 @@
           <input type="range" min="0" max="80" step="5" id="bubble-opacity-slider" class="hud-range-slider" oninput="onBubbleOpacitySliderChange(this.value)">
         </div>
         <div class="slider-ticks-row">
-          <span>0% Crystal</span>
+          <span>0% Clear</span>
           <span>18% Sheer</span>
-          <span>45% Frosted</span>
-          <span>80% Tinted</span>
+          <span>45% Frost</span>
+          <span>80% Tint</span>
         </div>
       </div>
 
@@ -2545,19 +2817,19 @@
         </div>
         <div class="slider-ticks-row">
           <span>1: Gentle</span>
-          <span>2: Slow</span>
+          <span>2</span>
           <span>3: Drift</span>
-          <span>4: Swift</span>
+          <span>4</span>
           <span>5: Hyper</span>
         </div>
       </div>
 
       <!-- Kinetic Outer Shape Spin Mode (Text Stays Upright) -->
       <div class="config-section-label" style="margin-top: 14px;" id="bubble-spin-title">Shape Dynamic Rotation &amp; Keel Physics</div>
-      <div class="bubble-mode-toggle-group" id="bubble-spin-mode-group">
-        <button class="bubble-mode-btn is-selected" id="bubble-spin-keel" onclick="setBubbleSpinMode('keel')">⚓ Weighted Keel</button>
-        <button class="bubble-mode-btn" id="bubble-spin-off" onclick="setBubbleSpinMode('off')">Static</button>
-        <button class="bubble-mode-btn" id="bubble-spin-gps" onclick="setBubbleSpinMode('gps')">⚡ Speed Spin</button>
+      <div class="bubble-mode-toggle-group bubble-spin-grid" id="bubble-spin-mode-group">
+        <button class="bubble-mode-btn is-selected" id="bubble-spin-keel" onclick="setBubbleSpinMode('keel')">⚓ Keel</button>
+        <button class="bubble-mode-btn" id="bubble-spin-off" onclick="setBubbleSpinMode('off')">Off</button>
+        <button class="bubble-mode-btn" id="bubble-spin-gps" onclick="setBubbleSpinMode('gps')">⚡ Speed</button>
         <button class="bubble-mode-btn" id="bubble-spin-gyro" onclick="setBubbleSpinMode('gyro')">🧭 Gyro</button>
       </div>
 
@@ -2571,11 +2843,11 @@
           <input type="range" min="1" max="5" step="1" id="bubble-spin-slider" class="hud-range-slider" oninput="onBubbleSpinSliderChange(this.value)">
         </div>
         <div class="slider-ticks-row">
-          <span>0.5x Subtle</span>
-          <span>1.0x Normal</span>
-          <span>1.5x Brisk</span>
-          <span>2.0x Rapid</span>
-          <span>3.0x Warp</span>
+          <span>0.5x</span>
+          <span>1.0x</span>
+          <span>1.5x</span>
+          <span>2.0x</span>
+          <span>3.0x</span>
         </div>
       </div>
 
@@ -3177,7 +3449,7 @@
 
       if (isLight) {
         // F-117 Stealth Fighter aesthetic for Light GPS Mode (Matte charcoal, obsidian canopy, crimson/slate accents)
-        vehicleSvg.style.filter = 'drop-shadow(0 0 8px rgba(15, 23, 42, 0.75)) drop-shadow(0 3px 10px rgba(0, 0, 0, 0.65))';
+        vehicleSvg.style.filter = 'drop-shadow(0 3px 6px rgba(0, 0, 0, 0.65))';
         vehicleSvg.innerHTML = `
           <!-- Main Stealth Fuselage (F-117 Matte Jet Black / Charcoal) -->
           <polygon points="16,1 19,10 19,26 13,26 13,10" fill="#1e242f" stroke="#0a0d14" stroke-width="0.9"/>
@@ -3196,7 +3468,7 @@
         `;
       } else {
         // Authentic Neon Arcade Galaga Fighter for Dark GPS Mode
-        vehicleSvg.style.filter = 'drop-shadow(0 0 12px #00d4ff) drop-shadow(0 3px 8px rgba(0,0,0,0.8))';
+        vehicleSvg.style.filter = 'drop-shadow(0 3px 6px rgba(0, 0, 0, 0.65))';
         vehicleSvg.innerHTML = `
           <polygon points="16,1 19,10 19,26 13,26 13,10" fill="#ffffff" stroke="#000000" stroke-width="0.8"/>
           <polygon points="16,1 18,8 14,8" fill="#ff0044"/>
@@ -4030,6 +4302,50 @@
       }
     }
 
+    let isLayoutInverted = false;
+    try {
+      isLayoutInverted = localStorage.getItem('nomad_layout_inverted') === 'true';
+    } catch (_) {}
+
+    function applyLayoutInversion(inverted, showToast = false) {
+      isLayoutInverted = !!inverted;
+      try {
+        localStorage.setItem('nomad_layout_inverted', isLayoutInverted ? 'true' : 'false');
+      } catch (_) {}
+
+      const dashboard = document.getElementById('main-dashboard');
+      if (dashboard) {
+        dashboard.classList.toggle('layout-inverted', isLayoutInverted);
+      }
+
+      // Sync map padding for 3D Take-Off perspective based on layout mode
+      syncMapPadding();
+
+      // Nudge kinetic bubble if currently violating boundaries
+      if (typeof speedBubbleConfig !== 'undefined') {
+        const vh = window.innerHeight;
+        const size = speedBubbleConfig.size || 104;
+        const topLimit = isLayoutInverted ? 88 : 64;
+        const bottomLimit = isLayoutInverted ? (vh - 68) : (vh - 108);
+        if (speedBubbleConfig.y < topLimit) speedBubbleConfig.y = topLimit;
+        if (speedBubbleConfig.y > bottomLimit) speedBubbleConfig.y = bottomLimit;
+      }
+
+      if (showToast) {
+        showMapThemeToast({
+          name: isLayoutInverted ? 'Layout: Location Top • Controls Bottom' : 'Layout: Location Bottom • Controls Top',
+          type: 'perspective'
+        });
+      }
+    }
+
+    function toggleCockpitLayout() {
+      if (navigator.vibrate) {
+        try { navigator.vibrate([30, 40, 60]); } catch (_) {}
+      }
+      applyLayoutInversion(!isLayoutInverted, true);
+    }
+
     function toggleFullScreen(event) {
       if (event) {
         event.preventDefault();
@@ -4237,8 +4553,85 @@
     function setupInteractions() {
       const fsBtn = document.getElementById('fullscreen-btn');
       if (fsBtn) {
+        let fsPressTimer = null;
+        let isFsLongPress = false;
+        let isFsTouch = false;
+
         fsBtn.addEventListener('contextmenu', (e) => e.preventDefault());
-        fsBtn.addEventListener('click', toggleFullScreen);
+
+        // Touch long-press handling (700ms)
+        fsBtn.addEventListener('touchstart', (e) => {
+          isFsTouch = true;
+          isFsLongPress = false;
+          fsPressTimer = setTimeout(() => {
+            isFsLongPress = true;
+            toggleCockpitLayout();
+          }, 700);
+        }, { passive: true });
+
+        fsBtn.addEventListener('touchend', (e) => {
+          if (fsPressTimer) {
+            clearTimeout(fsPressTimer);
+            fsPressTimer = null;
+          }
+          if (isFsLongPress) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+          // Normal touch tap toggles fullscreen
+          e.preventDefault();
+          toggleFullScreen(e);
+        });
+
+        fsBtn.addEventListener('touchcancel', () => {
+          if (fsPressTimer) {
+            clearTimeout(fsPressTimer);
+            fsPressTimer = null;
+          }
+        });
+
+        // Mouse long-press handling
+        fsBtn.addEventListener('mousedown', (e) => {
+          if (isFsTouch) return;
+          if (e.button !== 0) return;
+          isFsLongPress = false;
+          fsPressTimer = setTimeout(() => {
+            isFsLongPress = true;
+            toggleCockpitLayout();
+          }, 700);
+        });
+
+        fsBtn.addEventListener('mouseup', (e) => {
+          if (isFsTouch) return;
+          if (fsPressTimer) {
+            clearTimeout(fsPressTimer);
+            fsPressTimer = null;
+          }
+        });
+
+        fsBtn.addEventListener('mouseleave', () => {
+          if (fsPressTimer) {
+            clearTimeout(fsPressTimer);
+            fsPressTimer = null;
+          }
+        });
+
+        fsBtn.addEventListener('click', (e) => {
+          if (isFsTouch) {
+            // Already handled in touchend
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+          if (isFsLongPress) {
+            e.preventDefault();
+            e.stopPropagation();
+            isFsLongPress = false;
+            return;
+          }
+          toggleFullScreen(e);
+        });
       }
 
       const compassBtn = document.getElementById('compass-btn');
@@ -4538,12 +4931,152 @@
         });
       }
 
-      // Map Double / Triple Tap Zoom Gestures
+      // Map Double / Triple Tap Zoom Gestures & Long-Press Config Menu Access
       const mapContainerEl = document.getElementById('map-card');
       if (mapContainerEl) {
+        let mapLongPressTimer = null;
+        let isMapLongPressTriggered = false;
+        let mapTouchStartX = 0;
+        let mapTouchStartY = 0;
+
+        const isOverlayTarget = (target) => {
+          if (!target) return false;
+          return !!(
+            target.closest('#vehicle-overlay') ||
+            target.closest('#vehicle-safe-zone') ||
+            target.closest('#interstate-badge-container') ||
+            target.closest('#route-badge-container') ||
+            target.closest('#fighter-toggle-btn') ||
+            target.closest('#pill-perspective-btn') ||
+            target.closest('#fullscreen-btn') ||
+            target.closest('#speed-bubble') ||
+            target.closest('#location-card') ||
+            target.closest('.modal-overlay') ||
+            target.closest('.modal-box') ||
+            target.closest('.hud-badge-floating')
+          );
+        };
+
+        const triggerMapLongPress = () => {
+          isMapLongPressTriggered = true;
+          if (navigator.vibrate) {
+            try { navigator.vibrate([40, 50, 40]); } catch(err) {}
+          }
+          if (typeof openKineticBubbleModal === 'function') {
+            openKineticBubbleModal();
+          }
+          setTimeout(() => { isMapLongPressTriggered = false; }, 450);
+        };
+
+        // Touch start for map long-press (600ms hold)
+        mapContainerEl.addEventListener('touchstart', (e) => {
+          if (e.touches && e.touches.length === 1) {
+            if (isOverlayTarget(e.target)) return;
+            isMapLongPressTriggered = false;
+            mapTouchStartX = e.touches[0].clientX;
+            mapTouchStartY = e.touches[0].clientY;
+            if (mapLongPressTimer) clearTimeout(mapLongPressTimer);
+            mapLongPressTimer = setTimeout(() => {
+              triggerMapLongPress();
+            }, 600);
+          } else {
+            // Multi-touch (e.g. pinch-to-zoom): cancel long-press immediately
+            if (mapLongPressTimer) {
+              clearTimeout(mapLongPressTimer);
+              mapLongPressTimer = null;
+            }
+          }
+        }, { passive: true });
+
+        // Touch move: if finger moves > 12px, user is panning the map — cancel long press so panning is unblocked
+        mapContainerEl.addEventListener('touchmove', (e) => {
+          if (mapLongPressTimer) {
+            if (!e.touches || e.touches.length !== 1) {
+              clearTimeout(mapLongPressTimer);
+              mapLongPressTimer = null;
+              return;
+            }
+            const dist = Math.hypot(e.touches[0].clientX - mapTouchStartX, e.touches[0].clientY - mapTouchStartY);
+            if (dist > 12) {
+              clearTimeout(mapLongPressTimer);
+              mapLongPressTimer = null;
+            }
+          }
+        }, { passive: true });
+
+        // Touch end / cancel
+        mapContainerEl.addEventListener('touchend', (e) => {
+          if (mapLongPressTimer) {
+            clearTimeout(mapLongPressTimer);
+            mapLongPressTimer = null;
+          }
+          if (isMapLongPressTriggered) {
+            if (e.cancelable) e.preventDefault();
+            e.stopPropagation();
+          }
+        });
+
+        mapContainerEl.addEventListener('touchcancel', () => {
+          if (mapLongPressTimer) {
+            clearTimeout(mapLongPressTimer);
+            mapLongPressTimer = null;
+          }
+        });
+
+        // Mouse down for desktop click-and-hold long-press
+        mapContainerEl.addEventListener('mousedown', (e) => {
+          if (e.button !== 0) return; // Only primary mouse button
+          if (isOverlayTarget(e.target)) return;
+          isMapLongPressTriggered = false;
+          mapTouchStartX = e.clientX;
+          mapTouchStartY = e.clientY;
+          if (mapLongPressTimer) clearTimeout(mapLongPressTimer);
+
+          function onMouseMove(me) {
+            if (mapLongPressTimer) {
+              const dist = Math.hypot(me.clientX - mapTouchStartX, me.clientY - mapTouchStartY);
+              if (dist > 12) {
+                clearTimeout(mapLongPressTimer);
+                mapLongPressTimer = null;
+                window.removeEventListener('mousemove', onMouseMove);
+              }
+            }
+          }
+
+          function onMouseUp() {
+            if (mapLongPressTimer) {
+              clearTimeout(mapLongPressTimer);
+              mapLongPressTimer = null;
+            }
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mouseup', onMouseUp);
+          }
+
+          window.addEventListener('mousemove', onMouseMove);
+          window.addEventListener('mouseup', onMouseUp);
+
+          mapLongPressTimer = setTimeout(() => {
+            triggerMapLongPress();
+          }, 600);
+        });
+
+        // Contextmenu (right-click on desktop or device long-press contextmenu)
+        mapContainerEl.addEventListener('contextmenu', (e) => {
+          if (isOverlayTarget(e.target)) return;
+          e.preventDefault();
+          e.stopPropagation();
+          triggerMapLongPress();
+        });
+
+        // Map Click: handle tap / double / triple tap, but ignore if long press just fired
         mapContainerEl.addEventListener('click', (e) => {
-          // Avoid triggering on overlay buttons, corner pods, or vehicle marker
-          if (e.target.closest('#vehicle-overlay') || e.target.closest('#interstate-badge-container') || e.target.closest('#route-badge-container') || e.target.closest('.hud-badge-floating')) return;
+          if (isOverlayTarget(e.target)) return;
+          if (isMapLongPressTriggered) {
+            isMapLongPressTriggered = false;
+            e.stopPropagation();
+            if (e.cancelable) e.preventDefault();
+            return;
+          }
           handleMapMultiTap(e);
         });
       }
@@ -4896,23 +5429,30 @@
       isFahrenheit = !isFahrenheit;
       renderTemperature();
       renderPressure();
+      if (typeof applyBubbleConfigUI === 'function') {
+        applyBubbleConfigUI('temp');
+      }
     }
 
     function renderTemperature() {
       const tempEl = document.getElementById('current-temp');
       if (rawTempF === null) {
         tempEl.innerText = '--°F';
-        return;
-      }
-      if (isFahrenheit) {
+      } else if (isFahrenheit) {
         tempEl.innerText = `${Math.round(rawTempF)}°F`;
       } else {
         const tempC = (rawTempF - 32) * (5 / 9);
         tempEl.innerText = `${Math.round(tempC)}°C`;
       }
+
+      if (typeof renderTemperatureBubble === 'function') {
+        renderTemperatureBubble();
+      }
     }
 
     let rawPressureHpa = null;
+    let rawHumidityPercent = null;
+    let rawUvIndex = null;
     let customPressureUnit = null; // null = follow isFahrenheit ('in' if true, 'hPa' if false), or 'in'/'hPa'
 
     function togglePressureUnit(event) {
@@ -4921,6 +5461,9 @@
       const currentUnit = customPressureUnit ? customPressureUnit : (isFahrenheit ? 'in' : 'hPa');
       customPressureUnit = (currentUnit === 'in') ? 'hPa' : 'in';
       renderPressure();
+      if (typeof renderAtmoBubble === 'function') {
+        renderAtmoBubble();
+      }
     }
 
     function renderPressure() {
@@ -4928,15 +5471,19 @@
       if (!pressureEl) return;
       if (rawPressureHpa === null || isNaN(rawPressureHpa)) {
         pressureEl.innerText = '--in';
-        return;
-      }
-      const unit = customPressureUnit ? customPressureUnit : (isFahrenheit ? 'in' : 'hPa');
-      if (unit === 'in') {
-        const inHg = (rawPressureHpa * 0.02953).toFixed(2);
-        pressureEl.innerHTML = `${inHg}<span style="font-size: 0.9em; font-weight: 500; margin-left: 1px;">in</span>`;
       } else {
-        const hpa = Math.round(rawPressureHpa);
-        pressureEl.innerHTML = `${hpa}<span style="font-size: 0.85em; font-weight: 500; margin-left: 1px;">hPa</span>`;
+        const unit = customPressureUnit ? customPressureUnit : (isFahrenheit ? 'in' : 'hPa');
+        if (unit === 'in') {
+          const inHg = (rawPressureHpa * 0.02953).toFixed(2);
+          pressureEl.innerHTML = `${inHg}<span style="font-size: 0.9em; font-weight: 500; margin-left: 1px;">in</span>`;
+        } else {
+          const hpa = Math.round(rawPressureHpa);
+          pressureEl.innerHTML = `${hpa}<span style="font-size: 0.85em; font-weight: 500; margin-left: 1px;">hPa</span>`;
+        }
+      }
+
+      if (typeof renderAtmoBubble === 'function') {
+        renderAtmoBubble();
       }
     }
 
@@ -4944,6 +5491,9 @@
       if (event) event.stopPropagation();
       isMph = !isMph;
       renderSpeed();
+      if (typeof applyBubbleConfigUI === 'function') {
+        applyBubbleConfigUI('speed');
+      }
     }
 
     function renderSpeed() {
@@ -5008,164 +5558,351 @@
     }
 
     /* =========================================================================
-       NOMAD V4 HYPERSPACE: KINETIC TELEMETRY BUBBLE & PHYSICS ENGINE
+       NOMAD V4 HYPERSPACE: UNIVERSAL 6-BUBBLE ROSTER & KINETIC ENGINE
+       Speed • Compass • Altitude • Temperature • Atmospherics • Coordinates
        ========================================================================= */
-    const speedBubbleConfig = {
-      mode: 'kinetic',            // 'kinetic' | 'stationary'
-      shape: 'circle',            // 'circle', 'egg', 'squirkle', 'square', 'triangle', 'pentagon', 'hexagon', 'octagon'
-      safeZoneBehavior: 'bounce', // 'bounce' (deflects off vehicle) | 'under' (passes underneath)
-      color: '#00d4ff',           // border & accent glow color
-      opacity: 18,                // glass background transparency (0% crystal clear to 80% tinted)
-      size: 125,                  // dimension in px (80 to 180, standard 125px)
-      speedLevel: 3,              // float speed level (1: gentle to 5: hyper)
-      spinMode: 'keel',           // 'keel' (weighted keel pendulum physics) | 'off' (static) | 'gps' (speed spin) | 'gyro' (compass heading)
-      spinRate: 2,                // 1 to 5 (0.5x, 1x, 1.5x, 2x, 3x)
-      currentRotation: 0,         // current rotation angle in degrees
-      angularVelocity: 0,         // angular rotation velocity in deg/frame for weighted keel physics
-      keelTime: 0,                // accumulator for subtle cruising sway
-      x: 30,                      // current px left
-      y: 110,                     // current px top
-      vx: 1.2,                    // velocity X
-      vy: 0.9,                    // velocity Y
-      isDragging: false,
-      isHovered: false
+    const BUBBLE_KEYS = ['speed', 'compass', 'altitude', 'temp', 'atmo', 'coords'];
+
+    const BUBBLE_METADATA = {
+      speed: { id: 'speed', title: 'Speed', icon: '⚡', notch: 'SPEED', defaultUnit: 'MPH' },
+      compass: { id: 'compass', title: 'Compass', icon: '🧭', notch: 'HEADING', defaultUnit: 'DIR' },
+      altitude: { id: 'altitude', title: 'Altitude', icon: '⛰️', notch: 'ALTITUDE', defaultUnit: 'FT' },
+      temp: { id: 'temp', title: 'Temp', icon: '☀️', notch: 'WEATHER', defaultUnit: '°F' },
+      atmo: { id: 'atmo', title: 'Atmo', icon: '🌤️', notch: 'ATMOSPHERE', defaultUnit: 'ATMO' },
+      coords: { id: 'coords', title: 'Coords', icon: '📍', notch: 'GPS COORD', defaultUnit: 'GPS' }
     };
 
+    let currentSelectedBubbleTab = 'speed';
+
+    const nomadBubbles = {
+      speed: {
+        id: 'speed',
+        active: true,
+        wallBehavior: 'bounce',
+        mode: 'kinetic',
+        shape: 'circle',
+        safeZoneBehavior: 'bounce',
+        color: '#00d4ff',
+        opacity: 18,
+        size: 90,
+        speedLevel: 3,
+        spinMode: 'keel',
+        spinRate: 2,
+        currentRotation: 0,
+        angularVelocity: 0,
+        keelTime: 0,
+        x: 24,
+        y: 110,
+        vx: 1.2,
+        vy: 0.9,
+        isDragging: false,
+        isHovered: false
+      },
+      compass: {
+        id: 'compass',
+        active: false,
+        wallBehavior: 'bounce',
+        mode: 'kinetic',
+        shape: 'circle',
+        safeZoneBehavior: 'bounce',
+        color: '#ffb703',
+        opacity: 18,
+        size: 90,
+        speedLevel: 3,
+        spinMode: 'keel',
+        spinRate: 2,
+        currentRotation: 0,
+        angularVelocity: 0,
+        keelTime: 0,
+        x: 125,
+        y: 110,
+        vx: -1.0,
+        vy: 1.1,
+        isDragging: false,
+        isHovered: false
+      },
+      altitude: {
+        id: 'altitude',
+        active: false,
+        wallBehavior: 'bounce',
+        mode: 'kinetic',
+        shape: 'hexagon',
+        safeZoneBehavior: 'bounce',
+        color: '#30d158',
+        opacity: 18,
+        size: 90,
+        speedLevel: 3,
+        spinMode: 'keel',
+        spinRate: 2,
+        currentRotation: 0,
+        angularVelocity: 0,
+        keelTime: 0,
+        x: 226,
+        y: 110,
+        vx: 1.1,
+        vy: -0.8,
+        isDragging: false,
+        isHovered: false
+      },
+      temp: {
+        id: 'temp',
+        active: false,
+        wallBehavior: 'bounce',
+        mode: 'kinetic',
+        shape: 'egg',
+        safeZoneBehavior: 'bounce',
+        color: '#ff7700',
+        opacity: 18,
+        size: 90,
+        speedLevel: 3,
+        spinMode: 'keel',
+        spinRate: 2,
+        currentRotation: 0,
+        angularVelocity: 0,
+        keelTime: 0,
+        x: 24,
+        y: 220,
+        vx: -0.9,
+        vy: -1.1,
+        isDragging: false,
+        isHovered: false
+      },
+      atmo: {
+        id: 'atmo',
+        active: false,
+        wallBehavior: 'bounce',
+        mode: 'kinetic',
+        shape: 'squirkle',
+        safeZoneBehavior: 'bounce',
+        color: '#bf5af2',
+        opacity: 18,
+        size: 95,
+        speedLevel: 3,
+        spinMode: 'keel',
+        spinRate: 2,
+        showHumidity: true,
+        showUv: true,
+        showPressure: true,
+        currentRotation: 0,
+        angularVelocity: 0,
+        keelTime: 0,
+        x: 125,
+        y: 220,
+        vx: 0.8,
+        vy: 1.2,
+        isDragging: false,
+        isHovered: false
+      },
+      coords: {
+        id: 'coords',
+        active: false,
+        wallBehavior: 'bounce',
+        mode: 'kinetic',
+        shape: 'square',
+        safeZoneBehavior: 'bounce',
+        color: '#ffffff',
+        opacity: 18,
+        size: 95,
+        speedLevel: 3,
+        spinMode: 'keel',
+        spinRate: 2,
+        currentRotation: 0,
+        angularVelocity: 0,
+        keelTime: 0,
+        x: 226,
+        y: 220,
+        vx: -1.2,
+        vy: 0.7,
+        isDragging: false,
+        isHovered: false
+      }
+    };
+
+    // Backward compatibility proxy for existing code targeting speedBubbleConfig
+    const speedBubbleConfig = nomadBubbles.speed;
+
     let kineticBubbleAnimFrame = null;
-    let bubbleLongPressTimer = null;
-    let bubbleDragStartX = 0;
-    let bubbleDragStartY = 0;
-    let bubbleInitialX = 0;
-    let bubbleInitialY = 0;
-    let lastBubbleDragTime = 0;
-    let dragVelocityX = 0;
-    let dragVelocityY = 0;
+    const bubbleInteractionStates = {};
 
     function initKineticSpeedBubble() {
-      // Load saved settings if any
+      // 1. Load saved settings for all 6 bubbles
       try {
-        const saved = localStorage.getItem('nomad_v4_speed_bubble');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          // Upgrade legacy opaque 44% setting to transparent 18% sheer glass
-          if (parsed.opacity === 44) {
-            parsed.opacity = 18;
+        const savedMulti = localStorage.getItem('nomad_v4_bubbles');
+        if (savedMulti) {
+          const parsedMulti = JSON.parse(savedMulti);
+          BUBBLE_KEYS.forEach(k => {
+            if (parsedMulti[k]) {
+              if (parsedMulti[k].opacity === 44) parsedMulti[k].opacity = 18;
+              Object.assign(nomadBubbles[k], parsedMulti[k]);
+            }
+          });
+        } else {
+          // Check legacy single-bubble storage
+          const savedLegacy = localStorage.getItem('nomad_v4_speed_bubble');
+          if (savedLegacy) {
+            const parsedLegacy = JSON.parse(savedLegacy);
+            if (parsedLegacy.opacity === 44) parsedLegacy.opacity = 18;
+            Object.assign(nomadBubbles.speed, parsedLegacy);
           }
-          // Upgrade legacy small sizes (80/104px) to generous 125px standard
-          if (!parsed.size || parsed.size <= 104) {
-            parsed.size = 125;
-          }
-          Object.assign(speedBubbleConfig, parsed);
         }
       } catch (e) {}
 
-      // Clamp initial coordinates within viewport
+      // 2. Clamp initial coordinates within viewport
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      if (speedBubbleConfig.x > vw - speedBubbleConfig.size) speedBubbleConfig.x = Math.max(16, vw - speedBubbleConfig.size - 20);
-      if (speedBubbleConfig.y > vh - speedBubbleConfig.size) speedBubbleConfig.y = Math.max(70, vh - speedBubbleConfig.size - 120);
+      BUBBLE_KEYS.forEach(k => {
+        const b = nomadBubbles[k];
+        const s = b.size || 90;
+        if (b.x > vw - s) b.x = Math.max(16, vw - s - 20);
+        if (b.y > vh - s) b.y = Math.max(70, vh - s - 120);
+      });
 
-      applyBubbleConfigUI();
-      setupSpeedBubbleInteractions();
+      // 3. Render all bubbles UI & attach interaction events
+      BUBBLE_KEYS.forEach(k => {
+        applyBubbleConfigUI(k);
+        setupBubbleInteractions(k);
+      });
+
+      // 4. Initial rendering for compass, altitude, temp, atmo, coords
+      renderCompassBubble(currentHeading);
+      renderAltitudeBubble();
+      renderTemperature();
+      renderAtmoBubble();
+      if (lastLat !== null && lastLon !== null) renderCoordsBubble(lastLat, lastLon);
+
+      // 5. Start unified kinetic physics animation loop
       startKineticBubbleLoop();
     }
 
-    function getBubbleShapeSVGMarkup(shape, hex, fill) {
+    function getBubbleShapeSVGMarkup(shape, hex, fill, channelLabel = 'SPEED', unitLabel = null) {
       const strokeW = 2.4;
       const strokeJoin = 'round';
       const strokeCap = 'round';
-      const channelLabel = 'SPEED';
+      if (!unitLabel) {
+        unitLabel = (typeof isMph !== 'undefined' && !isMph) ? 'KM/H' : 'MPH';
+      }
+      const labelFontSize = (shape === 'octagon') ? '8.4' : '8.8';
 
       switch (shape) {
         case 'triangle':
           // True Centroid Equilateral Triangle: Centroid mathematically at (50, 50).
-          // Apex at (50, 6), Base at y=72 from x=11.9 to x=88.1. All vertices R=44 from (50, 50).
-          // Wide 40-unit notch from x=30 to x=70 with generous 4+ unit safety clearance around SPEED.
+          // Apex at (50, 6), Base at y=72 from x=11.9 to x=88.1.
+          // Top notch at apex for MPH; bottom notch on base for SPEED.
           return `
             <polygon points="50,6 88.1,72 11.9,72" fill="${fill}" stroke="none"/>
-            <path d="M 30,72 L 11.9,72 L 50,6 L 88.1,72 L 70,72" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-            <text x="50" y="72" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="8.0" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.3">${channelLabel}</text>
+            <path d="M 56.6,17.5 L 88.1,72 L 68,72" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <path d="M 32,72 L 11.9,72 L 43.4,17.5" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <text x="50" y="10.5" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${unitLabel}</text>
+            <text x="50" y="72" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${channelLabel}</text>
           `;
 
         case 'square':
           // Centered at (50, 50): 78x78 rounded rect from x=11,y=11 to x=89,y=89 with rx=12.
-          // Bottom straight edge runs from x=23 to x=77 at y=89. Notch from x=30 to x=70 with zero bleed.
+          // Top straight edge notch for MPH (y=11); bottom notch for SPEED (y=89).
           return `
             <rect x="11" y="11" width="78" height="78" rx="12" fill="${fill}" stroke="none"/>
-            <path d="M 30,89 L 23,89 A 12 12 0 0 1 11,77 L 11,23 A 12 12 0 0 1 23,11 L 77,11 A 12 12 0 0 1 89,23 L 89,77 A 12 12 0 0 1 77,89 L 70,89" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-            <text x="50" y="89" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="8.0" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.3">${channelLabel}</text>
+            <path d="M 69,11 L 77,11 A 12 12 0 0 1 89,23 L 89,77 A 12 12 0 0 1 77,89 L 69,89" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <path d="M 31,89 L 23,89 A 12 12 0 0 1 11,77 L 11,23 A 12 12 0 0 1 23,11 L 31,11" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <text x="50" y="11" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${unitLabel}</text>
+            <text x="50" y="89" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${channelLabel}</text>
           `;
 
         case 'squirkle':
           // Centered at (50, 50): 82x82 squirkle from x=9,y=9 to x=91,y=91 with rx=20.
-          // Bottom straight edge runs from x=29 to x=71 at y=91. Notch from x=30 to x=70 ensures stroke never overlaps text.
+          // Top straight edge notch for MPH (y=9); bottom notch for SPEED (y=91).
           return `
             <rect x="9" y="9" width="82" height="82" rx="20" fill="${fill}" stroke="none"/>
-            <path d="M 30,91 L 29,91 A 20 20 0 0 1 9,71 L 9,29 A 20 20 0 0 1 29,9 L 71,9 A 20 20 0 0 1 91,29 L 91,71 A 20 20 0 0 1 71,91 L 70,91" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-            <text x="50" y="91" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="8.0" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.3">${channelLabel}</text>
+            <path d="M 68,9 L 71,9 A 20 20 0 0 1 91,29 L 91,71 A 20 20 0 0 1 71,91 L 68,91" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <path d="M 32,91 L 29,91 A 20 20 0 0 1 9,71 L 9,29 A 20 20 0 0 1 29,9 L 32,9" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <text x="50" y="9" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${unitLabel}</text>
+            <text x="50" y="91" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${channelLabel}</text>
           `;
 
         case 'hexagon':
-          // Centered at (50, 50): R=44 regular hexagon with flat base from x=28 to x=72 at y=88.1.
-          // Notch from x=31 to x=69 (38 units) provides clean air gap on both sides of SPEED.
+          // Centered at (50, 50): R=44 regular hexagon with flat top & base.
+          // Top facet notch for MPH (y=11.9); bottom facet notch for SPEED (y=88.1).
           return `
             <polygon points="28,11.9 72,11.9 94,50 72,88.1 28,88.1 6,50" fill="${fill}" stroke="none"/>
-            <path d="M 31,88.1 L 28,88.1 L 6,50 L 28,11.9 L 72,11.9 L 94,50 L 72,88.1 L 69,88.1" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-            <text x="50" y="88.1" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="8.0" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.3">${channelLabel}</text>
+            <path d="M 68,11.9 L 72,11.9 L 94,50 L 72,88.1 L 68,88.1" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <path d="M 32,88.1 L 28,88.1 L 6,50 L 28,11.9 L 32,11.9" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <text x="50" y="11.9" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${unitLabel}</text>
+            <text x="50" y="88.1" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${channelLabel}</text>
           `;
 
         case 'octagon':
-          // Centered at (50, 50): R=44 regular octagon. Bottom facet runs from (33.2, 90.6) to (66.8, 90.6).
-          // Dedicated full-facet notch across the bottom with stroke terminating crisply at corner vertices.
+          // Centered at (50, 50): R=44 regular octagon.
+          // Top facet notch for MPH (y=9.4); bottom facet notch for SPEED (y=90.6).
           return `
             <polygon points="33.2,9.4 66.8,9.4 90.6,33.2 90.6,66.8 66.8,90.6 33.2,90.6 9.4,66.8 9.4,33.2" fill="${fill}" stroke="none"/>
-            <path d="M 33.2,90.6 L 9.4,66.8 L 9.4,33.2 L 33.2,9.4 L 66.8,9.4 L 90.6,33.2 L 90.6,66.8 L 66.8,90.6" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-            <text x="50" y="90.6" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="7.6" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.1">${channelLabel}</text>
+            <path d="M 66.8,9.4 L 90.6,33.2 L 90.6,66.8 L 66.8,90.6" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <path d="M 33.2,90.6 L 9.4,66.8 L 9.4,33.2 L 33.2,9.4" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <text x="50" y="9.4" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.1">${unitLabel}</text>
+            <text x="50" y="90.6" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.1">${channelLabel}</text>
           `;
 
         case 'pentagon':
-          // Centered at (50, 50): R=44 regular pentagon with base from x=24.1 to x=75.9 at y=85.6.
-          // Notch from x=30 to x=70 provides wide breathing clearance.
+          // Centered at (50, 50): R=44 regular pentagon with base at y=85.6 and apex at (50, 6).
+          // Top apex notch for MPH (y=10); bottom base notch for SPEED (y=85.6).
           return `
             <polygon points="50,6 91.8,36.4 75.9,85.6 24.1,85.6 8.2,36.4" fill="${fill}" stroke="none"/>
-            <path d="M 30,85.6 L 24.1,85.6 L 8.2,36.4 L 50,6 L 91.8,36.4 L 75.9,85.6 L 70,85.6" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-            <text x="50" y="85.6" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="8.0" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.3">${channelLabel}</text>
+            <path d="M 63.7,16 L 91.8,36.4 L 75.9,85.6 L 68,85.6" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <path d="M 32,85.6 L 24.1,85.6 L 8.2,36.4 L 36.3,16" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <text x="50" y="10" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${unitLabel}</text>
+            <text x="50" y="85.6" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${channelLabel}</text>
           `;
 
         case 'circle':
-          // Centered at (50, 50): R=44 circle with open bottom arc from x=30 to x=70 at y=89.2.
+          // Centered at (50, 50): R=44 circle with open top arc for MPH and open bottom arc for SPEED.
           return `
             <circle cx="50" cy="50" r="44" fill="${fill}" stroke="none"/>
-            <path d="M 30,89.2 A 44 44 0 1 1 70,89.2" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-            <text x="50" y="89.2" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="8.0" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.3">${channelLabel}</text>
+            <path d="M 70,10.8 A 44 44 0 0 1 70,89.2" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <path d="M 30,89.2 A 44 44 0 0 1 30,10.8" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <text x="50" y="10.8" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${unitLabel}</text>
+            <text x="50" y="89.2" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${channelLabel}</text>
           `;
 
         case 'egg':
-          // Centered at (50, 50): Organic egg curve with open bottom notch from x=30 to x=70 at y=88.
+          // Centered at (50, 50): Organic egg curve with open top arch for MPH and bottom notch for SPEED.
           return `
             <path d="M 50,7 C 74,7 94,14 94,34 C 94,62 84,84 70,88 L 30,88 C 16,84 6,62 6,34 C 6,14 26,7 50,7 Z" fill="${fill}" stroke="none"/>
-            <path d="M 30,88 C 16,84 6,62 6,34 C 6,14 26,7 50,7 C 74,7 94,14 94,34 C 94,62 84,84 70,88" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-            <text x="50" y="88" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="8.0" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.3">${channelLabel}</text>
+            <path d="M 68,8 C 76,8 94,14 94,34 C 94,62 84,84 70,88" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <path d="M 30,88 C 16,84 6,62 6,34 C 6,14 24,8 32,8" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <text x="50" y="8" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${unitLabel}</text>
+            <text x="50" y="88" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${channelLabel}</text>
           `;
 
         default:
           return `
             <circle cx="50" cy="50" r="44" fill="${fill}" stroke="none"/>
-            <path d="M 30,89.2 A 44 44 0 1 1 70,89.2" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-            <text x="50" y="89.2" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="8.0" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.3">${channelLabel}</text>
+            <path d="M 70,10.8 A 44 44 0 0 1 70,89.2" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <path d="M 30,89.2 A 44 44 0 0 1 30,10.8" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <text x="50" y="10.8" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${unitLabel}</text>
+            <text x="50" y="89.2" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${channelLabel}</text>
           `;
       }
     }
 
-    function applyBubbleConfigUI() {
-      const el = document.getElementById('speed-bubble');
-      const shapeFrame = document.getElementById('speed-bubble-shape-frame');
-      const pinEl = document.getElementById('speed-bubble-pin');
+    function applyBubbleConfigUI(bubbleKey = currentSelectedBubbleTab) {
+      const b = nomadBubbles[bubbleKey];
+      if (!b) return;
+
+      const el = document.getElementById(`${bubbleKey}-bubble`);
+      const shapeFrame = document.getElementById(`${bubbleKey}-bubble-shape-frame`);
+      const pinEl = document.getElementById(`${bubbleKey}-bubble-pin`);
       if (!el) return;
 
+      // 0. Active Status (Visible vs Hidden)
+      if (b.active === false) {
+        el.style.display = 'none';
+        return;
+      } else {
+        el.style.display = 'flex';
+      }
+
       // 1. Dimensions
-      el.style.width = `${speedBubbleConfig.size}px`;
-      el.style.height = `${speedBubbleConfig.size}px`;
+      const size = b.size || 90;
+      el.style.width = `${size}px`;
+      el.style.height = `${size}px`;
 
       // Outer container is 100% transparent with zero rectangular bounding box artifacts
       el.style.background = 'transparent';
@@ -5175,9 +5912,9 @@
       el.style.outline = 'none';
 
       // 2. Color & Glass Transparency
-      const hex = speedBubbleConfig.color || '#00d4ff';
+      const hex = b.color || '#00d4ff';
       const isLight = document.getElementById('map-card')?.classList.contains('theme-light-active') || (typeof currentThemeIndex !== 'undefined' && currentThemeIndex === 1);
-      const rawOpacity = (typeof speedBubbleConfig.opacity === 'number') ? speedBubbleConfig.opacity : 18;
+      const rawOpacity = (typeof b.opacity === 'number') ? b.opacity : 18;
       const alpha = (Math.max(0, Math.min(100, rawOpacity)) / 100).toFixed(2);
 
       let fill = 'transparent';
@@ -5185,57 +5922,81 @@
         fill = isLight ? `rgba(255, 255, 255, ${alpha})` : `rgba(8, 14, 26, ${alpha})`;
       }
 
-      // Synchronize CSS accent color variable for dynamic glows
+      // Synchronize CSS accent color variable
       el.style.setProperty('--bubble-accent', hex);
       el.style.color = hex;
 
       // Update classes for optical centroid offsets and rotation states
-      el.className = `kinetic-bubble has-shape-${speedBubbleConfig.shape}` +
-        (speedBubbleConfig.isHovered ? ' is-hovered' : '') +
-        (speedBubbleConfig.isDragging ? ' is-dragging' : '') +
-        ((speedBubbleConfig.spinMode && speedBubbleConfig.spinMode !== 'off') ? ' is-spinning' : '');
+      el.className = `kinetic-bubble has-shape-${b.shape}` +
+        (b.isHovered ? ' is-hovered' : '') +
+        (b.isDragging ? ' is-dragging' : '') +
+        ((b.spinMode && b.spinMode !== 'off') ? ' is-spinning' : '');
 
-      // 3. Render SVG Vector Geometry (Structural Boundary with Integrated SPEED Notch)
+      // 3. Render SVG Vector Geometry with channel label and unit label
+      let channelLabel = 'SPEED';
+      let unitLabel = (typeof isMph !== 'undefined' && !isMph) ? 'KM/H' : 'MPH';
+
+      if (bubbleKey === 'compass') {
+        channelLabel = 'HEADING';
+        unitLabel = (typeof currentHeading === 'number' && !isNaN(currentHeading)) ? getCardinalDirection(currentHeading) : 'N';
+      } else if (bubbleKey === 'altitude') {
+        channelLabel = 'ALTITUDE';
+        unitLabel = 'FT';
+      } else if (bubbleKey === 'temp') {
+        channelLabel = 'TEMP';
+        unitLabel = isFahrenheit ? '°F' : '°C';
+      } else if (bubbleKey === 'atmo') {
+        channelLabel = 'ATMO';
+        unitLabel = 'AIR';
+      } else if (bubbleKey === 'coords') {
+        channelLabel = 'COORDS';
+        unitLabel = 'GPS';
+      }
+
       if (shapeFrame) {
-        shapeFrame.innerHTML = `<svg viewBox="0 0 100 100" class="kinetic-shape-svg" style="width:100%;height:100%;overflow:visible;display:block;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 8px ${hex}88);">${getBubbleShapeSVGMarkup(speedBubbleConfig.shape, hex, fill)}</svg>`;
+        shapeFrame.innerHTML = `<svg viewBox="0 0 100 100" class="kinetic-shape-svg" style="width:100%;height:100%;overflow:visible;display:block;filter:none;">${getBubbleShapeSVGMarkup(b.shape, hex, fill, channelLabel, unitLabel)}</svg>`;
         shapeFrame.style.border = 'none';
         shapeFrame.style.background = 'transparent';
         shapeFrame.style.outline = 'none';
         shapeFrame.style.boxShadow = 'none';
-        shapeFrame.style.transform = `rotate(${speedBubbleConfig.currentRotation || 0}deg)`;
+        shapeFrame.style.transform = `rotate(${b.currentRotation || 0}deg)`;
       }
 
-      // Font size scaling based on bubble dimension (centered solitary number)
-      const valEl = document.getElementById('speed-bubble-value');
-      if (valEl) {
-        valEl.style.fontSize = `${(speedBubbleConfig.size * 0.44).toFixed(1)}px`;
+      // Font size scaling based on bubble dimension
+      if (bubbleKey === 'speed' || bubbleKey === 'compass' || bubbleKey === 'altitude' || bubbleKey === 'temp') {
+        const valEl = document.getElementById(`${bubbleKey}-bubble-value`);
+        if (valEl) {
+          valEl.style.fontSize = `${(size * 0.44).toFixed(1)}px`;
+        }
+      } else if (bubbleKey === 'atmo') {
+        const stack = document.getElementById('atmo-stack-inner');
+        if (stack) {
+          stack.style.fontSize = `${Math.max(9.5, size * 0.135).toFixed(1)}px`;
+        }
+      } else if (bubbleKey === 'coords') {
+        const cLines = document.querySelectorAll('#coords-bubble-content .coords-line');
+        cLines.forEach(cl => {
+          cl.style.fontSize = `${Math.max(9.5, size * 0.13).toFixed(1)}px`;
+        });
       }
 
       // 4. Mode Pin indicator
       if (pinEl) {
-        pinEl.style.display = (speedBubbleConfig.mode === 'stationary') ? 'block' : 'none';
+        pinEl.style.display = (b.mode === 'stationary') ? 'block' : 'none';
       }
 
       // 5. Position
-      el.style.left = `${speedBubbleConfig.x}px`;
-      el.style.top = `${speedBubbleConfig.y}px`;
+      el.style.left = `${b.x}px`;
+      el.style.top = `${b.y}px`;
     }
 
     function saveBubbleConfig() {
       try {
-        localStorage.setItem('nomad_v4_speed_bubble', JSON.stringify({
-          mode: speedBubbleConfig.mode,
-          shape: speedBubbleConfig.shape,
-          safeZoneBehavior: speedBubbleConfig.safeZoneBehavior,
-          color: speedBubbleConfig.color,
-          opacity: speedBubbleConfig.opacity,
-          size: speedBubbleConfig.size,
-          speedLevel: speedBubbleConfig.speedLevel,
-          spinMode: speedBubbleConfig.spinMode || 'off',
-          spinRate: speedBubbleConfig.spinRate || 2,
-          x: Math.round(speedBubbleConfig.x),
-          y: Math.round(speedBubbleConfig.y)
-        }));
+        localStorage.setItem('nomad_v4_bubbles', JSON.stringify(nomadBubbles));
+        // Save legacy speed bubble for backward compatibility
+        if (nomadBubbles.speed) {
+          localStorage.setItem('nomad_v4_speed_bubble', JSON.stringify(nomadBubbles.speed));
+        }
       } catch (e) {}
     }
 
@@ -5243,204 +6004,303 @@
       if (kineticBubbleAnimFrame) cancelAnimationFrame(kineticBubbleAnimFrame);
 
       function step() {
-        // Freeze kinetic movement if hovered by cursor, being dragged, or pinned in stationary mode
-        if (speedBubbleConfig.mode === 'kinetic' && !speedBubbleConfig.isDragging && !speedBubbleConfig.isHovered) {
-          updateBubblePhysics();
-        }
+        BUBBLE_KEYS.forEach(k => {
+          const b = nomadBubbles[k];
+          if (!b || b.active === false) return;
 
-        // Shape Dynamic Rotation (Text remains upright, outer shape spins based on GPS speed or Gyro/Heading)
-        if (speedBubbleConfig.spinMode && speedBubbleConfig.spinMode !== 'off') {
-          updateBubbleShapeSpin();
-        }
+          // Freeze kinetic movement if hovered by cursor, being dragged, or pinned in stationary mode
+          if (b.mode === 'kinetic' && !b.isDragging && !b.isHovered) {
+            updateBubblePhysics(k);
+          }
+
+          // Shape Dynamic Rotation (Text remains upright, outer shape spins based on Keel, GPS speed, or Gyro/Heading)
+          if (b.spinMode && b.spinMode !== 'off') {
+            updateBubbleShapeSpin(k);
+          }
+        });
 
         kineticBubbleAnimFrame = requestAnimationFrame(step);
       }
       kineticBubbleAnimFrame = requestAnimationFrame(step);
     }
 
-    function updateBubbleShapeSpin() {
-      const shapeFrame = document.getElementById('speed-bubble-shape-frame');
+    function updateBubbleShapeSpin(bubbleKey) {
+      const b = nomadBubbles[bubbleKey];
+      if (!b) return;
+      const shapeFrame = document.getElementById(`${bubbleKey}-bubble-shape-frame`);
       if (!shapeFrame) return;
 
-      const rateMultiplier = [0, 0.5, 1.0, 1.5, 2.0, 3.0][speedBubbleConfig.spinRate || 2] || 1.0;
+      const rateMultiplier = [0, 0.5, 1.0, 1.5, 2.0, 3.0][b.spinRate || 2] || 1.0;
 
-      if (speedBubbleConfig.spinMode === 'gps') {
-        // Spin speed scales directly with live vehicle GPS speed (MPH)
+      if (b.spinMode === 'keel') {
+        b.keelTime = (b.keelTime || 0) + (0.048 * rateMultiplier);
+
+        const motionTilt = Math.max(-10.0, Math.min(10.0, -b.vx * 3.6 * rateMultiplier));
+        const cruisingSway = (Math.sin(b.keelTime) * 4.2 + Math.cos(b.keelTime * 0.65) * 1.8) * rateMultiplier;
+        const targetAngle = motionTilt + cruisingSway;
+
+        const currentAngle = b.currentRotation || 0;
+        const displacement = currentAngle - targetAngle;
+        const absAngle = Math.abs(currentAngle);
+
+        let springK = 0.08 * rateMultiplier;
+        let damping = 0.94;
+
+        if (absAngle > 40) {
+          const excess = absAngle - 40;
+          springK = (0.22 + excess * 0.025) * rateMultiplier;
+          damping = 0.86;
+        } else if (absAngle > 28) {
+          springK = 0.12 * rateMultiplier;
+          damping = 0.91;
+        }
+
+        b.angularVelocity = ((b.angularVelocity || 0) - (displacement * springK)) * damping;
+        b.angularVelocity = Math.max(-20, Math.min(20, b.angularVelocity));
+
+        if (absAngle < 7.0 && Math.abs(b.angularVelocity) < 0.9) {
+          b.angularVelocity *= 0.92;
+          if (absAngle < 1.0 && Math.abs(b.angularVelocity) < 0.18) {
+            b.angularVelocity = 0;
+          }
+        }
+
+        b.currentRotation = currentAngle + b.angularVelocity;
+
+        if (b.currentRotation > 48) {
+          b.currentRotation = 48;
+          b.angularVelocity = -Math.abs(b.angularVelocity) * 0.4;
+        } else if (b.currentRotation < -48) {
+          b.currentRotation = -48;
+          b.angularVelocity = Math.abs(b.angularVelocity) * 0.4;
+        }
+
+        shapeFrame.style.transform = `rotate(${b.currentRotation.toFixed(1)}deg)`;
+      } else if (b.spinMode === 'gps') {
         const currentMph = (rawSpeedMps !== null && !isNaN(rawSpeedMps)) ? (rawSpeedMps * 2.23694) : 0;
-        // At 0 MPH: subtle 0.2° idle drift. At 60 MPH: brisk 3.2° per frame rotation
-        const delta = (0.2 + (Math.max(0, currentMph) * 0.05)) * rateMultiplier;
-        speedBubbleConfig.currentRotation = (speedBubbleConfig.currentRotation + delta) % 360;
-        shapeFrame.style.transform = `rotate(${speedBubbleConfig.currentRotation.toFixed(1)}deg)`;
-      } else if (speedBubbleConfig.spinMode === 'gyro') {
-        // Orient outer shape directly to current vehicle compass heading / gyro orientation
+        const speedBank = Math.sin(Date.now() * 0.002) * Math.min(22, 4 + (currentMph * 0.25)) * rateMultiplier;
+        b.currentRotation = speedBank;
+        shapeFrame.style.transform = `rotate(${b.currentRotation.toFixed(1)}deg)`;
+      } else if (b.spinMode === 'gyro') {
         const targetHeading = typeof currentHeading === 'number' ? currentHeading : 0;
-        speedBubbleConfig.currentRotation = targetHeading;
+        b.currentRotation = targetHeading;
         shapeFrame.style.transform = `rotate(${targetHeading.toFixed(1)}deg)`;
+      } else {
+        b.currentRotation = 0;
+        shapeFrame.style.transform = 'rotate(0deg)';
       }
     }
 
-    function updateBubblePhysics() {
-      const el = document.getElementById('speed-bubble');
+    function updateBubblePhysics(bubbleKey) {
+      const b = nomadBubbles[bubbleKey];
+      if (!b || b.active === false) return;
+      const el = document.getElementById(`${bubbleKey}-bubble`);
       if (!el) return;
 
-      const size = speedBubbleConfig.size;
+      const size = b.size || 90;
       const vw = window.innerWidth;
       const vh = window.innerHeight;
 
       // Base speed multiplier from slider (1 to 5)
-      const speedMultiplier = 0.4 + (speedBubbleConfig.speedLevel * 0.45); // 0.85 to 2.65
-
-      // Boundaries: keep clear of top corner buttons and bottom location bar
-      const topLimit = 64;
-      const bottomLimit = vh - 108; // clear bottom location bar
-      const leftLimit = 10;
-      const rightLimit = vw - size - 10;
+      const speedMultiplier = 0.4 + ((b.speedLevel || 3) * 0.45); // 0.85 to 2.65
+      const rateMultiplier = [0, 0.5, 1.0, 1.5, 2.0, 3.0][b.spinRate || 2] || 1.0;
 
       // Move by velocity
-      speedBubbleConfig.x += speedBubbleConfig.vx * speedMultiplier;
-      speedBubbleConfig.y += speedBubbleConfig.vy * speedMultiplier;
+      b.x += b.vx * speedMultiplier;
+      b.y += b.vy * speedMultiplier;
 
-      // 1. Boundary Wall Bounces
-      if (speedBubbleConfig.x <= leftLimit) {
-        speedBubbleConfig.x = leftLimit;
-        speedBubbleConfig.vx = Math.abs(speedBubbleConfig.vx);
-      } else if (speedBubbleConfig.x >= rightLimit) {
-        speedBubbleConfig.x = rightLimit;
-        speedBubbleConfig.vx = -Math.abs(speedBubbleConfig.vx);
-      }
+      // 1. Boundary Wall Interaction: Pass Through & Wrap vs Bounce Off Walls
+      if (b.wallBehavior === 'wrap') {
+        if (b.x > vw) {
+          b.x = -size;
+        } else if (b.x < -size) {
+          b.x = vw;
+        }
 
-      if (speedBubbleConfig.y <= topLimit) {
-        speedBubbleConfig.y = topLimit;
-        speedBubbleConfig.vy = Math.abs(speedBubbleConfig.vy);
-      } else if (speedBubbleConfig.y >= bottomLimit) {
-        speedBubbleConfig.y = bottomLimit;
-        speedBubbleConfig.vy = -Math.abs(speedBubbleConfig.vy);
+        if (b.y > vh) {
+          b.y = -size;
+        } else if (b.y < -size) {
+          b.y = vh;
+        }
+      } else {
+        const topLimit = isLayoutInverted ? 88 : 64;
+        const bottomLimit = isLayoutInverted ? (vh - 68) : (vh - 108);
+        const leftLimit = 10;
+        const rightLimit = vw - size - 10;
+
+        if (b.x <= leftLimit) {
+          b.x = leftLimit;
+          b.vx = Math.abs(b.vx);
+          if (b.spinMode === 'keel') {
+            b.angularVelocity = Math.min(15, (b.angularVelocity || 0) + 11 * rateMultiplier);
+          }
+        } else if (b.x >= rightLimit) {
+          b.x = rightLimit;
+          b.vx = -Math.abs(b.vx);
+          if (b.spinMode === 'keel') {
+            b.angularVelocity = Math.max(-15, (b.angularVelocity || 0) - 11 * rateMultiplier);
+          }
+        }
+
+        if (b.y <= topLimit) {
+          b.y = topLimit;
+          b.vy = Math.abs(b.vy);
+          if (b.spinMode === 'keel') {
+            const impulse = Math.max(-8, Math.min(8, b.vx * 4.5)) * rateMultiplier;
+            b.angularVelocity += impulse;
+          }
+        } else if (b.y >= bottomLimit) {
+          b.y = bottomLimit;
+          b.vy = -Math.abs(b.vy);
+          if (b.spinMode === 'keel') {
+            const impulse = Math.max(-8, Math.min(8, -b.vx * 4.5)) * rateMultiplier;
+            b.angularVelocity += impulse;
+          }
+        }
       }
 
       // 2. Vehicle Safe Zone Deflection (only active when safeZoneBehavior is 'bounce')
-      if (speedBubbleConfig.safeZoneBehavior === 'bounce' && typeof window.getNomadVehicleSafeZone === 'function') {
+      if (b.safeZoneBehavior === 'bounce' && typeof window.getNomadVehicleSafeZone === 'function') {
         const safeZone = window.getNomadVehicleSafeZone();
         if (safeZone) {
-          // Bubble center
-          const bubbleCenterX = speedBubbleConfig.x + size / 2;
-          const bubbleCenterY = speedBubbleConfig.y + size / 2;
+          const bubbleCenterX = b.x + size / 2;
+          const bubbleCenterY = b.y + size / 2;
 
-          // Distance to vehicle center
           const dx = bubbleCenterX - safeZone.x;
           const dy = bubbleCenterY - safeZone.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          // Combined radius of bubble + vehicle safe zone
           const minSafeDist = (size / 2) + safeZone.radius;
 
           if (dist < minSafeDist && dist > 0.001) {
-            // Collision normal
             const nx = dx / dist;
             const ny = dy / dist;
 
-            // Push bubble outside safe zone boundary
             const overlap = minSafeDist - dist;
-            speedBubbleConfig.x += nx * overlap;
-            speedBubbleConfig.y += ny * overlap;
+            b.x += nx * overlap;
+            b.y += ny * overlap;
 
-            // Reflect velocity vector off normal
-            const dot = (speedBubbleConfig.vx * nx) + (speedBubbleConfig.vy * ny);
-            speedBubbleConfig.vx = speedBubbleConfig.vx - 2 * dot * nx;
-            speedBubbleConfig.vy = speedBubbleConfig.vy - 2 * dot * ny;
+            const dot = (b.vx * nx) + (b.vy * ny);
+            b.vx = b.vx - 2 * dot * nx;
+            b.vy = b.vy - 2 * dot * ny;
 
-            // Ensure minimal bounce impulse
-            const curSpeed = Math.sqrt(speedBubbleConfig.vx * speedBubbleConfig.vx + speedBubbleConfig.vy * speedBubbleConfig.vy) || 1;
-            speedBubbleConfig.vx = (speedBubbleConfig.vx / curSpeed) * 1.4;
-            speedBubbleConfig.vy = (speedBubbleConfig.vy / curSpeed) * 1.4;
+            if (b.spinMode === 'keel') {
+              const tangentImpulse = (-nx * b.vy + ny * b.vx);
+              b.angularVelocity = Math.max(-13, Math.min(13, (b.angularVelocity || 0) + tangentImpulse * 8 * rateMultiplier));
+            }
+
+            const curSpeed = Math.sqrt(b.vx * b.vx + b.vy * b.vy) || 1;
+            b.vx = (b.vx / curSpeed) * 1.4;
+            b.vy = (b.vy / curSpeed) * 1.4;
           }
         }
       }
 
-      // Apply transform / position
-      el.style.left = `${speedBubbleConfig.x}px`;
-      el.style.top = `${speedBubbleConfig.y}px`;
+      el.style.left = `${b.x}px`;
+      el.style.top = `${b.y}px`;
     }
 
-    function setupSpeedBubbleInteractions() {
-      const el = document.getElementById('speed-bubble');
+    function setupBubbleInteractions(bubbleKey) {
+      const el = document.getElementById(`${bubbleKey}-bubble`);
       if (!el) return;
+
+      const state = {
+        dragStartX: 0,
+        dragStartY: 0,
+        initialX: 0,
+        initialY: 0,
+        lastDragTime: 0,
+        dragVelocityX: 0,
+        dragVelocityY: 0,
+        longPressTimer: null
+      };
+      bubbleInteractionStates[bubbleKey] = state;
+
+      const b = nomadBubbles[bubbleKey];
 
       // Mouse enter & leave: freeze bubble kinetic motion instantly on hover so user can easily catch & long press
       el.addEventListener('mouseenter', () => {
-        speedBubbleConfig.isHovered = true;
+        b.isHovered = true;
         el.classList.add('is-hovered');
       });
 
       el.addEventListener('mouseleave', () => {
-        speedBubbleConfig.isHovered = false;
+        b.isHovered = false;
         el.classList.remove('is-hovered');
       });
 
       function onPointerDown(clientX, clientY, event) {
-        bubbleDragStartX = clientX;
-        bubbleDragStartY = clientY;
-        bubbleInitialX = speedBubbleConfig.x;
-        bubbleInitialY = speedBubbleConfig.y;
-        lastBubbleDragTime = Date.now();
-        dragVelocityX = 0;
-        dragVelocityY = 0;
-        speedBubbleConfig.isDragging = false;
+        state.dragStartX = clientX;
+        state.dragStartY = clientY;
+        state.initialX = b.x;
+        state.initialY = b.y;
+        state.lastDragTime = Date.now();
+        state.dragVelocityX = 0;
+        state.dragVelocityY = 0;
+        b.isDragging = false;
 
-        // Long press trigger (600ms) for opening configuration modal
+        // Long press trigger (600ms) for opening configuration modal directly for THIS bubble
         el.classList.add('is-longpressing');
-        clearTimeout(bubbleLongPressTimer);
-        bubbleLongPressTimer = setTimeout(() => {
-          speedBubbleConfig.isDragging = false;
+        clearTimeout(state.longPressTimer);
+        state.longPressTimer = setTimeout(() => {
+          b.isDragging = false;
           el.classList.remove('is-longpressing');
           if (navigator.vibrate) {
             try { navigator.vibrate(35); } catch(e) {}
           }
-          openKineticBubbleModal();
+          openKineticBubbleModal(bubbleKey);
         }, 600);
       }
 
       function onPointerMove(clientX, clientY, event) {
-        const dx = clientX - bubbleDragStartX;
-        const dy = clientY - bubbleDragStartY;
+        const dx = clientX - state.dragStartX;
+        const dy = clientY - state.dragStartY;
 
         // Threshold to start repositioning / dragging (12px to allow steady finger long press without accidental drag cancel)
         if (Math.abs(dx) > 12 || Math.abs(dy) > 12) {
-          clearTimeout(bubbleLongPressTimer);
+          clearTimeout(state.longPressTimer);
           el.classList.remove('is-longpressing');
-          speedBubbleConfig.isDragging = true;
+          b.isDragging = true;
           el.classList.add('is-dragging');
 
           const now = Date.now();
-          const dt = Math.max(16, now - lastBubbleDragTime);
-          const newX = bubbleInitialX + dx;
-          const newY = bubbleInitialY + dy;
+          const dt = Math.max(16, now - state.lastDragTime);
+          const newX = state.initialX + dx;
+          const newY = state.initialY + dy;
 
-          dragVelocityX = (newX - speedBubbleConfig.x) / (dt / 16);
-          dragVelocityY = (newY - speedBubbleConfig.y) / (dt / 16);
+          state.dragVelocityX = (newX - b.x) / (dt / 16);
+          state.dragVelocityY = (newY - b.y) / (dt / 16);
 
-          speedBubbleConfig.x = newX;
-          speedBubbleConfig.y = newY;
-          lastBubbleDragTime = now;
+          b.x = newX;
+          b.y = newY;
+          state.lastDragTime = now;
 
-          el.style.left = `${speedBubbleConfig.x}px`;
-          el.style.top = `${speedBubbleConfig.y}px`;
+          el.style.left = `${b.x}px`;
+          el.style.top = `${b.y}px`;
+
+          if (b.spinMode === 'keel') {
+            b.angularVelocity = Math.max(-12, Math.min(12, -state.dragVelocityX * 2.2));
+          }
         }
       }
 
       function onPointerUp() {
-        clearTimeout(bubbleLongPressTimer);
+        clearTimeout(state.longPressTimer);
         el.classList.remove('is-longpressing');
-        if (speedBubbleConfig.isDragging) {
-          speedBubbleConfig.isDragging = false;
+        if (b.isDragging) {
+          b.isDragging = false;
           el.classList.remove('is-dragging');
 
           // Impart flick velocity if in kinetic mode
-          if (speedBubbleConfig.mode === 'kinetic') {
-            const flickX = Math.max(-4, Math.min(4, dragVelocityX * 0.8));
-            const flickY = Math.max(-4, Math.min(4, dragVelocityY * 0.8));
+          if (b.mode === 'kinetic') {
+            const flickX = Math.max(-3.5, Math.min(3.5, state.dragVelocityX * 0.7));
+            const flickY = Math.max(-3.5, Math.min(3.5, state.dragVelocityY * 0.7));
             if (Math.abs(flickX) > 0.4 || Math.abs(flickY) > 0.4) {
-              speedBubbleConfig.vx = flickX;
-              speedBubbleConfig.vy = flickY;
+              b.vx = flickX;
+              b.vy = flickY;
+              if (b.spinMode === 'keel') {
+                b.angularVelocity = Math.max(-14, Math.min(14, flickX * 4.8));
+              }
             }
           }
           saveBubbleConfig();
@@ -5449,14 +6309,14 @@
 
       // Touch events
       el.addEventListener('touchstart', (e) => {
-        speedBubbleConfig.isHovered = true; // freeze on finger contact
+        b.isHovered = true; // freeze on finger contact
         if (e.touches.length === 1) {
           onPointerDown(e.touches[0].clientX, e.touches[0].clientY, e);
         }
       }, { passive: true });
 
       window.addEventListener('touchmove', (e) => {
-        if (speedBubbleConfig.isDragging || bubbleLongPressTimer) {
+        if (b.isDragging || state.longPressTimer) {
           if (e.touches.length === 1) {
             onPointerMove(e.touches[0].clientX, e.touches[0].clientY, e);
           }
@@ -5464,7 +6324,7 @@
       }, { passive: true });
 
       window.addEventListener('touchend', () => {
-        speedBubbleConfig.isHovered = false;
+        b.isHovered = false;
         onPointerUp();
       }, { passive: true });
 
@@ -5486,22 +6346,92 @@
       });
     }
 
-    /* Kinetic Bubble Modal Controls */
-    function openKineticBubbleModal() {
+    // Backward compatibility wrapper
+    function setupSpeedBubbleInteractions() {
+      setupBubbleInteractions('speed');
+    }
+
+    /* Universal Kinetic Bubble Modal Controls */
+    function openKineticBubbleModal(bubbleKey) {
       const modal = document.getElementById('kinetic-bubble-modal');
       if (!modal) return;
 
-      // Sync active states
-      setBubbleMotionModeUI(speedBubbleConfig.mode);
-      setBubbleSafeZoneBehaviorUI(speedBubbleConfig.safeZoneBehavior || 'bounce');
-      setBubbleShapeUI(speedBubbleConfig.shape);
-      setBubbleColorUI(speedBubbleConfig.color);
-      setBubbleSizeUI(speedBubbleConfig.size);
+      if (bubbleKey && BUBBLE_KEYS.includes(bubbleKey)) {
+        currentSelectedBubbleTab = bubbleKey;
+      }
 
-      // Sliders
+      switchBubbleTab(currentSelectedBubbleTab);
+      modal.classList.add('active');
+    }
+
+    function closeKineticBubbleModal(event) {
+      if (event && event.target !== event.currentTarget) return;
+      const modal = document.getElementById('kinetic-bubble-modal');
+      if (modal) modal.classList.remove('active');
+      saveBubbleConfig();
+    }
+
+    function switchBubbleTab(tabId) {
+      if (!BUBBLE_KEYS.includes(tabId)) return;
+      currentSelectedBubbleTab = tabId;
+
+      // 1. Update tab buttons active states and status indicators
+      BUBBLE_KEYS.forEach(k => {
+        const tabBtn = document.getElementById(`bubble-tab-${k}`);
+        if (tabBtn) tabBtn.classList.toggle('is-active', k === tabId);
+        const statusDot = document.getElementById(`bubble-tab-status-${k}`);
+        if (statusDot) statusDot.classList.toggle('is-active', nomadBubbles[k].active !== false);
+      });
+
+      // 2. Update modal title
+      const meta = BUBBLE_METADATA[tabId];
+      const titleEl = document.getElementById('bubble-modal-title');
+      if (titleEl && meta) {
+        titleEl.innerText = `${meta.title} Bubble Config`;
+      }
+
+      // 3. Show/hide tab-specific sections
+      const atmoSection = document.getElementById('atmo-options-section');
+      if (atmoSection) {
+        atmoSection.style.display = (tabId === 'atmo') ? 'block' : 'none';
+      }
+      const coordsSection = document.getElementById('coords-options-section');
+      if (coordsSection) {
+        coordsSection.style.display = (tabId === 'coords') ? 'block' : 'none';
+      }
+
+      // 4. Sync modal controls for this bubble
+      syncModalControlsForTab(tabId);
+    }
+
+    function syncModalControlsForTab(tabId) {
+      const b = nomadBubbles[tabId];
+      if (!b) return;
+
+      setBubbleActiveUI(b.active !== false);
+      setBubbleMotionModeUI(b.mode || 'kinetic');
+      setBubbleSafeZoneBehaviorUI(b.safeZoneBehavior || 'bounce');
+      setBubbleWallBehaviorUI(b.wallBehavior || 'bounce');
+      setBubbleShapeUI(b.shape || 'circle');
+      setBubbleColorUI(b.color || '#00d4ff');
+      setBubbleSizeUI(b.size || 90);
+
+      const isStationary = (b.mode === 'stationary');
+      const safezoneGroup = document.getElementById('bubble-safezone-group');
+      const safezoneTitle = document.getElementById('bubble-safezone-title');
+      const wallGroup = document.getElementById('bubble-wall-group');
+      const wallTitle = document.getElementById('bubble-wall-title');
+      const speedSliderWrap = document.getElementById('bubble-speed-slider-wrap');
+      if (safezoneGroup) safezoneGroup.style.display = isStationary ? 'none' : 'flex';
+      if (safezoneTitle) safezoneTitle.style.display = isStationary ? 'none' : 'block';
+      if (wallGroup) wallGroup.style.display = isStationary ? 'none' : 'flex';
+      if (wallTitle) wallTitle.style.display = isStationary ? 'none' : 'block';
+      if (speedSliderWrap) speedSliderWrap.style.display = isStationary ? 'none' : 'block';
+
+      // Opacity
       const opacitySlider = document.getElementById('bubble-opacity-slider');
       const opacityLabel = document.getElementById('bubble-opacity-val-label');
-      const currentOpacity = (typeof speedBubbleConfig.opacity === 'number') ? speedBubbleConfig.opacity : 18;
+      const currentOpacity = (typeof b.opacity === 'number') ? b.opacity : 18;
       if (opacitySlider) opacitySlider.value = currentOpacity;
       if (opacityLabel) {
         if (currentOpacity === 0) {
@@ -5513,47 +6443,81 @@
         }
       }
 
+      // Size
       const sizeSlider = document.getElementById('bubble-size-slider');
-      if (sizeSlider) sizeSlider.value = speedBubbleConfig.size;
+      if (sizeSlider) sizeSlider.value = b.size || 90;
 
+      // Speed
       const speedSlider = document.getElementById('bubble-speed-slider');
       const speedLabel = document.getElementById('bubble-speed-val-label');
-      const speedSliderWrap = document.getElementById('bubble-speed-slider-wrap');
-      if (speedSlider) speedSlider.value = speedBubbleConfig.speedLevel;
-      if (speedSliderWrap) speedSliderWrap.style.display = (speedBubbleConfig.mode === 'stationary') ? 'none' : 'block';
+      if (speedSlider) speedSlider.value = b.speedLevel || 3;
       if (speedLabel) {
         const speedNames = ['', 'Gentle', 'Slow', 'Cruising Drift', 'Swift', 'Hyper'];
-        speedLabel.innerText = speedNames[speedBubbleConfig.speedLevel] || 'Drift';
+        speedLabel.innerText = speedNames[b.speedLevel || 3] || 'Drift';
       }
 
-      // Shape Dynamic Spin Mode UI Sync
-      setBubbleSpinModeUI(speedBubbleConfig.spinMode || 'off');
+      // Spin Mode
+      setBubbleSpinModeUI(b.spinMode || 'keel');
       const spinSlider = document.getElementById('bubble-spin-slider');
       const spinLabel = document.getElementById('bubble-spin-val-label');
       const spinSliderWrap = document.getElementById('bubble-spin-intensity-wrap');
-      if (spinSlider) spinSlider.value = speedBubbleConfig.spinRate || 2;
-      if (spinSliderWrap) spinSliderWrap.style.display = (speedBubbleConfig.spinMode === 'off') ? 'none' : 'block';
+      if (spinSlider) spinSlider.value = b.spinRate || 2;
+      if (spinSliderWrap) spinSliderWrap.style.display = (b.spinMode === 'off') ? 'none' : 'block';
       if (spinLabel) {
-        const spinRateNames = ['', '0.5x Subtle', '1.0x Normal', '1.5x Brisk', '2.0x Rapid', '3.0x Warp'];
-        spinLabel.innerText = spinRateNames[speedBubbleConfig.spinRate || 2] || '1.0x Normal';
+        const spinRateNames = ['', '0.5x Subtle', '1.0x Normal', '1.5x Lively', '2.0x Dynamic', '3.0x Hyper'];
+        spinLabel.innerText = spinRateNames[b.spinRate || 2] || '1.0x Normal';
       }
 
-      modal.classList.add('active');
+      // If Atmo tab, sync its metric toggles
+      if (tabId === 'atmo') {
+        syncAtmoMetricButtonsUI();
+      }
     }
 
-    function closeKineticBubbleModal(event) {
-      if (event && event.target !== event.currentTarget) return;
-      const modal = document.getElementById('kinetic-bubble-modal');
-      if (modal) modal.classList.remove('active');
+    function setBubbleActive(isActive) {
+      const b = nomadBubbles[currentSelectedBubbleTab];
+      if (!b) return;
+      b.active = !!isActive;
+      setBubbleActiveUI(b.active);
+      const statusDot = document.getElementById(`bubble-tab-status-${currentSelectedBubbleTab}`);
+      if (statusDot) statusDot.classList.toggle('is-active', b.active);
+      applyBubbleConfigUI(currentSelectedBubbleTab);
       saveBubbleConfig();
+      if (typeof showMapThemeToast === 'function') {
+        const meta = BUBBLE_METADATA[currentSelectedBubbleTab];
+        showMapThemeToast({
+          name: b.active ? `${meta.title} Bubble: Active (Visible)` : `${meta.title} Bubble: Inactive (Hidden)`,
+          type: 'perspective'
+        });
+      }
+    }
+
+    function setBubbleActiveUI(isActive) {
+      const activeBtn = document.getElementById('bubble-status-active');
+      const inactiveBtn = document.getElementById('bubble-status-inactive');
+      if (activeBtn && inactiveBtn) {
+        activeBtn.classList.toggle('is-selected', !!isActive);
+        inactiveBtn.classList.toggle('is-selected', !isActive);
+      }
     }
 
     function setBubbleMotionMode(mode) {
-      speedBubbleConfig.mode = mode;
+      const b = nomadBubbles[currentSelectedBubbleTab];
+      if (!b) return;
+      b.mode = mode;
       setBubbleMotionModeUI(mode);
-      applyBubbleConfigUI();
+      applyBubbleConfigUI(currentSelectedBubbleTab);
+      const isStationary = (mode === 'stationary');
+      const safezoneGroup = document.getElementById('bubble-safezone-group');
+      const safezoneTitle = document.getElementById('bubble-safezone-title');
+      const wallGroup = document.getElementById('bubble-wall-group');
+      const wallTitle = document.getElementById('bubble-wall-title');
       const speedSliderWrap = document.getElementById('bubble-speed-slider-wrap');
-      if (speedSliderWrap) speedSliderWrap.style.display = (mode === 'stationary') ? 'none' : 'block';
+      if (safezoneGroup) safezoneGroup.style.display = isStationary ? 'none' : 'flex';
+      if (safezoneTitle) safezoneTitle.style.display = isStationary ? 'none' : 'block';
+      if (wallGroup) wallGroup.style.display = isStationary ? 'none' : 'flex';
+      if (wallTitle) wallTitle.style.display = isStationary ? 'none' : 'block';
+      if (speedSliderWrap) speedSliderWrap.style.display = isStationary ? 'none' : 'block';
       saveBubbleConfig();
     }
 
@@ -5572,7 +6536,9 @@
     }
 
     function setBubbleSafeZoneBehavior(behavior) {
-      speedBubbleConfig.safeZoneBehavior = behavior;
+      const b = nomadBubbles[currentSelectedBubbleTab];
+      if (!b) return;
+      b.safeZoneBehavior = behavior;
       setBubbleSafeZoneBehaviorUI(behavior);
       saveBubbleConfig();
     }
@@ -5591,12 +6557,45 @@
       }
     }
 
+    function setBubbleWallBehavior(behavior) {
+      const b = nomadBubbles[currentSelectedBubbleTab];
+      if (!b) return;
+      b.wallBehavior = behavior;
+      setBubbleWallBehaviorUI(behavior);
+      if (behavior === 'bounce') {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const size = b.size || 90;
+        const topLimit = isLayoutInverted ? 88 : 64;
+        const bottomLimit = isLayoutInverted ? (vh - 68) : (vh - 108);
+        const leftLimit = 10;
+        const rightLimit = vw - size - 10;
+        if (b.x < leftLimit) b.x = leftLimit;
+        if (b.x > rightLimit) b.x = rightLimit;
+        if (b.y < topLimit) b.y = topLimit;
+        if (b.y > bottomLimit) b.y = bottomLimit;
+        applyBubbleConfigUI(currentSelectedBubbleTab);
+      }
+      saveBubbleConfig();
+    }
+
+    function setBubbleWallBehaviorUI(behavior) {
+      const bounceBtn = document.getElementById('bubble-wall-bounce');
+      const wrapBtn = document.getElementById('bubble-wall-wrap');
+      if (bounceBtn && wrapBtn) {
+        bounceBtn.classList.toggle('is-selected', behavior === 'bounce');
+        wrapBtn.classList.toggle('is-selected', behavior === 'wrap');
+      }
+    }
+
     function setBubbleSize(sizePx) {
-      speedBubbleConfig.size = sizePx;
+      const b = nomadBubbles[currentSelectedBubbleTab];
+      if (!b) return;
+      b.size = sizePx;
       setBubbleSizeUI(sizePx);
       const sizeSlider = document.getElementById('bubble-size-slider');
       if (sizeSlider) sizeSlider.value = sizePx;
-      applyBubbleConfigUI();
+      applyBubbleConfigUI(currentSelectedBubbleTab);
       saveBubbleConfig();
     }
 
@@ -5619,9 +6618,11 @@
     }
 
     function setBubbleShape(shape) {
-      speedBubbleConfig.shape = shape;
+      const b = nomadBubbles[currentSelectedBubbleTab];
+      if (!b) return;
+      b.shape = shape;
       setBubbleShapeUI(shape);
-      applyBubbleConfigUI();
+      applyBubbleConfigUI(currentSelectedBubbleTab);
       saveBubbleConfig();
     }
 
@@ -5637,9 +6638,11 @@
     }
 
     function setBubbleColor(colorHex) {
-      speedBubbleConfig.color = colorHex;
+      const b = nomadBubbles[currentSelectedBubbleTab];
+      if (!b) return;
+      b.color = colorHex;
       setBubbleColorUI(colorHex);
-      applyBubbleConfigUI();
+      applyBubbleConfigUI(currentSelectedBubbleTab);
       saveBubbleConfig();
     }
 
@@ -5655,8 +6658,10 @@
     }
 
     function onBubbleOpacitySliderChange(val) {
+      const b = nomadBubbles[currentSelectedBubbleTab];
+      if (!b) return;
       const num = parseInt(val, 10);
-      speedBubbleConfig.opacity = num;
+      b.opacity = num;
       const label = document.getElementById('bubble-opacity-val-label');
       if (label) {
         if (num === 0) {
@@ -5667,57 +6672,199 @@
           label.innerText = `${num}% Frosted Tint`;
         }
       }
-      applyBubbleConfigUI();
+      applyBubbleConfigUI(currentSelectedBubbleTab);
       saveBubbleConfig();
     }
 
     function onBubbleSizeSliderChange(val) {
+      const b = nomadBubbles[currentSelectedBubbleTab];
+      if (!b) return;
       const sizeInt = parseInt(val, 10);
-      speedBubbleConfig.size = sizeInt;
+      b.size = sizeInt;
       setBubbleSizeUI(sizeInt);
-      applyBubbleConfigUI();
+      applyBubbleConfigUI(currentSelectedBubbleTab);
       saveBubbleConfig();
     }
 
     function onBubbleSpeedSliderChange(val) {
-      speedBubbleConfig.speedLevel = parseInt(val, 10);
+      const b = nomadBubbles[currentSelectedBubbleTab];
+      if (!b) return;
+      b.speedLevel = parseInt(val, 10);
       const label = document.getElementById('bubble-speed-val-label');
       const speedNames = ['', 'Gentle', 'Slow', 'Cruising Drift', 'Swift', 'Hyper'];
-      if (label) label.innerText = speedNames[speedBubbleConfig.speedLevel] || 'Drift';
+      if (label) label.innerText = speedNames[b.speedLevel] || 'Drift';
       saveBubbleConfig();
     }
 
     function setBubbleSpinMode(mode) {
-      speedBubbleConfig.spinMode = mode;
+      const b = nomadBubbles[currentSelectedBubbleTab];
+      if (!b) return;
+      b.spinMode = mode;
       setBubbleSpinModeUI(mode);
       const spinSliderWrap = document.getElementById('bubble-spin-intensity-wrap');
       if (spinSliderWrap) spinSliderWrap.style.display = (mode === 'off') ? 'none' : 'block';
       if (mode === 'off') {
-        speedBubbleConfig.currentRotation = 0;
-        const shapeFrame = document.getElementById('speed-bubble-shape-frame');
+        b.currentRotation = 0;
+        const shapeFrame = document.getElementById(`${currentSelectedBubbleTab}-bubble-shape-frame`);
         if (shapeFrame) shapeFrame.style.transform = 'rotate(0deg)';
       }
-      applyBubbleConfigUI();
+      applyBubbleConfigUI(currentSelectedBubbleTab);
       saveBubbleConfig();
     }
 
     function setBubbleSpinModeUI(mode) {
+      const keelBtn = document.getElementById('bubble-spin-keel');
       const offBtn = document.getElementById('bubble-spin-off');
       const gpsBtn = document.getElementById('bubble-spin-gps');
       const gyroBtn = document.getElementById('bubble-spin-gyro');
-      if (offBtn && gpsBtn && gyroBtn) {
-        offBtn.classList.toggle('is-selected', mode === 'off');
-        gpsBtn.classList.toggle('is-selected', mode === 'gps');
-        gyroBtn.classList.toggle('is-selected', mode === 'gyro');
-      }
+      if (keelBtn) keelBtn.classList.toggle('is-selected', mode === 'keel');
+      if (offBtn) offBtn.classList.toggle('is-selected', mode === 'off');
+      if (gpsBtn) gpsBtn.classList.toggle('is-selected', mode === 'gps');
+      if (gyroBtn) gyroBtn.classList.toggle('is-selected', mode === 'gyro');
     }
 
     function onBubbleSpinSliderChange(val) {
-      speedBubbleConfig.spinRate = parseInt(val, 10);
+      const b = nomadBubbles[currentSelectedBubbleTab];
+      if (!b) return;
+      b.spinRate = parseInt(val, 10);
       const label = document.getElementById('bubble-spin-val-label');
-      const spinRateNames = ['', '0.5x Subtle', '1.0x Normal', '1.5x Brisk', '2.0x Rapid', '3.0x Warp'];
-      if (label) label.innerText = spinRateNames[speedBubbleConfig.spinRate] || '1.0x Normal';
+      const spinRateNames = ['', '0.5x Subtle', '1.0x Normal', '1.5x Lively', '2.0x Dynamic', '3.0x Hyper'];
+      if (label) label.innerText = spinRateNames[b.spinRate] || '1.0x Normal';
       saveBubbleConfig();
+    }
+
+    // Atmospheric Triad Sub-Selector Logic
+    function toggleAtmoMetric(metric) {
+      const b = nomadBubbles.atmo;
+      if (!b) return;
+      if (metric === 'humidity') {
+        b.showHumidity = !b.showHumidity;
+      } else if (metric === 'uv') {
+        b.showUv = !b.showUv;
+      } else if (metric === 'pressure') {
+        b.showPressure = !b.showPressure;
+      }
+
+      // Ensure at least one metric remains active so bubble never empties completely
+      if (!b.showHumidity && !b.showUv && !b.showPressure) {
+        b[metric === 'humidity' ? 'showHumidity' : (metric === 'uv' ? 'showUv' : 'showPressure')] = true;
+      }
+
+      syncAtmoMetricButtonsUI();
+      renderAtmoBubble();
+      saveBubbleConfig();
+    }
+
+    function syncAtmoMetricButtonsUI() {
+      const b = nomadBubbles.atmo;
+      const humBtn = document.getElementById('atmo-btn-humidity');
+      const uvBtn = document.getElementById('atmo-btn-uv');
+      const pressBtn = document.getElementById('atmo-btn-pressure');
+
+      if (humBtn) humBtn.classList.toggle('is-selected', b.showHumidity !== false);
+      if (uvBtn) uvBtn.classList.toggle('is-selected', b.showUv !== false);
+      if (pressBtn) pressBtn.classList.toggle('is-selected', b.showPressure !== false);
+    }
+
+    // Telemetry Rendering Handlers for All 6 Bubbles
+    function renderCompassBubble(heading) {
+      const el = document.getElementById('compass-bubble-value');
+      if (!el) return;
+      if (heading === null || isNaN(heading)) {
+        el.innerText = '--°';
+        return;
+      }
+      el.innerText = `${Math.round(heading)}°`;
+      if (nomadBubbles.compass.active !== false) {
+        applyBubbleConfigUI('compass');
+      }
+    }
+
+    function renderAltitudeBubble(altMeters) {
+      const el = document.getElementById('altitude-bubble-value');
+      if (!el) return;
+      const meters = (typeof altMeters === 'number') ? altMeters : rawAltitudeMeters;
+      if (meters === null || isNaN(meters)) {
+        el.innerText = '--';
+        return;
+      }
+      const feet = Math.round(meters * 3.28084);
+      el.innerText = feet.toLocaleString();
+    }
+
+    function renderTemperatureBubble() {
+      const el = document.getElementById('temp-bubble-value');
+      if (!el) return;
+      if (rawTempF === null || isNaN(rawTempF)) {
+        el.innerText = '--°';
+        return;
+      }
+      if (isFahrenheit) {
+        el.innerText = `${Math.round(rawTempF)}°`;
+      } else {
+        const tempC = (rawTempF - 32) * (5 / 9);
+        el.innerText = `${Math.round(tempC)}°`;
+      }
+    }
+
+    function renderAtmoBubble() {
+      const b = nomadBubbles.atmo;
+      const humRow = document.getElementById('atmo-row-humidity');
+      const uvRow = document.getElementById('atmo-row-uv');
+      const pressRow = document.getElementById('atmo-row-pressure');
+      const humVal = document.getElementById('atmo-val-humidity');
+      const uvVal = document.getElementById('atmo-val-uv');
+      const pressVal = document.getElementById('atmo-val-pressure');
+
+      if (humRow) humRow.style.display = (b.showHumidity !== false) ? 'flex' : 'none';
+      if (uvRow) uvRow.style.display = (b.showUv !== false) ? 'flex' : 'none';
+      if (pressRow) pressRow.style.display = (b.showPressure !== false) ? 'flex' : 'none';
+
+      if (humVal) {
+        humVal.innerText = (typeof rawHumidityPercent === 'number') ? `${Math.round(rawHumidityPercent)}%` : '--%';
+      }
+      if (uvVal) {
+        if (typeof rawUvIndex === 'number') {
+          const formattedUv = (rawUvIndex % 1 === 0) ? rawUvIndex.toFixed(0) : rawUvIndex.toFixed(1);
+          uvVal.innerText = `UV ${formattedUv}`;
+        } else {
+          uvVal.innerText = 'UV --';
+        }
+      }
+      if (pressVal) {
+        if (rawPressureHpa === null || isNaN(rawPressureHpa)) {
+          pressVal.innerText = '--';
+        } else {
+          const unit = customPressureUnit ? customPressureUnit : (isFahrenheit ? 'in' : 'hPa');
+          if (unit === 'in') {
+            const inHg = (rawPressureHpa * 0.02953).toFixed(2);
+            pressVal.innerText = `${inHg}in`;
+          } else {
+            pressVal.innerText = `${Math.round(rawPressureHpa)}hPa`;
+          }
+        }
+      }
+    }
+
+    function renderCoordsBubble(lat, lon) {
+      const latEl = document.getElementById('coords-lat');
+      const lonEl = document.getElementById('coords-lon');
+      if (!latEl || !lonEl) return;
+
+      if (lat === null || lon === null || isNaN(lat) || isNaN(lon)) {
+        latEl.innerText = '--.---° N';
+        lonEl.innerText = '--.---° W';
+        return;
+      }
+
+      // Format coordinates to 3 decimal places for clean, uncluttered floating bubble readability
+      const latAbs = Math.abs(lat).toFixed(3);
+      const latDir = lat >= 0 ? 'N' : 'S';
+      latEl.innerText = `${latAbs}° ${latDir}`;
+
+      const lonAbs = Math.abs(lon).toFixed(3);
+      const lonDir = lon >= 0 ? 'E' : 'W';
+      lonEl.innerText = `${lonAbs}° ${lonDir}`;
     }
 
     async function requestWakeLock() {
@@ -5876,6 +7023,10 @@
 
       map.on('dragstart', () => { lastUserMapInteractionTime = Date.now(); });
       map.on('zoomstart', (e) => { if (e.originalEvent) lastUserMapInteractionTime = Date.now(); });
+      map.on('contextmenu', (e) => {
+        if (e && e.preventDefault) e.preventDefault();
+        if (typeof openKineticBubbleModal === 'function') openKineticBubbleModal();
+      });
 
       // Ensure crisp render when returning from background or resizing viewport
       window.addEventListener('resize', () => { if (map) map.resize(); });
@@ -6286,11 +7437,13 @@
 
           // Humidity
           if (data.current.relative_humidity_2m !== undefined) {
+            rawHumidityPercent = data.current.relative_humidity_2m;
             document.getElementById('humidity-val').innerText = `${Math.round(data.current.relative_humidity_2m)}%`;
           }
 
           // UV Index
           if (data.current.uv_index !== undefined) {
+            rawUvIndex = data.current.uv_index;
             const uv = data.current.uv_index;
             let uvColor = '#ffb703';
             if (uv < 3) uvColor = '#4cd964';
@@ -6307,6 +7460,10 @@
               </svg>
             `;
             document.getElementById('uv-val').innerHTML = `<span style="color: ${uvColor};">${uvDisplay}<span style="font-size: 0.9em; font-weight: 500; margin-left: 1px;">uv</span></span>`;
+          }
+
+          if (typeof renderAtmoBubble === 'function') {
+            renderAtmoBubble();
           }
         }
       } catch (err) {}
@@ -6328,6 +7485,10 @@
         pushHeadingHistory(heading);
         renderTelemetryBadge();
         renderRouteBadges();
+
+        if (typeof renderCompassBubble === 'function') {
+          renderCompassBubble(heading);
+        }
 
         if (window.KineticConsole && window.KineticConsole.isVisible) {
           window.KineticConsole.updateTelemetry({
@@ -6453,6 +7614,12 @@
       }
 
       renderSpeed();
+      if (typeof renderAltitudeBubble === 'function') {
+        renderAltitudeBubble(rawAltitudeMeters);
+      }
+      if (typeof renderCoordsBubble === 'function') {
+        renderCoordsBubble(latitude, longitude);
+      }
       if (window.KineticConsole && window.KineticConsole.isVisible) {
         window.KineticConsole.updateTelemetry({
           speedMph: speedMph,
@@ -6580,6 +7747,7 @@
     function bootstrapNomad() {
       if (window.__nomadInitialized) return;
       window.__nomadInitialized = true;
+      applyLayoutInversion(isLayoutInverted, false);
       initMap();
       applyHudScale(hudScale);
       applyHudOpacity(hudOpacity);
