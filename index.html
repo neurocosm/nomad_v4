@@ -234,10 +234,10 @@
       stroke: #007aff !important;
     }
 
-    /* NOMAD V4 HYPERSPACE: KINETIC TELEMETRY BUBBLE & GEOMETRIC SHAPES */
+    /* NOMAD V4 HYPERSPACE: KINETIC TELEMETRY BUBBLE & GEOMETRIC SHAPES (CRYSTAL TRANSPARENCY) */
     .kinetic-bubble {
       position: absolute;
-      z-index: 35;
+      z-index: 18; /* Sits cleanly beneath Chevron (z:20) and Location Pill (z:30) */
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -247,19 +247,52 @@
       -webkit-user-select: none;
       touch-action: none;
       cursor: grab;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      transition: box-shadow 0.25s ease, border-color 0.25s ease;
-      will-change: transform, left, top;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      outline: none !important;
+      transition: transform 0.15s ease;
+      will-change: left, top;
+      --bubble-accent: #00d4ff;
+    }
+    .kinetic-bubble:hover,
+    .kinetic-bubble.is-hovered {
+      filter: drop-shadow(0 0 10px var(--bubble-accent, #00d4ff)) drop-shadow(0 0 20px var(--bubble-accent, #00d4ff));
     }
     .kinetic-bubble:active,
     .kinetic-bubble.is-dragging {
       cursor: grabbing;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 24px rgba(0, 212, 255, 0.6) !important;
+      filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 16px var(--bubble-accent, #00d4ff));
+    }
+    .kinetic-bubble.is-longpressing {
+      transform: scale(0.96);
     }
 
-    /* Kinetic Bubble Inner Content */
+    /* Kinetic Bubble Geometric Shape Canvas (Outer Rotating Vector Frame) */
+    .kinetic-bubble-shape-wrap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      pointer-events: none;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      outline: none !important;
+      border-radius: 0 !important;
+      clip-path: none !important;
+      -webkit-clip-path: none !important;
+      transition: transform 0.15s ease-out, filter 0.25s ease;
+      will-change: transform;
+    }
+
+    /* Kinetic Bubble Inner Content (Remains Upright & Centered in Centroid of Shape) */
     .kinetic-bubble-inner {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -269,64 +302,51 @@
       line-height: 1;
       width: 100%;
       height: 100%;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 12px rgba(0, 0, 0, 0.85);
     }
 
+    /* Perimeter Structural Label: Replaces legacy interior floating title */
     .kinetic-bubble-title {
-      font-size: 0.65rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      opacity: 0.85;
-      margin-bottom: 2px;
+      display: none;
     }
 
     .kinetic-bubble-value {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      font-weight: 700;
-      font-size: 2.1rem;
-      line-height: 0.9;
-      letter-spacing: -0.02em;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-weight: 300; /* Sleek, elegant, unbolded modern telemetry typography */
+      font-size: 2.5rem;
+      line-height: 1;
+      letter-spacing: -0.03em;
     }
 
     .kinetic-bubble-unit {
-      font-size: 0.62rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      opacity: 0.80;
-      margin-top: 3px;
+      display: none;
     }
 
-    /* Kinetic Bubble Geometric Shapes */
-    .kinetic-shape-circle {
-      border-radius: 50% !important;
+    /* 3 Preset Sizes Segmented Control */
+    .bubble-size-preset-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
     }
-    .kinetic-shape-egg {
-      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40% !important;
+    .bubble-size-btn {
+      flex: 1;
+      padding: 9px 4px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #e2e8f0;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: center;
     }
-    .kinetic-shape-squirkle {
-      border-radius: 28% !important;
-    }
-    .kinetic-shape-square {
-      border-radius: 12px !important;
-    }
-    .kinetic-shape-triangle {
-      clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-      -webkit-clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-      padding-top: 14px;
-    }
-    .kinetic-shape-pentagon {
-      clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
-      -webkit-clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
-      padding-top: 6px;
-    }
-    .kinetic-shape-hexagon {
-      clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-      -webkit-clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-    }
-    .kinetic-shape-octagon {
-      clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
-      -webkit-clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+    .bubble-size-btn.is-selected {
+      background: #00d4ff !important;
+      color: #040914 !important;
+      border-color: #00d4ff !important;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
     }
 
     /* Pinned Indicator Badge */
@@ -364,6 +384,16 @@
       border-color: #00d4ff !important;
       font-weight: 700;
       box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+    }
+    .shape-btn-icon {
+      display: block;
+      margin: 0 auto 4px auto;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 8;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      pointer-events: none;
     }
 
     .bubble-color-row {
@@ -1925,12 +1955,53 @@
       cursor: pointer;
     }
 
+    .modal-version-banner {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 6px auto 12px auto;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(0, 212, 255, 0.12);
+      border: 1px solid rgba(0, 212, 255, 0.45);
+      color: #00d4ff;
+      font-size: 0.84rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      box-shadow: 0 0 14px rgba(0, 212, 255, 0.25);
+    }
+
     .modal-version-tag {
       margin-top: 10px;
-      font-size: 0.72rem;
-      font-family: "Courier New", Courier, monospace;
-      color: #666666;
-      letter-spacing: 0.5px;
+      font-size: 0.78rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: #00d4ff;
+      letter-spacing: 0.6px;
+      font-weight: 600;
+    }
+
+    .modal-install-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #00d4ff, #0077ff);
+      color: #050b14;
+      border: none;
+      border-radius: 12px;
+      padding: 11px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      box-shadow: 0 0 16px rgba(0, 212, 255, 0.4);
+      transition: transform 0.15s ease, filter 0.2s ease;
+    }
+    .modal-install-btn:active {
+      transform: scale(0.97);
     }
 
     .config-section-label {
@@ -2137,12 +2208,14 @@
       </div>
 
       <!-- NOMAD v4 Hyperspace: Kinetic Telemetry Speed Bubble -->
-      <div class="kinetic-bubble kinetic-shape-circle" id="speed-bubble" style="width: 104px; height: 104px; left: 24px; top: 110px; background: rgba(8, 14, 26, 0.44); border: 2px solid #00d4ff; color: #00d4ff;" title="Drag to flick • Long-press to configure">
-        <div class="kinetic-pin-indicator" id="speed-bubble-pin" style="display: none;">📌</div>
+      <div class="kinetic-bubble" id="speed-bubble" style="width: 104px; height: 104px; left: 24px; top: 110px; color: #00d4ff;" title="Drag to flick • Long-press to configure">
+        <!-- Outer Rotating Geometric Shape Frame (Rotates with Gyro/GPS Speed while text stays upright) -->
+        <div class="kinetic-bubble-shape-wrap kinetic-shape-circle" id="speed-bubble-shape-frame"></div>
+        <div class="kinetic-pin-indicator" id="speed-bubble-pin" style="display: none; z-index: 3;">📌</div>
         <div class="kinetic-bubble-inner">
-          <div class="kinetic-bubble-title" id="speed-bubble-title">SPEED</div>
+          <div class="kinetic-bubble-title" id="speed-bubble-title" style="display: none;">SPEED</div>
           <div class="kinetic-bubble-value" id="speed-bubble-value">0</div>
-          <div class="kinetic-bubble-unit" id="speed-bubble-unit">MPH</div>
+          <div class="kinetic-bubble-unit" id="speed-bubble-unit" style="display: none;">MPH</div>
         </div>
       </div>
 
@@ -2286,15 +2359,27 @@
   <div class="modal-overlay" id="about-modal" onclick="closeAboutModal(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
       <a href="features.html" class="modal-title-link" onclick="window.location.replace('features.html'); return false;" title="View Features & Guide">
-        <div class="modal-title">NOMAD: RoadTrip ↗</div>
-        <div class="modal-features-hint">Features &amp; User Guide</div>
+        <div class="modal-title">NOMAD: Hyperspace ↗</div>
+        <div class="modal-features-hint">Version 4 &bull; User Guide &amp; Features</div>
       </a>
       <div class="modal-author">by [merge_creator]</div>
-      <div class="modal-body">
-        Real-time telemetry, GPS tracking, and heads-up navigation dashboard.
+
+      <!-- Prominent System Version Banner -->
+      <div class="modal-version-banner">
+        <span style="opacity: 0.75; font-size: 0.75rem;">SYSTEM FIRMWARE</span>
+        <span class="nomad-version" id="nomad-modal-version-hero">v4.09162026.1953</span>
       </div>
+
+      <div class="modal-body" style="margin-bottom: 12px;">
+        Real-time heads-up GPS telemetry, kinetic data bubbles, and sensory visualizer arcade.
+      </div>
+
+      <!-- One-Click In-App PWA Install Button (shown when installable) -->
+      <button class="modal-install-btn" id="modal-pwa-install-btn" onclick="triggerPWAInstall()">
+        📲 INSTALL NOMAD HYPERSPACE (PWA)
+      </button>
       
-      <a href="nomad_v3/visualizer.html" class="modal-vis-btn" onclick="window.location.replace('nomad_v3/visualizer.html'); return false;">✨ VISUALIZER ARCADE (V3) ↗</a>
+      <a href="visualizer.html" class="modal-vis-btn" onclick="window.location.replace('visualizer.html'); return false;">✨ VISUALIZER ARCADE ↗</a>
       <a href="geek-stats.html" class="modal-stats-btn" onclick="window.location.replace('geek-stats.html'); return false;">&gt; GEEK STATS (VT220) _</a>
 
       <!-- ONE-CLICK FULL WORKSPACE BACKUP DOWNLOAD -->
@@ -2306,7 +2391,7 @@
       <div style="margin-top: 4px;">
         <button class="modal-close-btn" onclick="closeAboutModal()">Close</button>
       </div>
-      <div class="modal-version-tag nomad-version" id="nomad-modal-version">v3.08302026.0722</div>
+      <div class="modal-version-tag nomad-version" id="nomad-modal-version">v4.09162026.1953</div>
     </div>
   </div>
 
@@ -2355,17 +2440,69 @@
         <button class="bubble-mode-btn" id="bubble-mode-stationary" onclick="setBubbleMotionMode('stationary')">📌 Stationary Pinned</button>
       </div>
 
+      <!-- Vehicle Safe Zone Options: Bounce OFF vs Pass Underneath -->
+      <div class="config-section-label" style="margin-top: 14px;" id="bubble-safezone-title">Vehicle Safe Zone Interaction</div>
+      <div class="bubble-mode-toggle-group" id="bubble-safezone-group">
+        <button class="bubble-mode-btn is-selected" id="bubble-safezone-bounce" onclick="setBubbleSafeZoneBehavior('bounce')">🛡️ Bounce Off</button>
+        <button class="bubble-mode-btn" id="bubble-safezone-under" onclick="setBubbleSafeZoneBehavior('under')">🌌 Pass Underneath</button>
+      </div>
+
+      <!-- 3 Preset Sizes: Compact (80px), Standard (104px), Hero (140px) -->
+      <div class="slider-config-container" style="margin-top: 14px;">
+        <div class="slider-header-row">
+          <span class="config-section-label" style="margin:0;">Preset Dimensions</span>
+          <span class="slider-val-badge" id="bubble-size-val-label">104px (Standard)</span>
+        </div>
+        <div class="bubble-size-preset-group">
+          <button class="bubble-size-btn" id="bubble-size-opt-90" onclick="setBubbleSize(90)">Compact<br><span style="font-size:0.65rem; opacity:0.8;">90px</span></button>
+          <button class="bubble-size-btn is-selected" id="bubble-size-opt-125" onclick="setBubbleSize(125)">Standard<br><span style="font-size:0.65rem; opacity:0.8;">125px</span></button>
+          <button class="bubble-size-btn" id="bubble-size-opt-160" onclick="setBubbleSize(160)">Hero<br><span style="font-size:0.65rem; opacity:0.8;">160px</span></button>
+        </div>
+        <div class="slider-track-wrap" style="margin-top: 10px;">
+          <input type="range" min="80" max="180" step="5" id="bubble-size-slider" class="hud-range-slider" oninput="onBubbleSizeSliderChange(this.value)">
+        </div>
+        <div class="slider-ticks-row">
+          <span>80px Compact</span>
+          <span>125px Standard</span>
+          <span>180px Hero</span>
+        </div>
+      </div>
+
       <!-- Geometric Shape Selector -->
       <div class="config-section-label" style="margin-top: 14px;">Geometric Shape</div>
       <div class="bubble-shape-grid" id="bubble-shape-picker">
-        <button class="bubble-shape-btn is-selected" data-shape="circle" onclick="setBubbleShape('circle')">Circle</button>
-        <button class="bubble-shape-btn" data-shape="egg" onclick="setBubbleShape('egg')">Egg</button>
-        <button class="bubble-shape-btn" data-shape="squirkle" onclick="setBubbleShape('squirkle')">Squirkle</button>
-        <button class="bubble-shape-btn" data-shape="square" onclick="setBubbleShape('square')">Square</button>
-        <button class="bubble-shape-btn" data-shape="triangle" onclick="setBubbleShape('triangle')">Triangle</button>
-        <button class="bubble-shape-btn" data-shape="pentagon" onclick="setBubbleShape('pentagon')">Pentagon</button>
-        <button class="bubble-shape-btn" data-shape="hexagon" onclick="setBubbleShape('hexagon')">Hexagon</button>
-        <button class="bubble-shape-btn" data-shape="octagon" onclick="setBubbleShape('octagon')">Octagon</button>
+        <button class="bubble-shape-btn is-selected" data-shape="circle" onclick="setBubbleShape('circle')">
+          <svg width="20" height="20" viewBox="0 0 100 100" class="shape-btn-icon"><circle cx="50" cy="50" r="42"/></svg>
+          Circle
+        </button>
+        <button class="bubble-shape-btn" data-shape="egg" onclick="setBubbleShape('egg')">
+          <svg width="20" height="20" viewBox="0 0 100 100" class="shape-btn-icon"><path d="M 50,6 C 74,6 94,28 94,56 C 94,78 74,94 50,94 C 26,94 6,78 6,56 C 6,28 26,6 50,6 Z"/></svg>
+          Egg
+        </button>
+        <button class="bubble-shape-btn" data-shape="squirkle" onclick="setBubbleShape('squirkle')">
+          <svg width="20" height="20" viewBox="0 0 100 100" class="shape-btn-icon"><rect x="6" y="6" width="88" height="88" rx="26" ry="26"/></svg>
+          Squirkle
+        </button>
+        <button class="bubble-shape-btn" data-shape="square" onclick="setBubbleShape('square')">
+          <svg width="20" height="20" viewBox="0 0 100 100" class="shape-btn-icon"><rect x="8" y="8" width="84" height="84" rx="12" ry="12"/></svg>
+          Square
+        </button>
+        <button class="bubble-shape-btn" data-shape="triangle" onclick="setBubbleShape('triangle')">
+          <svg width="20" height="20" viewBox="0 0 100 100" class="shape-btn-icon"><polygon points="50,8 92,92 8,92"/></svg>
+          Triangle
+        </button>
+        <button class="bubble-shape-btn" data-shape="pentagon" onclick="setBubbleShape('pentagon')">
+          <svg width="20" height="20" viewBox="0 0 100 100" class="shape-btn-icon"><polygon points="50,8 92,38 76,92 24,92 8,38"/></svg>
+          Pentagon
+        </button>
+        <button class="bubble-shape-btn" data-shape="hexagon" onclick="setBubbleShape('hexagon')">
+          <svg width="20" height="20" viewBox="0 0 100 100" class="shape-btn-icon"><polygon points="28,8 72,8 92,50 72,92 28,92 8,50"/></svg>
+          Hexagon
+        </button>
+        <button class="bubble-shape-btn" data-shape="octagon" onclick="setBubbleShape('octagon')">
+          <svg width="20" height="20" viewBox="0 0 100 100" class="shape-btn-icon"><polygon points="32,8 68,8 92,32 92,68 68,92 32,92 8,68 8,32"/></svg>
+          Octagon
+        </button>
       </div>
 
       <!-- Color Theme Swatches -->
@@ -2384,32 +2521,16 @@
       <div class="slider-config-container" style="margin-top: 14px;">
         <div class="slider-header-row">
           <span class="config-section-label" style="margin:0;">Glass Transparency</span>
-          <span class="slider-val-badge" id="bubble-opacity-val-label">44% Glass</span>
+          <span class="slider-val-badge" id="bubble-opacity-val-label">18% Sheer Glass</span>
         </div>
         <div class="slider-track-wrap">
-          <input type="range" min="15" max="100" step="5" id="bubble-opacity-slider" class="hud-range-slider" oninput="onBubbleOpacitySliderChange(this.value)">
+          <input type="range" min="0" max="80" step="5" id="bubble-opacity-slider" class="hud-range-slider" oninput="onBubbleOpacitySliderChange(this.value)">
         </div>
         <div class="slider-ticks-row">
-          <span>15% Sheer</span>
-          <span>45% Glass</span>
-          <span>75% Muted</span>
-          <span>100% Solid</span>
-        </div>
-      </div>
-
-      <!-- Bubble Size Scale Slider -->
-      <div class="slider-config-container" style="margin-top: 14px;">
-        <div class="slider-header-row">
-          <span class="config-section-label" style="margin:0;">Size Dimension</span>
-          <span class="slider-val-badge" id="bubble-size-val-label">104px (Standard)</span>
-        </div>
-        <div class="slider-track-wrap">
-          <input type="range" min="80" max="150" step="6" id="bubble-size-slider" class="hud-range-slider" oninput="onBubbleSizeSliderChange(this.value)">
-        </div>
-        <div class="slider-ticks-row">
-          <span>80px Compact</span>
-          <span>104px Standard</span>
-          <span>150px Hero</span>
+          <span>0% Crystal</span>
+          <span>18% Sheer</span>
+          <span>45% Frosted</span>
+          <span>80% Tinted</span>
         </div>
       </div>
 
@@ -2428,6 +2549,33 @@
           <span>3: Drift</span>
           <span>4: Swift</span>
           <span>5: Hyper</span>
+        </div>
+      </div>
+
+      <!-- Kinetic Outer Shape Spin Mode (Text Stays Upright) -->
+      <div class="config-section-label" style="margin-top: 14px;" id="bubble-spin-title">Shape Dynamic Rotation &amp; Keel Physics</div>
+      <div class="bubble-mode-toggle-group" id="bubble-spin-mode-group">
+        <button class="bubble-mode-btn is-selected" id="bubble-spin-keel" onclick="setBubbleSpinMode('keel')">⚓ Weighted Keel</button>
+        <button class="bubble-mode-btn" id="bubble-spin-off" onclick="setBubbleSpinMode('off')">Static</button>
+        <button class="bubble-mode-btn" id="bubble-spin-gps" onclick="setBubbleSpinMode('gps')">⚡ Speed Spin</button>
+        <button class="bubble-mode-btn" id="bubble-spin-gyro" onclick="setBubbleSpinMode('gyro')">🧭 Gyro</button>
+      </div>
+
+      <!-- Spin Intensity Slider -->
+      <div class="slider-config-container" style="margin-top: 12px;" id="bubble-spin-intensity-wrap">
+        <div class="slider-header-row">
+          <span class="config-section-label" style="margin:0;">Rotation Rate</span>
+          <span class="slider-val-badge" id="bubble-spin-val-label">1.0x Normal</span>
+        </div>
+        <div class="slider-track-wrap">
+          <input type="range" min="1" max="5" step="1" id="bubble-spin-slider" class="hud-range-slider" oninput="onBubbleSpinSliderChange(this.value)">
+        </div>
+        <div class="slider-ticks-row">
+          <span>0.5x Subtle</span>
+          <span>1.0x Normal</span>
+          <span>1.5x Brisk</span>
+          <span>2.0x Rapid</span>
+          <span>3.0x Warp</span>
         </div>
       </div>
 
@@ -3018,19 +3166,36 @@
       }
     }
 
-    function toggleGalagaMode() {
-      isGalagaMode = !isGalagaMode;
-      const dashboard = document.getElementById('main-dashboard');
+    function renderGalagaFighterSVG() {
       const vehicleSvg = document.getElementById('vehicle-overlay-svg');
-      const badgeEl = document.getElementById('heading-text');
+      if (!vehicleSvg || !isGalagaMode) return;
+      const isLight = document.getElementById('map-card')?.classList.contains('theme-light-active') || (currentThemeIndex === 1);
 
-      playArcadeSound(isGalagaMode);
+      vehicleSvg.setAttribute('viewBox', '0 0 32 32');
+      vehicleSvg.removeAttribute('fill');
+      vehicleSvg.removeAttribute('stroke');
 
-      if (isGalagaMode) {
-        dashboard.classList.add('galaga-theme');
-        vehicleSvg.setAttribute('viewBox', '0 0 32 32');
-        vehicleSvg.removeAttribute('fill');
-        vehicleSvg.removeAttribute('stroke');
+      if (isLight) {
+        // F-117 Stealth Fighter aesthetic for Light GPS Mode (Matte charcoal, obsidian canopy, crimson/slate accents)
+        vehicleSvg.style.filter = 'drop-shadow(0 0 8px rgba(15, 23, 42, 0.75)) drop-shadow(0 3px 10px rgba(0, 0, 0, 0.65))';
+        vehicleSvg.innerHTML = `
+          <!-- Main Stealth Fuselage (F-117 Matte Jet Black / Charcoal) -->
+          <polygon points="16,1 19,10 19,26 13,26 13,10" fill="#1e242f" stroke="#0a0d14" stroke-width="0.9"/>
+          <!-- Stealth Nose Radome (Crimson Stealth Radar) -->
+          <polygon points="16,1 18,8 14,8" fill="#d90429"/>
+          <!-- Left Wing & Chined Leading Edge (Tactical Dark Slate) -->
+          <polygon points="13,10 13,25 2,26 6,17" fill="#2d3748" stroke="#111827" stroke-width="0.7"/>
+          <!-- Left Wing Leading Tip (Infrared Dark Red) -->
+          <polygon points="2,26 6,17 2,15" fill="#9b111e"/>
+          <!-- Right Wing & Chined Leading Edge (Tactical Dark Slate) -->
+          <polygon points="19,10 19,25 30,26 26,17" fill="#2d3748" stroke="#111827" stroke-width="0.7"/>
+          <!-- Right Wing Leading Tip (Infrared Dark Red) -->
+          <polygon points="30,26 26,17 30,15" fill="#9b111e"/>
+          <!-- Afterburner / Low-RCS Exhaust Plume (Amber Afterburner) -->
+          <rect x="14" y="26" width="4" height="4" fill="#ff9100" stroke="#b45309" stroke-width="0.5"/>
+        `;
+      } else {
+        // Authentic Neon Arcade Galaga Fighter for Dark GPS Mode
         vehicleSvg.style.filter = 'drop-shadow(0 0 12px #00d4ff) drop-shadow(0 3px 8px rgba(0,0,0,0.8))';
         vehicleSvg.innerHTML = `
           <polygon points="16,1 19,10 19,26 13,26 13,10" fill="#ffffff" stroke="#000000" stroke-width="0.8"/>
@@ -3041,6 +3206,20 @@
           <polygon points="30,26 26,17 30,15" fill="#ff0044"/>
           <rect x="14" y="26" width="4" height="4" fill="#ffcc00"/>
         `;
+      }
+    }
+
+    function toggleGalagaMode() {
+      isGalagaMode = !isGalagaMode;
+      const dashboard = document.getElementById('main-dashboard');
+      const vehicleSvg = document.getElementById('vehicle-overlay-svg');
+      const badgeEl = document.getElementById('heading-text');
+
+      playArcadeSound(isGalagaMode);
+
+      if (isGalagaMode) {
+        dashboard.classList.add('galaga-theme');
+        renderGalagaFighterSVG();
         showMapThemeToast({ name: 'Galaga Fighter Active', type: 'fighter' });
         if (badgeEl) {
           clearTimeout(hudBannerTimeout);
@@ -3918,7 +4097,22 @@
 
     function openAboutModal() {
       const modal = document.getElementById('about-modal');
-      if (modal) modal.classList.add('active');
+      if (modal) {
+        if (typeof applyNomadRegistry === 'function') applyNomadRegistry();
+        const ver = window.NOMAD_VERSION || 'v4';
+        const heroVer = document.getElementById('nomad-modal-version-hero');
+        if (heroVer) heroVer.textContent = ver;
+        const tagVer = document.getElementById('nomad-modal-version');
+        if (tagVer) tagVer.textContent = ver;
+
+        // Show PWA install button if the browser prompt is ready
+        const installBtn = document.getElementById('modal-pwa-install-btn');
+        if (installBtn) {
+          installBtn.style.display = (window.deferredInstallPrompt) ? 'flex' : 'none';
+        }
+
+        modal.classList.add('active');
+      }
     }
 
     function closeAboutModal(event) {
@@ -4536,7 +4730,14 @@
         if (vehicleSvg && !isGalagaMode) {
           vehicleSvg.setAttribute('fill', '#007aff');
           vehicleSvg.setAttribute('stroke', '#ffffff');
+        } else if (isGalagaMode) {
+          renderGalagaFighterSVG();
         }
+      }
+
+      // Synchronize kinetic telemetry bubble transparent glass tint with the active map theme
+      if (typeof applyBubbleConfigUI === 'function') {
+        applyBubbleConfigUI();
       }
 
       const speedSignBox = document.getElementById('speed-sign-box');
@@ -4810,17 +5011,24 @@
        NOMAD V4 HYPERSPACE: KINETIC TELEMETRY BUBBLE & PHYSICS ENGINE
        ========================================================================= */
     const speedBubbleConfig = {
-      mode: 'kinetic',       // 'kinetic' | 'stationary'
-      shape: 'circle',       // 'circle', 'egg', 'squirkle', 'square', 'triangle', 'pentagon', 'hexagon', 'octagon'
-      color: '#00d4ff',      // border & accent glow color
-      opacity: 44,           // glass background transparency (15% to 100%)
-      size: 104,             // dimension in px (80 to 150)
-      speedLevel: 3,         // float speed level (1: gentle to 5: hyper)
-      x: 30,                 // current px left
-      y: 110,                // current px top
-      vx: 1.2,               // velocity X
-      vy: 0.9,               // velocity Y
-      isDragging: false
+      mode: 'kinetic',            // 'kinetic' | 'stationary'
+      shape: 'circle',            // 'circle', 'egg', 'squirkle', 'square', 'triangle', 'pentagon', 'hexagon', 'octagon'
+      safeZoneBehavior: 'bounce', // 'bounce' (deflects off vehicle) | 'under' (passes underneath)
+      color: '#00d4ff',           // border & accent glow color
+      opacity: 18,                // glass background transparency (0% crystal clear to 80% tinted)
+      size: 125,                  // dimension in px (80 to 180, standard 125px)
+      speedLevel: 3,              // float speed level (1: gentle to 5: hyper)
+      spinMode: 'keel',           // 'keel' (weighted keel pendulum physics) | 'off' (static) | 'gps' (speed spin) | 'gyro' (compass heading)
+      spinRate: 2,                // 1 to 5 (0.5x, 1x, 1.5x, 2x, 3x)
+      currentRotation: 0,         // current rotation angle in degrees
+      angularVelocity: 0,         // angular rotation velocity in deg/frame for weighted keel physics
+      keelTime: 0,                // accumulator for subtle cruising sway
+      x: 30,                      // current px left
+      y: 110,                     // current px top
+      vx: 1.2,                    // velocity X
+      vy: 0.9,                    // velocity Y
+      isDragging: false,
+      isHovered: false
     };
 
     let kineticBubbleAnimFrame = null;
@@ -4839,6 +5047,14 @@
         const saved = localStorage.getItem('nomad_v4_speed_bubble');
         if (saved) {
           const parsed = JSON.parse(saved);
+          // Upgrade legacy opaque 44% setting to transparent 18% sheer glass
+          if (parsed.opacity === 44) {
+            parsed.opacity = 18;
+          }
+          // Upgrade legacy small sizes (80/104px) to generous 125px standard
+          if (!parsed.size || parsed.size <= 104) {
+            parsed.size = 125;
+          }
           Object.assign(speedBubbleConfig, parsed);
         }
       } catch (e) {}
@@ -4854,8 +5070,96 @@
       startKineticBubbleLoop();
     }
 
+    function getBubbleShapeSVGMarkup(shape, hex, fill) {
+      const strokeW = 2.4;
+      const strokeJoin = 'round';
+      const strokeCap = 'round';
+      const channelLabel = 'SPEED';
+
+      switch (shape) {
+        case 'triangle':
+          // True Centroid Equilateral Triangle: Centroid mathematically at (50, 50).
+          // Apex at (50, 6), Base at y=72 from x=11.9 to x=88.1. All vertices R=44 from (50, 50).
+          // Wide 40-unit notch from x=30 to x=70 with generous 4+ unit safety clearance around SPEED.
+          return `
+            <polygon points="50,6 88.1,72 11.9,72" fill="${fill}" stroke="none"/>
+            <path d="M 30,72 L 11.9,72 L 50,6 L 88.1,72 L 70,72" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <text x="50" y="72" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="8.0" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.3">${channelLabel}</text>
+          `;
+
+        case 'square':
+          // Centered at (50, 50): 78x78 rounded rect from x=11,y=11 to x=89,y=89 with rx=12.
+          // Bottom straight edge runs from x=23 to x=77 at y=89. Notch from x=30 to x=70 with zero bleed.
+          return `
+            <rect x="11" y="11" width="78" height="78" rx="12" fill="${fill}" stroke="none"/>
+            <path d="M 30,89 L 23,89 A 12 12 0 0 1 11,77 L 11,23 A 12 12 0 0 1 23,11 L 77,11 A 12 12 0 0 1 89,23 L 89,77 A 12 12 0 0 1 77,89 L 70,89" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <text x="50" y="89" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="8.0" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.3">${channelLabel}</text>
+          `;
+
+        case 'squirkle':
+          // Centered at (50, 50): 82x82 squirkle from x=9,y=9 to x=91,y=91 with rx=20.
+          // Bottom straight edge runs from x=29 to x=71 at y=91. Notch from x=30 to x=70 ensures stroke never overlaps text.
+          return `
+            <rect x="9" y="9" width="82" height="82" rx="20" fill="${fill}" stroke="none"/>
+            <path d="M 30,91 L 29,91 A 20 20 0 0 1 9,71 L 9,29 A 20 20 0 0 1 29,9 L 71,9 A 20 20 0 0 1 91,29 L 91,71 A 20 20 0 0 1 71,91 L 70,91" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <text x="50" y="91" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="8.0" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.3">${channelLabel}</text>
+          `;
+
+        case 'hexagon':
+          // Centered at (50, 50): R=44 regular hexagon with flat base from x=28 to x=72 at y=88.1.
+          // Notch from x=31 to x=69 (38 units) provides clean air gap on both sides of SPEED.
+          return `
+            <polygon points="28,11.9 72,11.9 94,50 72,88.1 28,88.1 6,50" fill="${fill}" stroke="none"/>
+            <path d="M 31,88.1 L 28,88.1 L 6,50 L 28,11.9 L 72,11.9 L 94,50 L 72,88.1 L 69,88.1" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <text x="50" y="88.1" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="8.0" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.3">${channelLabel}</text>
+          `;
+
+        case 'octagon':
+          // Centered at (50, 50): R=44 regular octagon. Bottom facet runs from (33.2, 90.6) to (66.8, 90.6).
+          // Dedicated full-facet notch across the bottom with stroke terminating crisply at corner vertices.
+          return `
+            <polygon points="33.2,9.4 66.8,9.4 90.6,33.2 90.6,66.8 66.8,90.6 33.2,90.6 9.4,66.8 9.4,33.2" fill="${fill}" stroke="none"/>
+            <path d="M 33.2,90.6 L 9.4,66.8 L 9.4,33.2 L 33.2,9.4 L 66.8,9.4 L 90.6,33.2 L 90.6,66.8 L 66.8,90.6" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <text x="50" y="90.6" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="7.6" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.1">${channelLabel}</text>
+          `;
+
+        case 'pentagon':
+          // Centered at (50, 50): R=44 regular pentagon with base from x=24.1 to x=75.9 at y=85.6.
+          // Notch from x=30 to x=70 provides wide breathing clearance.
+          return `
+            <polygon points="50,6 91.8,36.4 75.9,85.6 24.1,85.6 8.2,36.4" fill="${fill}" stroke="none"/>
+            <path d="M 30,85.6 L 24.1,85.6 L 8.2,36.4 L 50,6 L 91.8,36.4 L 75.9,85.6 L 70,85.6" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <text x="50" y="85.6" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="8.0" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.3">${channelLabel}</text>
+          `;
+
+        case 'circle':
+          // Centered at (50, 50): R=44 circle with open bottom arc from x=30 to x=70 at y=89.2.
+          return `
+            <circle cx="50" cy="50" r="44" fill="${fill}" stroke="none"/>
+            <path d="M 30,89.2 A 44 44 0 1 1 70,89.2" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <text x="50" y="89.2" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="8.0" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.3">${channelLabel}</text>
+          `;
+
+        case 'egg':
+          // Centered at (50, 50): Organic egg curve with open bottom notch from x=30 to x=70 at y=88.
+          return `
+            <path d="M 50,7 C 74,7 94,14 94,34 C 94,62 84,84 70,88 L 30,88 C 16,84 6,62 6,34 C 6,14 26,7 50,7 Z" fill="${fill}" stroke="none"/>
+            <path d="M 30,88 C 16,84 6,62 6,34 C 6,14 26,7 50,7 C 74,7 94,14 94,34 C 94,62 84,84 70,88" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <text x="50" y="88" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="8.0" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.3">${channelLabel}</text>
+          `;
+
+        default:
+          return `
+            <circle cx="50" cy="50" r="44" fill="${fill}" stroke="none"/>
+            <path d="M 30,89.2 A 44 44 0 1 1 70,89.2" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
+            <text x="50" y="89.2" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="8.0" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.3">${channelLabel}</text>
+          `;
+      }
+    }
+
     function applyBubbleConfigUI() {
       const el = document.getElementById('speed-bubble');
+      const shapeFrame = document.getElementById('speed-bubble-shape-frame');
       const pinEl = document.getElementById('speed-bubble-pin');
       if (!el) return;
 
@@ -4863,23 +5167,48 @@
       el.style.width = `${speedBubbleConfig.size}px`;
       el.style.height = `${speedBubbleConfig.size}px`;
 
-      // 2. Shape classes
-      const allShapes = ['circle', 'egg', 'squirkle', 'square', 'triangle', 'pentagon', 'hexagon', 'octagon'];
-      allShapes.forEach(s => el.classList.remove(`kinetic-shape-${s}`));
-      el.classList.add(`kinetic-shape-${speedBubbleConfig.shape}`);
+      // Outer container is 100% transparent with zero rectangular bounding box artifacts
+      el.style.background = 'transparent';
+      el.style.backgroundColor = 'transparent';
+      el.style.border = 'none';
+      el.style.boxShadow = 'none';
+      el.style.outline = 'none';
 
-      // 3. Color & Glass Transparency
+      // 2. Color & Glass Transparency
       const hex = speedBubbleConfig.color || '#00d4ff';
-      const alpha = (speedBubbleConfig.opacity / 100).toFixed(2);
-      el.style.background = `rgba(8, 14, 26, ${alpha})`;
-      el.style.borderColor = hex;
-      el.style.color = hex;
-      el.style.boxShadow = `0 4px 20px rgba(0, 0, 0, 0.45), 0 0 16px ${hex}44`;
+      const isLight = document.getElementById('map-card')?.classList.contains('theme-light-active') || (typeof currentThemeIndex !== 'undefined' && currentThemeIndex === 1);
+      const rawOpacity = (typeof speedBubbleConfig.opacity === 'number') ? speedBubbleConfig.opacity : 18;
+      const alpha = (Math.max(0, Math.min(100, rawOpacity)) / 100).toFixed(2);
 
-      // Font size scaling based on bubble dimension
+      let fill = 'transparent';
+      if (rawOpacity > 0) {
+        fill = isLight ? `rgba(255, 255, 255, ${alpha})` : `rgba(8, 14, 26, ${alpha})`;
+      }
+
+      // Synchronize CSS accent color variable for dynamic glows
+      el.style.setProperty('--bubble-accent', hex);
+      el.style.color = hex;
+
+      // Update classes for optical centroid offsets and rotation states
+      el.className = `kinetic-bubble has-shape-${speedBubbleConfig.shape}` +
+        (speedBubbleConfig.isHovered ? ' is-hovered' : '') +
+        (speedBubbleConfig.isDragging ? ' is-dragging' : '') +
+        ((speedBubbleConfig.spinMode && speedBubbleConfig.spinMode !== 'off') ? ' is-spinning' : '');
+
+      // 3. Render SVG Vector Geometry (Structural Boundary with Integrated SPEED Notch)
+      if (shapeFrame) {
+        shapeFrame.innerHTML = `<svg viewBox="0 0 100 100" class="kinetic-shape-svg" style="width:100%;height:100%;overflow:visible;display:block;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 8px ${hex}88);">${getBubbleShapeSVGMarkup(speedBubbleConfig.shape, hex, fill)}</svg>`;
+        shapeFrame.style.border = 'none';
+        shapeFrame.style.background = 'transparent';
+        shapeFrame.style.outline = 'none';
+        shapeFrame.style.boxShadow = 'none';
+        shapeFrame.style.transform = `rotate(${speedBubbleConfig.currentRotation || 0}deg)`;
+      }
+
+      // Font size scaling based on bubble dimension (centered solitary number)
       const valEl = document.getElementById('speed-bubble-value');
       if (valEl) {
-        valEl.style.fontSize = `${(speedBubbleConfig.size * 0.32).toFixed(1)}px`;
+        valEl.style.fontSize = `${(speedBubbleConfig.size * 0.44).toFixed(1)}px`;
       }
 
       // 4. Mode Pin indicator
@@ -4897,10 +5226,13 @@
         localStorage.setItem('nomad_v4_speed_bubble', JSON.stringify({
           mode: speedBubbleConfig.mode,
           shape: speedBubbleConfig.shape,
+          safeZoneBehavior: speedBubbleConfig.safeZoneBehavior,
           color: speedBubbleConfig.color,
           opacity: speedBubbleConfig.opacity,
           size: speedBubbleConfig.size,
           speedLevel: speedBubbleConfig.speedLevel,
+          spinMode: speedBubbleConfig.spinMode || 'off',
+          spinRate: speedBubbleConfig.spinRate || 2,
           x: Math.round(speedBubbleConfig.x),
           y: Math.round(speedBubbleConfig.y)
         }));
@@ -4911,12 +5243,40 @@
       if (kineticBubbleAnimFrame) cancelAnimationFrame(kineticBubbleAnimFrame);
 
       function step() {
-        if (speedBubbleConfig.mode === 'kinetic' && !speedBubbleConfig.isDragging) {
+        // Freeze kinetic movement if hovered by cursor, being dragged, or pinned in stationary mode
+        if (speedBubbleConfig.mode === 'kinetic' && !speedBubbleConfig.isDragging && !speedBubbleConfig.isHovered) {
           updateBubblePhysics();
         }
+
+        // Shape Dynamic Rotation (Text remains upright, outer shape spins based on GPS speed or Gyro/Heading)
+        if (speedBubbleConfig.spinMode && speedBubbleConfig.spinMode !== 'off') {
+          updateBubbleShapeSpin();
+        }
+
         kineticBubbleAnimFrame = requestAnimationFrame(step);
       }
       kineticBubbleAnimFrame = requestAnimationFrame(step);
+    }
+
+    function updateBubbleShapeSpin() {
+      const shapeFrame = document.getElementById('speed-bubble-shape-frame');
+      if (!shapeFrame) return;
+
+      const rateMultiplier = [0, 0.5, 1.0, 1.5, 2.0, 3.0][speedBubbleConfig.spinRate || 2] || 1.0;
+
+      if (speedBubbleConfig.spinMode === 'gps') {
+        // Spin speed scales directly with live vehicle GPS speed (MPH)
+        const currentMph = (rawSpeedMps !== null && !isNaN(rawSpeedMps)) ? (rawSpeedMps * 2.23694) : 0;
+        // At 0 MPH: subtle 0.2° idle drift. At 60 MPH: brisk 3.2° per frame rotation
+        const delta = (0.2 + (Math.max(0, currentMph) * 0.05)) * rateMultiplier;
+        speedBubbleConfig.currentRotation = (speedBubbleConfig.currentRotation + delta) % 360;
+        shapeFrame.style.transform = `rotate(${speedBubbleConfig.currentRotation.toFixed(1)}deg)`;
+      } else if (speedBubbleConfig.spinMode === 'gyro') {
+        // Orient outer shape directly to current vehicle compass heading / gyro orientation
+        const targetHeading = typeof currentHeading === 'number' ? currentHeading : 0;
+        speedBubbleConfig.currentRotation = targetHeading;
+        shapeFrame.style.transform = `rotate(${targetHeading.toFixed(1)}deg)`;
+      }
     }
 
     function updateBubblePhysics() {
@@ -4957,8 +5317,8 @@
         speedBubbleConfig.vy = -Math.abs(speedBubbleConfig.vy);
       }
 
-      // 2. Vehicle Safe Zone Deflection (Protective Forcefield)
-      if (typeof window.getNomadVehicleSafeZone === 'function') {
+      // 2. Vehicle Safe Zone Deflection (only active when safeZoneBehavior is 'bounce')
+      if (speedBubbleConfig.safeZoneBehavior === 'bounce' && typeof window.getNomadVehicleSafeZone === 'function') {
         const safeZone = window.getNomadVehicleSafeZone();
         if (safeZone) {
           // Bubble center
@@ -5005,6 +5365,17 @@
       const el = document.getElementById('speed-bubble');
       if (!el) return;
 
+      // Mouse enter & leave: freeze bubble kinetic motion instantly on hover so user can easily catch & long press
+      el.addEventListener('mouseenter', () => {
+        speedBubbleConfig.isHovered = true;
+        el.classList.add('is-hovered');
+      });
+
+      el.addEventListener('mouseleave', () => {
+        speedBubbleConfig.isHovered = false;
+        el.classList.remove('is-hovered');
+      });
+
       function onPointerDown(clientX, clientY, event) {
         bubbleDragStartX = clientX;
         bubbleDragStartY = clientY;
@@ -5015,24 +5386,27 @@
         dragVelocityY = 0;
         speedBubbleConfig.isDragging = false;
 
-        // Long press trigger (700ms) for opening configuration modal
+        // Long press trigger (600ms) for opening configuration modal
+        el.classList.add('is-longpressing');
         clearTimeout(bubbleLongPressTimer);
         bubbleLongPressTimer = setTimeout(() => {
           speedBubbleConfig.isDragging = false;
+          el.classList.remove('is-longpressing');
           if (navigator.vibrate) {
-            try { navigator.vibrate(30); } catch(e) {}
+            try { navigator.vibrate(35); } catch(e) {}
           }
           openKineticBubbleModal();
-        }, 700);
+        }, 600);
       }
 
       function onPointerMove(clientX, clientY, event) {
         const dx = clientX - bubbleDragStartX;
         const dy = clientY - bubbleDragStartY;
 
-        // Threshold to start dragging
-        if (Math.abs(dx) > 6 || Math.abs(dy) > 6) {
+        // Threshold to start repositioning / dragging (12px to allow steady finger long press without accidental drag cancel)
+        if (Math.abs(dx) > 12 || Math.abs(dy) > 12) {
           clearTimeout(bubbleLongPressTimer);
+          el.classList.remove('is-longpressing');
           speedBubbleConfig.isDragging = true;
           el.classList.add('is-dragging');
 
@@ -5055,6 +5429,7 @@
 
       function onPointerUp() {
         clearTimeout(bubbleLongPressTimer);
+        el.classList.remove('is-longpressing');
         if (speedBubbleConfig.isDragging) {
           speedBubbleConfig.isDragging = false;
           el.classList.remove('is-dragging');
@@ -5074,6 +5449,7 @@
 
       // Touch events
       el.addEventListener('touchstart', (e) => {
+        speedBubbleConfig.isHovered = true; // freeze on finger contact
         if (e.touches.length === 1) {
           onPointerDown(e.touches[0].clientX, e.touches[0].clientY, e);
         }
@@ -5088,6 +5464,7 @@
       }, { passive: true });
 
       window.addEventListener('touchend', () => {
+        speedBubbleConfig.isHovered = false;
         onPointerUp();
       }, { passive: true });
 
@@ -5116,19 +5493,28 @@
 
       // Sync active states
       setBubbleMotionModeUI(speedBubbleConfig.mode);
+      setBubbleSafeZoneBehaviorUI(speedBubbleConfig.safeZoneBehavior || 'bounce');
       setBubbleShapeUI(speedBubbleConfig.shape);
       setBubbleColorUI(speedBubbleConfig.color);
+      setBubbleSizeUI(speedBubbleConfig.size);
 
       // Sliders
       const opacitySlider = document.getElementById('bubble-opacity-slider');
       const opacityLabel = document.getElementById('bubble-opacity-val-label');
-      if (opacitySlider) opacitySlider.value = speedBubbleConfig.opacity;
-      if (opacityLabel) opacityLabel.innerText = `${speedBubbleConfig.opacity}% Glass`;
+      const currentOpacity = (typeof speedBubbleConfig.opacity === 'number') ? speedBubbleConfig.opacity : 18;
+      if (opacitySlider) opacitySlider.value = currentOpacity;
+      if (opacityLabel) {
+        if (currentOpacity === 0) {
+          opacityLabel.innerText = '0% Crystal Clear';
+        } else if (currentOpacity <= 25) {
+          opacityLabel.innerText = `${currentOpacity}% Sheer Glass`;
+        } else {
+          opacityLabel.innerText = `${currentOpacity}% Frosted Tint`;
+        }
+      }
 
       const sizeSlider = document.getElementById('bubble-size-slider');
-      const sizeLabel = document.getElementById('bubble-size-val-label');
       if (sizeSlider) sizeSlider.value = speedBubbleConfig.size;
-      if (sizeLabel) sizeLabel.innerText = `${speedBubbleConfig.size}px`;
 
       const speedSlider = document.getElementById('bubble-speed-slider');
       const speedLabel = document.getElementById('bubble-speed-val-label');
@@ -5140,13 +5526,25 @@
         speedLabel.innerText = speedNames[speedBubbleConfig.speedLevel] || 'Drift';
       }
 
-      modal.classList.add('modal-visible');
+      // Shape Dynamic Spin Mode UI Sync
+      setBubbleSpinModeUI(speedBubbleConfig.spinMode || 'off');
+      const spinSlider = document.getElementById('bubble-spin-slider');
+      const spinLabel = document.getElementById('bubble-spin-val-label');
+      const spinSliderWrap = document.getElementById('bubble-spin-intensity-wrap');
+      if (spinSlider) spinSlider.value = speedBubbleConfig.spinRate || 2;
+      if (spinSliderWrap) spinSliderWrap.style.display = (speedBubbleConfig.spinMode === 'off') ? 'none' : 'block';
+      if (spinLabel) {
+        const spinRateNames = ['', '0.5x Subtle', '1.0x Normal', '1.5x Brisk', '2.0x Rapid', '3.0x Warp'];
+        spinLabel.innerText = spinRateNames[speedBubbleConfig.spinRate || 2] || '1.0x Normal';
+      }
+
+      modal.classList.add('active');
     }
 
     function closeKineticBubbleModal(event) {
       if (event && event.target !== event.currentTarget) return;
       const modal = document.getElementById('kinetic-bubble-modal');
-      if (modal) modal.classList.remove('modal-visible');
+      if (modal) modal.classList.remove('active');
       saveBubbleConfig();
     }
 
@@ -5170,6 +5568,53 @@
           kineticBtn.classList.remove('is-selected');
           stationaryBtn.classList.add('is-selected');
         }
+      }
+    }
+
+    function setBubbleSafeZoneBehavior(behavior) {
+      speedBubbleConfig.safeZoneBehavior = behavior;
+      setBubbleSafeZoneBehaviorUI(behavior);
+      saveBubbleConfig();
+    }
+
+    function setBubbleSafeZoneBehaviorUI(behavior) {
+      const bounceBtn = document.getElementById('bubble-safezone-bounce');
+      const underBtn = document.getElementById('bubble-safezone-under');
+      if (bounceBtn && underBtn) {
+        if (behavior === 'under') {
+          underBtn.classList.add('is-selected');
+          bounceBtn.classList.remove('is-selected');
+        } else {
+          bounceBtn.classList.add('is-selected');
+          underBtn.classList.remove('is-selected');
+        }
+      }
+    }
+
+    function setBubbleSize(sizePx) {
+      speedBubbleConfig.size = sizePx;
+      setBubbleSizeUI(sizePx);
+      const sizeSlider = document.getElementById('bubble-size-slider');
+      if (sizeSlider) sizeSlider.value = sizePx;
+      applyBubbleConfigUI();
+      saveBubbleConfig();
+    }
+
+    function setBubbleSizeUI(sizePx) {
+      const label = document.getElementById('bubble-size-val-label');
+      let sizeName = '';
+      if (sizePx <= 95) sizeName = ' (Compact)';
+      else if (sizePx >= 145) sizeName = ' (Hero)';
+      else sizeName = ' (Standard)';
+      if (label) label.innerText = `${sizePx}px${sizeName}`;
+
+      const btn90 = document.getElementById('bubble-size-opt-90');
+      const btn125 = document.getElementById('bubble-size-opt-125');
+      const btn160 = document.getElementById('bubble-size-opt-160');
+      if (btn90 && btn125 && btn160) {
+        btn90.classList.toggle('is-selected', sizePx <= 95);
+        btn125.classList.toggle('is-selected', sizePx > 95 && sizePx < 145);
+        btn160.classList.toggle('is-selected', sizePx >= 145);
       }
     }
 
@@ -5210,17 +5655,28 @@
     }
 
     function onBubbleOpacitySliderChange(val) {
-      speedBubbleConfig.opacity = parseInt(val, 10);
+      const num = parseInt(val, 10);
+      speedBubbleConfig.opacity = num;
       const label = document.getElementById('bubble-opacity-val-label');
-      if (label) label.innerText = `${val}% Glass`;
+      if (label) {
+        if (num === 0) {
+          label.innerText = '0% Crystal Clear';
+        } else if (num <= 25) {
+          label.innerText = `${num}% Sheer Glass`;
+        } else {
+          label.innerText = `${num}% Frosted Tint`;
+        }
+      }
       applyBubbleConfigUI();
+      saveBubbleConfig();
     }
 
     function onBubbleSizeSliderChange(val) {
-      speedBubbleConfig.size = parseInt(val, 10);
-      const label = document.getElementById('bubble-size-val-label');
-      if (label) label.innerText = `${val}px`;
+      const sizeInt = parseInt(val, 10);
+      speedBubbleConfig.size = sizeInt;
+      setBubbleSizeUI(sizeInt);
       applyBubbleConfigUI();
+      saveBubbleConfig();
     }
 
     function onBubbleSpeedSliderChange(val) {
@@ -5228,6 +5684,40 @@
       const label = document.getElementById('bubble-speed-val-label');
       const speedNames = ['', 'Gentle', 'Slow', 'Cruising Drift', 'Swift', 'Hyper'];
       if (label) label.innerText = speedNames[speedBubbleConfig.speedLevel] || 'Drift';
+      saveBubbleConfig();
+    }
+
+    function setBubbleSpinMode(mode) {
+      speedBubbleConfig.spinMode = mode;
+      setBubbleSpinModeUI(mode);
+      const spinSliderWrap = document.getElementById('bubble-spin-intensity-wrap');
+      if (spinSliderWrap) spinSliderWrap.style.display = (mode === 'off') ? 'none' : 'block';
+      if (mode === 'off') {
+        speedBubbleConfig.currentRotation = 0;
+        const shapeFrame = document.getElementById('speed-bubble-shape-frame');
+        if (shapeFrame) shapeFrame.style.transform = 'rotate(0deg)';
+      }
+      applyBubbleConfigUI();
+      saveBubbleConfig();
+    }
+
+    function setBubbleSpinModeUI(mode) {
+      const offBtn = document.getElementById('bubble-spin-off');
+      const gpsBtn = document.getElementById('bubble-spin-gps');
+      const gyroBtn = document.getElementById('bubble-spin-gyro');
+      if (offBtn && gpsBtn && gyroBtn) {
+        offBtn.classList.toggle('is-selected', mode === 'off');
+        gpsBtn.classList.toggle('is-selected', mode === 'gps');
+        gyroBtn.classList.toggle('is-selected', mode === 'gyro');
+      }
+    }
+
+    function onBubbleSpinSliderChange(val) {
+      speedBubbleConfig.spinRate = parseInt(val, 10);
+      const label = document.getElementById('bubble-spin-val-label');
+      const spinRateNames = ['', '0.5x Subtle', '1.0x Normal', '1.5x Brisk', '2.0x Rapid', '3.0x Warp'];
+      if (label) label.innerText = spinRateNames[speedBubbleConfig.spinRate] || '1.0x Normal';
+      saveBubbleConfig();
     }
 
     async function requestWakeLock() {
@@ -6108,6 +6598,34 @@
   </script>
 
   <script>
+    window.deferredInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      window.deferredInstallPrompt = e;
+      const btn = document.getElementById('modal-pwa-install-btn');
+      if (btn) btn.style.display = 'flex';
+    });
+
+    window.addEventListener('appinstalled', () => {
+      window.deferredInstallPrompt = null;
+      const btn = document.getElementById('modal-pwa-install-btn');
+      if (btn) btn.style.display = 'none';
+      console.log('NOMAD Hyperspace PWA successfully installed');
+    });
+
+    function triggerPWAInstall() {
+      if (!window.deferredInstallPrompt) return;
+      window.deferredInstallPrompt.prompt();
+      window.deferredInstallPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted NOMAD installation');
+        }
+        window.deferredInstallPrompt = null;
+        const btn = document.getElementById('modal-pwa-install-btn');
+        if (btn) btn.style.display = 'none';
+      });
+    }
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').then((reg) => {

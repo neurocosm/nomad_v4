@@ -1,8 +1,10 @@
 {
-  "name": "NOMAD: RoadTrip",
+  "id": "./",
+  "name": "NOMAD: Hyperspace",
   "short_name": "NOMAD",
   "description": "Real-time Heads-Up GPS Navigation, Telemetry Dashboard, and Visualizer Arcade.",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",

@@ -150,5 +150,81 @@
     - **Dimension & Transparency Sliders**: Live adjustment of size (80px–150px) with proportional font scaling, background opacity (15% sheer to 100% solid), and drift speed (1: Gentle to 5: Hyper).
     - **LocalStorage Persistence**: Saves shape, color, opacity, size, velocity, and pin coordinates across reloads.
 
+### v4 Step 8: Kinetic Bubble Hover Catch, 3 Preset Sizes & Safe Zone Behavior [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **Immediate Stop on Hover ("Catch the Bubble")**: The kinetic physics loop checks `isHovered` and halts immediately when the cursor hovers or a finger makes contact, completely eliminating the frustration of having to chase the moving bubble.
+  - **Visual Feedback on Hover & Long Press**: Added an unmistakable cyan glow highlight upon hover, subtle compression scaling with cyan resonance during a 600ms long press, and gentle haptic vibration upon modal reveal.
+  - **Vehicle Safe Zone Options (Bounce Off vs. Pass Underneath)**: Added a dedicated toggle in the configuration modal:
+    - **Bounce Off (Default)**: Telemetry bubble elastically deflects off the vehicle's protective forcefield bubble (`window.getNomadVehicleSafeZone()`).
+    - **Pass Underneath**: Skips vehicle collision calculation and glides smoothly beneath the Chevron (z:20) and bottom location block (z:30), perfectly mimicking the location plaque pass-underneath behavior.
+  - **3 Quick-Select Preset Dimensions**: Integrated a 3-button segmented selector (`Compact 80px`, `Standard 104px`, `Hero 140px`) synchronized seamlessly with the granular size slider and live font scaling.
+  - **Repositioning & Full Preset Persistence**: Preserved direct drag repositioning and full state persistence in `localStorage`.
+
+### v4 Step 9: Stealth Fighter Theme Adaptation & Kinetic Shape Dynamic Spin [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **F-117 Stealth Fighter Light GPS Palette**: Transformed the retro Galaga Fighter in Light Navigation mode into a striking matte charcoal and stealth slate interceptor (`#1e293b`, `#334155`, `#475569`) with high-contrast road visibility, automatically switching back to vibrant arcade neon (`#ff0055`, `#ffe600`, `#00d4ff`) in Dark GPS mode.
+  - **Theme Switcher Synchronization**: Hooked `renderGalagaFighterSVG` directly into `applyThemeByIndex` and `toggleGalagaMode` for instantaneous color palette transitions when toggling map styles.
+  - **Upright Data with Dynamic Shape Rotation**: Decoupled the outer geometric shape from inner telemetry content using a dedicated rotation frame (`#speed-bubble-shape-frame`), keeping speed digits, unit labels, and dots locked strictly upright while the outer boundary rotates.
+  - **Live GPS Speed & Gyro Spin Modes**:
+    - **Speed Spin (`gps`)**: Outer shape rotation rate scales dynamically with live vehicle speed (subtle 0.2° idle drift at 0 MPH up to rapid 3.2°/frame rotation at highway speeds).
+    - **Compass/Gyro Orientation (`gyro`)**: Outer shape aligns directly with the vehicle's compass bearing / gyroscope heading.
+    - **Static Shape (`off`)**: Resets outer boundary cleanly to 0° rotation.
+  - **Granular Rotation Intensity Slider**: Added a 5-step rate multiplier slider (0.5x Subtle, 1.0x Normal, 1.5x Brisk, 2.0x Rapid, 3.0x Warp) in the modal with full state persistence.
+
+### v4 Step 10: Crystal Transparent Data Bubbles & Bounding Box Elimination [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **Square Bounding Box & Artifact Eradication**: Stripped away all legacy rectangular box-shadows and unclipped `backdrop-filter: blur(12px)` that caused visible square artifacts and blurred tiles outside complex shapes (such as eggs and polygons). Enforced strict `background: transparent !important; border: none !important; box-shadow: none !important;` on the outer `#speed-bubble` anchor.
+  - **Contour-Conforming Dynamic Glow**: Replaced rectangular box-shadow with alpha-channel `filter: drop-shadow(...)` on both the rotating geometric shape frame and hover/dragging states, guaranteeing all glows conform strictly to the egg, circle, or polygon contour with 100% transparent corners.
+  - **Crystalline Transparent Glass Background**: Replaced dark opaque fill with sheer, see-through glass tint (`18% Sheer Glass` default) that dynamically adapts to both Dark GPS mode (`rgba(8, 14, 26, alpha)`) and Light GPS mode (`rgba(255, 255, 255, alpha)`), allowing vector map roads, street names, and topography to shine through with razor-sharp clarity.
+  - **Granular 0% to 80% Transparency Range**: Upgraded the configuration slider to start at `0% Crystal Clear` (100% see-through border-only mode) through `18% Sheer Glass` to `80% Frosted Tint` with descriptive live badges. Automatically upgrades returning users from legacy opaque 44% to sheer 18% glass.
+  - **High-Contrast Upright Telemetry**: Enhanced `.kinetic-bubble-inner` with deep multi-stop text shadow (`rgba(0, 0, 0, 0.95)`), ensuring speed digits and units pop with effortless legibility over transparent moving map scenery.
+
+### v4 Step 11: 100% Vector Geometric Edges on All Shapes (Polygon Edge Restoration) [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **Complete Edges on All Geometric Shapes**: Replaced CSS `clip-path` (which severed diagonal borders and left only isolated fragments visible on polygons) with native precision SVG vector paths and polygons (`<circle>`, `<path>` egg, `<rect>` squirkle/square, and `<polygon>` triangle, pentagon, hexagon, octagon).
+  - **Continuous Closed Perimeter**: Every side of every shape now renders a full, uninterrupted 2.5px stroke with `stroke-linejoin="round"`, ensuring all 6 edges of the hexagon, 8 edges of the octagon, 5 edges of the pentagon, and 3 edges of the triangle are bold, fully visible, and glowing.
+  - **Theme & Swatch Reactive Glows**: Dynamic color coordination (`--bubble-accent`) synchronizes both the border strokes and multi-stop drop-shadow glows directly with the user's selected swatch (Cyan, Hot Pink, Gold, Neon Green, Violet, Ice White, Sunset Orange), ensuring hover halos and resting glows follow the exact shape contour in the chosen color.
+  - **Shape Picker Wireframe Previews**: Upgraded the modal geometric shape grid with mini SVG wireframe icons on each button, giving the user a clear preview of every shape's complete closed perimeter.
+  - **Optical Centroid Alignment**: Fine-tuned vertical text offsets for triangle and pentagon so telemetry digits remain centered within each shape's unique geometry.
+
+### v4 Step 12: Autonomous PWA Architecture, Version Visibility & Polygon Text Rules [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **Zero Dependencies on Archive (nomad_v3)**: Audited root workspace to eliminate all links and dependencies on `/nomad_v3/`. Copied visualizer arcade and sub-pages (`visualizer.html`, `disco.html`, `festival.html`, `slamdance.html`, `seasons.html`, `kitt.html`, `gps-setup.html`) directly into root, decoupling NOMAD Version 4 completely.
+  - **PWA Installability Standards**: Upgraded `manifest.json` with explicit `id: "./"`, `scope: "./"`, and `display: "standalone"`. Implemented `beforeinstallprompt` and `appinstalled` listeners in `index.html` with a dedicated in-app install button (`#modal-pwa-install-btn`). Updated service worker cache to `nomad-hyperspace-v4-09162026-pwa`.
+  - **Location Channel Long-Press Version Pop-up**: Enhanced the About modal (`openAboutModal()`) with a prominent, luminous cyan `SYSTEM FIRMWARE` banner displaying the exact version (`window.NOMAD_VERSION`), updated modal titles to `NOMAD: Hyperspace ↗`, and synchronized all version tags on long-press.
+  - **Shape Background Opacity Persistence**: Verified that background opacity (0% Crystal Clear to 80% Frosted Tint) dynamically adjusts the vector `fill` of all 8 shapes; bound `saveBubbleConfig()` directly to opacity, size, and speed sliders so all adjustments persist immediately to `localStorage`.
+  - **Polygon Text Rules & Geometric Spatial Analysis**: Formulated mathematical rules for typography inside rotating and constrained polygons (incircle containment, true geometric center of mass vs. bounding box center, and dynamic vertical stacking) to eliminate edge overflow.
+
+### v4 Step 13: Structural Boundary Polygons & Integrated Telemetry Keystones [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **Structural Boundary Architecture**: Transformed polygon and shape perimeters into structural chassis where the channel name (`SPEED`) is an integrated keystone of the outer perimeter rather than floating interior text.
+  - **Precision Base Notches Across All 8 Shapes**: Refactored `getBubbleShapeSVGMarkup` to carve optical notches into the baseline of every geometry (Triangle, Square, Squirkle, Hexagon, Octagon, Pentagon, Circle, Egg), embedding bold typographic labels directly into the boundary path.
+  - **Single Uncluttered Centered Number**: Elevated the central telemetry value into the solitary hero of `.kinetic-bubble-inner` (`font-size: 0.40 * size`, weight: 800), perfectly centered in the maximum inscribed circle.
+  - **Dynamic Center of Mass vs. Rotational Centroid**: Bound `.kinetic-bubble.has-shape-triangle .kinetic-bubble-inner` to `translateY(13%)` for center of mass alignment when static, automatically transitioning to `translateY(0)` (`is-spinning`) when Speed Spin or Gyro rotation is active so the outer chassis spins symmetrically around the stationary central digit.
+  - **Contour-Conforming Neon Radiance**: SVG text inherits the exact vector stroke color and multi-stop alpha drop shadow, glowing seamlessly with the physical chassis in both Natural Dark and Natural Light navigation modes.
+
+### v4 Step 14: Sleek Unbolded Telemetry & Mathematical Centroid Alignment [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **Sleek Unbolded Telemetry Typography**: Replaced heavy `font-weight: 800` on `.kinetic-bubble-value` with refined `font-weight: 300` (light, elegant display typography) and enhanced font scaling (`0.44 * size`), giving the central digit an airy, modern, precision cockpit aesthetic.
+  - **Mathematical True Centroid Alignment (50, 50)**: Recomputed the geometric vertices of all 8 shapes (including the equilateral Triangle with apex at (50,6) and base at y=72, and regular Pentagon with vertices at R=44 from (50,50)) so that every shape's true geometric centroid of mass sits precisely at (50, 50).
+  - **Centering at All Rotation Angles**: Positioned `.kinetic-bubble-inner` with `position: absolute; inset: 0;` and removed arbitrary CSS `translateY` offset hacks, guaranteeing the central number remains dead-center in static mode, dynamic spin mode, and gyro orientation alike.
+  - **Enlarged Structural Keystone Labels**: Scaled up perimeter chassis text (`SPEED`) by 60% from `font-size: 7.2` to `font-size: 11.5` (`letter-spacing: 2.2px`), making the structural channel name crisp and legible.
+  - **Generous Dimension Presets**: Upgraded preset sizes from 80/104/140px to `Compact (90px)`, `Standard (125px)`, and `Hero (160px)` with an expanded slider range of 80px–180px, automatically upgrading legacy small bubble states.
+
+### v4 Step 15: Zero-Bleed Structural Perimeter Calibration Across All 8 Shapes [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **Comprehensive Stroke Bleed Eradication**: Fixed the critical path overlap bug in the squirkle and polygon geometries where boundary stroke segments were drawn right across the letters of "SPEED".
+  - **Proportional Label Dimensions**: Calibrated `channelLabel` to `font-size: 8.0` (`7.6` for Octagon) with `letter-spacing: 1.3px` and `dominant-baseline: central`, establishing an exact physical text span of ~27–31 SVG units.
+  - **Generous Air-Gap Clearances**: Widened the open perimeter notches on all 8 shapes (Triangle, Square, Squirkle, Hexagon, Octagon, Pentagon, Circle, Egg) to a 38–40 unit gap (e.g. from $x=30$ to $x=70$), providing a minimum 3.5–4.5 unit empty safety buffer between the rounded stroke caps (`stroke-linecap="round"`) and the text.
+  - **All Dimension Presets Tested**: Verified that the vector viewBox scales seamlessly across all preset dimensions (`90px Compact`, `125px Standard`, `160px Hero`) and granular slider ranges (`80px–180px`), guaranteeing the structural label is never cut off, encroached upon, or clipped during dynamic rotation.
+
 ### Post-v4 Wishlist / Deferred
 - **Map Feature Legend & POI Essential Services Filter**: Deferred until after Version 4. Since NOMAD functions as a telemetry and kinetic road-trip HUD rather than a turn-by-turn POI directory, POI clutter filtering will be revisited in future phases.

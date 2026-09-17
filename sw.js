@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nomad-roadtrip-v19-09152026-weather-cockpit-scaling';
+const CACHE_NAME = 'nomad-hyperspace-v4-09162026-pwa';
 
 const ASSETS_TO_CACHE = [
   './',
