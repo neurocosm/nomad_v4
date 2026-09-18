@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nomad-hyperspace-v4-09182026-pwa';
+const CACHE_NAME = 'nomad-hyperspace-v4-09182026-1440';
 
 const ASSETS_TO_CACHE = [
   './',

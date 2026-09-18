@@ -59,7 +59,8 @@
       mode: 'kinetic', wallBehavior: 'bounce', safeZoneBehavior: 'bounce',
       spinMode: 'keel', spinRate: 2, currentRotation: 0, angularVelocity: 0, keelTime: 4.8,
       speedLevel: 3, x: 28, y: 480, vx: 0.70, vy: 0.95, isDragging: false, isHovered: false,
-      showHumidity: true, showUv: true, showPressure: true
+      showHumidity: true, showUv: true, showPressure: true,
+      displayFormat: 'ticker', tickerSpeed: 2.5, currentTickerIndex: 0
     },
     coords: {
       key: 'coords', active: true, shape: 'square', color: '#ffffff', opacity: 18, size: 95,
@@ -68,6 +69,19 @@
       speedLevel: 3, x: 230, y: 490, vx: -0.65, vy: -0.90, isDragging: false, isHovered: false
     }
   };
+
+  // Global Bubble Settings (Inter-bubble collision & Units)
+  try {
+    const savedGlobals = localStorage.getItem('nomad_v4_bubble_globals');
+    window.nomadBubbleGlobalSettings = savedGlobals ? JSON.parse(savedGlobals) : {
+      interBubbleCollision: 'bounce',
+      globalUnitSystem: 'imperial'
+    };
+  } catch (e) {
+    window.nomadBubbleGlobalSettings = { interBubbleCollision: 'bounce', globalUnitSystem: 'imperial' };
+  }
+
+  window.altitudeUnit = localStorage.getItem('nomad_v4_altitude_unit') || 'ft';
 
   // Backward compatibility alias for legacy code referencing speedBubbleConfig
   window.speedBubbleConfig = window.nomadBubbles.speed;
@@ -121,8 +135,9 @@
     // 4. Initial rendering for compass, altitude, temp, atmo, coords
     if (typeof window.renderCompassBubble === 'function') window.renderCompassBubble(window.currentHeading);
     if (typeof window.renderAltitudeBubble === 'function') window.renderAltitudeBubble();
-    if (typeof window.renderTemperature === 'function') window.renderTemperature();
+    if (typeof window.renderTemperatureBubble === 'function') window.renderTemperatureBubble();
     if (typeof window.renderAtmoBubble === 'function') window.renderAtmoBubble();
+    if (typeof window.startAtmoTickerTimer === 'function') window.startAtmoTickerTimer();
     if (window.lastLat !== null && window.lastLon !== null && typeof window.renderCoordsBubble === 'function') {
       window.renderCoordsBubble(window.lastLat, window.lastLon);
     }
@@ -220,6 +235,52 @@
   };
 
   /**
+   * Calculates optimal font size for bubble telemetry so text NEVER overflows
+   * any geometric shape boundary at any bubble size (80px - 180px).
+   *
+   * @param {string|number} text - Content string being rendered
+   * @param {number} size - Outer bubble dimension in pixels
+   * @param {string} shape - Geometric shape ('circle', 'egg', 'squirkle', 'square', 'triangle', 'pentagon', 'hexagon', 'octagon')
+   * @param {object} options - Sizing configuration (maxScale, minPx, hasSubLabel)
+   * @returns {string} Font size in CSS px (e.g. '24.5px')
+   */
+  window.calculateDynamicBubbleFontSize = function(text, size = 90, shape = 'circle', options = {}) {
+    const str = String(text != null ? text : '').trim();
+    const len = Math.max(1, str.length);
+
+    let shapeFactor = 0.74;
+    switch (shape) {
+      case 'triangle': shapeFactor = 0.50; break;
+      case 'pentagon': shapeFactor = 0.58; break;
+      case 'hexagon': shapeFactor = 0.66; break;
+      case 'octagon': shapeFactor = 0.70; break;
+      case 'egg': shapeFactor = 0.72; break;
+      case 'squirkle': shapeFactor = 0.75; break;
+      case 'square': shapeFactor = 0.76; break;
+      case 'circle':
+      default: shapeFactor = 0.74; break;
+    }
+
+    const maxScale = options.maxScale || 0.40;
+    const minPx = options.minPx || 9.5;
+    const usableWidth = size * shapeFactor;
+
+    let charWidthRatio = 0.56;
+    if (str.includes('.') || str.includes('°') || str.includes(':') || str.includes('%')) {
+      charWidthRatio = 0.50;
+    }
+
+    const sizeByWidth = usableWidth / (len * charWidthRatio);
+    const heightFactor = options.hasSubLabel ? (maxScale * 0.85) : maxScale;
+    const sizeByHeight = size * heightFactor;
+
+    let fitted = Math.min(sizeByWidth, sizeByHeight);
+    fitted = Math.max(minPx, fitted);
+
+    return `${fitted.toFixed(1)}px`;
+  };
+
+  /**
    * Applies configuration styling and SVG vector frame to a specific bubble's DOM
    */
   window.applyBubbleConfigUI = function(bubbleKey = window.currentSelectedBubbleTab) {
@@ -274,21 +335,34 @@
 
     // 3. Render SVG Vector Geometry with channel label and unit label
     let channelLabel = 'SPEED';
-    let unitLabel = (typeof window.isMph !== 'undefined' && !window.isMph) ? 'KM/H' : 'MPH';
+    let unitLabel = (window.isMph === false) ? 'KM/H' : 'MPH';
 
     if (bubbleKey === 'compass') {
       channelLabel = 'HEADING';
-      unitLabel = (typeof window.currentHeading === 'number' && !isNaN(window.currentHeading) && typeof window.getCardinalDirection === 'function') 
-        ? window.getCardinalDirection(window.currentHeading) : 'N';
+      const h = (typeof window.currentHeading === 'number' && !isNaN(window.currentHeading)) ? window.currentHeading : 0;
+      const getCard = (typeof window.getCardinalDirection === 'function') 
+        ? window.getCardinalDirection 
+        : (a => ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.round((a || 0) / 45) % 8]);
+      unitLabel = getCard(h);
     } else if (bubbleKey === 'altitude') {
       channelLabel = 'ALTITUDE';
-      unitLabel = 'FT';
+      unitLabel = (window.altitudeUnit === 'm') ? 'M' : 'FT';
     } else if (bubbleKey === 'temp') {
       channelLabel = 'TEMP';
-      unitLabel = window.isFahrenheit ? '°F' : '°C';
+      unitLabel = (window.isFahrenheit === false) ? '°C' : '°F';
     } else if (bubbleKey === 'atmo') {
       channelLabel = 'ATMO';
-      unitLabel = 'AIR';
+      if (b.displayFormat !== 'stack') {
+        const activeMetrics = [
+          b.showHumidity !== false && 'humidity',
+          b.showUv !== false && 'uv',
+          b.showPressure !== false && 'pressure'
+        ].filter(Boolean);
+        const cur = activeMetrics[(b.currentTickerIndex || 0) % (activeMetrics.length || 1)] || 'humidity';
+        unitLabel = (cur === 'humidity') ? 'HUM' : ((cur === 'uv') ? 'UV' : 'BARO');
+      } else {
+        unitLabel = 'AIR';
+      }
     } else if (bubbleKey === 'coords') {
       channelLabel = 'COORDS';
       unitLabel = 'GPS';
@@ -303,22 +377,19 @@
       shapeFrame.style.transform = `rotate(${b.currentRotation || 0}deg)`;
     }
 
-    // Font size scaling based on bubble dimension
-    if (bubbleKey === 'speed' || bubbleKey === 'compass' || bubbleKey === 'altitude' || bubbleKey === 'temp') {
-      const valEl = document.getElementById(`${bubbleKey}-bubble-value`);
-      if (valEl) {
-        valEl.style.fontSize = `${(size * 0.44).toFixed(1)}px`;
-      }
+    // Dynamic text sizing based on bubble dimension, geometry, and live content
+    if (bubbleKey === 'speed') {
+      if (typeof window.renderSpeedBubble === 'function') window.renderSpeedBubble();
+    } else if (bubbleKey === 'compass') {
+      if (typeof window.renderCompassBubble === 'function') window.renderCompassBubble();
+    } else if (bubbleKey === 'altitude') {
+      if (typeof window.renderAltitudeBubble === 'function') window.renderAltitudeBubble();
+    } else if (bubbleKey === 'temp') {
+      if (typeof window.renderTemperatureBubble === 'function') window.renderTemperatureBubble();
     } else if (bubbleKey === 'atmo') {
-      const stack = document.getElementById('atmo-stack-inner');
-      if (stack) {
-        stack.style.fontSize = `${Math.max(9.5, size * 0.135).toFixed(1)}px`;
-      }
+      if (typeof window.renderAtmoBubble === 'function') window.renderAtmoBubble();
     } else if (bubbleKey === 'coords') {
-      const cLines = document.querySelectorAll('#coords-bubble-content .coords-line');
-      cLines.forEach(cl => {
-        cl.style.fontSize = `${Math.max(9.5, size * 0.13).toFixed(1)}px`;
-      });
+      if (typeof window.renderCoordsBubble === 'function') window.renderCoordsBubble();
     }
 
     // 4. Mode Pin indicator
@@ -363,6 +434,20 @@
         // Shape Dynamic Rotation (Text remains upright, outer shape spins based on Keel, GPS speed, or Gyro/Heading)
         if (b.spinMode && b.spinMode !== 'off') {
           updateBubbleShapeSpin(k);
+        }
+      });
+
+      // Inter-bubble elastic collision resolution (Pinball mode vs Ghost mode)
+      resolveBubbleCollisions();
+
+      // Flush coordinates to DOM
+      window.BUBBLE_KEYS.forEach(k => {
+        const b = window.nomadBubbles[k];
+        if (!b || b.active === false) return;
+        const el = document.getElementById(`${k}-bubble`);
+        if (el) {
+          el.style.left = `${b.x}px`;
+          el.style.top = `${b.y}px`;
         }
       });
 
@@ -476,10 +561,11 @@
         b.y = vh;
       }
     } else {
-      const topLimit = window.isLayoutInverted ? 88 : 64;
-      const bottomLimit = window.isLayoutInverted ? (vh - 68) : (vh - 108);
-      const leftLimit = 10;
-      const rightLimit = vw - size - 10;
+      // Full screen edge-to-edge and corner-to-corner bounce (glides underneath top buttons and bottom location bar)
+      const topLimit = 0;
+      const bottomLimit = Math.max(0, vh - size);
+      const leftLimit = 0;
+      const rightLimit = Math.max(0, vw - size);
 
       if (b.x <= leftLimit) {
         b.x = leftLimit;
@@ -551,6 +637,96 @@
 
     el.style.left = `${b.x}px`;
     el.style.top = `${b.y}px`;
+  }
+
+  /**
+   * Resolves 2D elastic collisions between kinetic bubbles (Pinball mode vs Ghost mode)
+   */
+  function resolveBubbleCollisions() {
+    if (!window.nomadBubbleGlobalSettings || window.nomadBubbleGlobalSettings.interBubbleCollision === 'ghost') return;
+
+    const keys = window.BUBBLE_KEYS;
+    const len = keys.length;
+
+    for (let i = 0; i < len; i++) {
+      const b1 = window.nomadBubbles[keys[i]];
+      if (!b1 || b1.active === false) continue;
+      const size1 = b1.size || 90;
+      const r1 = size1 / 2;
+      const c1x = b1.x + r1;
+      const c1y = b1.y + r1;
+
+      for (let j = i + 1; j < len; j++) {
+        const b2 = window.nomadBubbles[keys[j]];
+        if (!b2 || b2.active === false) continue;
+        const size2 = b2.size || 90;
+        const r2 = size2 / 2;
+        const c2x = b2.x + r2;
+        const c2y = b2.y + r2;
+
+        const dx = c2x - c1x;
+        const dy = c2y - c1y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const minDist = r1 + r2;
+
+        if (dist < minDist && dist > 0.001) {
+          const nx = dx / dist;
+          const ny = dy / dist;
+          const overlap = minDist - dist;
+
+          const b1Kinetic = (b1.mode === 'kinetic' && !b1.isDragging && !b1.isHovered);
+          const b2Kinetic = (b2.mode === 'kinetic' && !b2.isDragging && !b2.isHovered);
+
+          // Positional separation to guarantee zero visual overlap
+          if (b1Kinetic && b2Kinetic) {
+            b1.x -= nx * (overlap * 0.5);
+            b1.y -= ny * (overlap * 0.5);
+            b2.x += nx * (overlap * 0.5);
+            b2.y += ny * (overlap * 0.5);
+          } else if (b1Kinetic && !b2Kinetic) {
+            b1.x -= nx * overlap;
+            b1.y -= ny * overlap;
+          } else if (!b1Kinetic && b2Kinetic) {
+            b2.x += nx * overlap;
+            b2.y += ny * overlap;
+          }
+
+          // Elastic momentum exchange
+          if (b1Kinetic || b2Kinetic) {
+            const v1x = b1Kinetic ? b1.vx : 0;
+            const v1y = b1Kinetic ? b1.vy : 0;
+            const v2x = b2Kinetic ? b2.vx : 0;
+            const v2y = b2Kinetic ? b2.vy : 0;
+
+            const kx = v1x - v2x;
+            const ky = v1y - v2y;
+            const normalVel = (kx * nx + ky * ny);
+
+            // Deflect only when moving toward one another
+            if (normalVel > 0) {
+              const m1 = r1;
+              const m2 = r2;
+              const impulse = (2 * normalVel) / (m1 + m2);
+
+              if (b1Kinetic) {
+                b1.vx -= impulse * m2 * nx;
+                b1.vy -= impulse * m2 * ny;
+                if (b1.spinMode === 'keel') {
+                  b1.angularVelocity = Math.max(-12, Math.min(12, (b1.angularVelocity || 0) + (-nx * b1.vy + ny * b1.vx) * 5));
+                }
+              }
+              if (b2Kinetic) {
+                b2.vx += impulse * m1 * nx;
+                b2.vy += impulse * m1 * ny;
+                if (b2.spinMode === 'keel') {
+                  b2.angularVelocity = Math.max(-12, Math.min(12, (b2.angularVelocity || 0) + (-nx * b2.vy + ny * b2.vx) * 5));
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -662,19 +838,43 @@
           }
         }
         window.saveBubbleConfig();
+      } else {
+        // Quick tap without drag: for ATMOS bubble in ticker mode, tap immediately advances to the next active metric!
+        if (bubbleKey === 'atmo' && b.displayFormat !== 'stack') {
+          const activeMetrics = [
+            b.showHumidity !== false && 'humidity',
+            b.showUv !== false && 'uv',
+            b.showPressure !== false && 'pressure'
+          ].filter(Boolean);
+          if (activeMetrics.length > 1) {
+            const hero = document.getElementById('atmo-ticker-hero');
+            if (hero) hero.classList.add('atmo-ticker-transitioning');
+            setTimeout(() => {
+              b.currentTickerIndex = ((b.currentTickerIndex || 0) + 1) % activeMetrics.length;
+              window.renderAtmoBubble();
+              if (hero) hero.classList.remove('atmo-ticker-transitioning');
+            }, 80);
+            window.startAtmoTickerTimer();
+            if (navigator.vibrate) {
+              try { navigator.vibrate(12); } catch (_) {}
+            }
+          }
+        }
       }
     }
 
     // Touch events
+    let isTrackingTouch = false;
     el.addEventListener('touchstart', (e) => {
       b.isHovered = true; // freeze on finger contact
       if (e.touches.length === 1) {
+        isTrackingTouch = true;
         onPointerDown(e.touches[0].clientX, e.touches[0].clientY, e);
       }
     }, { passive: true });
 
     window.addEventListener('touchmove', (e) => {
-      if (b.isDragging || state.longPressTimer) {
+      if (isTrackingTouch && (b.isDragging || state.longPressTimer)) {
         if (e.touches.length === 1) {
           onPointerMove(e.touches[0].clientX, e.touches[0].clientY, e);
         }
@@ -682,8 +882,25 @@
     }, { passive: true });
 
     window.addEventListener('touchend', () => {
-      b.isHovered = false;
-      onPointerUp();
+      if (isTrackingTouch) {
+        isTrackingTouch = false;
+        b.isHovered = false;
+        onPointerUp();
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchcancel', () => {
+      if (isTrackingTouch) {
+        isTrackingTouch = false;
+        b.isHovered = false;
+        clearTimeout(state.longPressTimer);
+        state.longPressTimer = null;
+        el.classList.remove('is-longpressing');
+        if (b.isDragging) {
+          b.isDragging = false;
+          el.classList.remove('is-dragging');
+        }
+      }
     }, { passive: true });
 
     // Mouse events for desktop
@@ -761,15 +978,26 @@
     window.setBubbleSizeUI(b.size || 90);
 
     const isStationary = (b.mode === 'stationary');
+    const safezoneSection = document.getElementById('bubble-safezone-section');
     const safezoneGroup = document.getElementById('bubble-safezone-group');
     const safezoneTitle = document.getElementById('bubble-safezone-title');
+    const wallSection = document.getElementById('bubble-wall-section');
     const wallGroup = document.getElementById('bubble-wall-group');
     const wallTitle = document.getElementById('bubble-wall-title');
     const speedSliderWrap = document.getElementById('bubble-speed-slider-wrap');
-    if (safezoneGroup) safezoneGroup.style.display = isStationary ? 'none' : 'flex';
-    if (safezoneTitle) safezoneTitle.style.display = isStationary ? 'none' : 'block';
-    if (wallGroup) wallGroup.style.display = isStationary ? 'none' : 'flex';
-    if (wallTitle) wallTitle.style.display = isStationary ? 'none' : 'block';
+
+    if (safezoneSection) safezoneSection.style.display = isStationary ? 'none' : 'block';
+    else {
+      if (safezoneGroup) safezoneGroup.style.display = isStationary ? 'none' : 'flex';
+      if (safezoneTitle) safezoneTitle.style.display = isStationary ? 'none' : 'block';
+    }
+
+    if (wallSection) wallSection.style.display = isStationary ? 'none' : 'block';
+    else {
+      if (wallGroup) wallGroup.style.display = isStationary ? 'none' : 'flex';
+      if (wallTitle) wallTitle.style.display = isStationary ? 'none' : 'block';
+    }
+
     if (speedSliderWrap) speedSliderWrap.style.display = isStationary ? 'none' : 'block';
 
     // Opacity
@@ -812,10 +1040,16 @@
       spinLabel.innerText = spinRateNames[b.spinRate || 2] || '1.0x Normal';
     }
 
-    // If Atmo tab, sync its metric toggles
+    // If Atmo tab, sync its metric toggles and format/pace
     if (tabId === 'atmo') {
       window.syncAtmoMetricButtonsUI();
+      window.syncAtmoDisplayFormatUI();
+      window.syncAtmoTickerPaceUI();
     }
+
+    // Sync inter-bubble collision and unit controls
+    if (typeof window.syncInterBubbleCollisionUI === 'function') window.syncInterBubbleCollisionUI();
+    if (typeof window.syncUnitUI === 'function') window.syncUnitUI();
   };
 
   window.setBubbleActive = function(isActive) {
@@ -879,12 +1113,39 @@
     }
   };
 
-  window.setBubbleSafeZoneBehavior = function(behavior) {
-    const b = window.nomadBubbles[window.currentSelectedBubbleTab];
+  window.setBubbleSafeZoneBehavior = function(behavior, applyToAll = false) {
+    const tabId = window.currentSelectedBubbleTab;
+    const b = window.nomadBubbles[tabId];
     if (!b) return;
-    b.safeZoneBehavior = behavior;
+
+    if (applyToAll) {
+      window.BUBBLE_KEYS.forEach(k => {
+        if (window.nomadBubbles[k]) {
+          window.nomadBubbles[k].safeZoneBehavior = behavior;
+        }
+      });
+    } else {
+      b.safeZoneBehavior = behavior;
+    }
+
     window.setBubbleSafeZoneBehaviorUI(behavior);
+    window.applyBubbleConfigUI(tabId);
     window.saveBubbleConfig();
+
+    if (navigator.vibrate) try { navigator.vibrate(25); } catch (_) {}
+    if (typeof window.showMapThemeToast === 'function') {
+      const title = (window.BUBBLE_METADATA && window.BUBBLE_METADATA[tabId]?.title) || tabId.toUpperCase();
+      const msg = (behavior === 'under')
+        ? (applyToAll ? '🌌 Glide Under: All Bubbles Pass Under Vehicle' : `🌌 Glide Under: ${title} Passes Under Vehicle`)
+        : (applyToAll ? '🛡️ Safe Zone Deflect: All Bubbles Bounce' : `🛡️ Safe Zone Deflect: ${title} Bounces Off Forcefield`);
+      window.showMapThemeToast({ name: msg, type: 'perspective' });
+    }
+  };
+
+  window.applySafeZoneToAll = function() {
+    const tabId = window.currentSelectedBubbleTab;
+    const behavior = (window.nomadBubbles[tabId] && window.nomadBubbles[tabId].safeZoneBehavior) || 'bounce';
+    window.setBubbleSafeZoneBehavior(behavior, true);
   };
 
   window.setBubbleSafeZoneBehaviorUI = function(behavior) {
@@ -901,10 +1162,21 @@
     }
   };
 
-  window.setBubbleWallBehavior = function(behavior) {
-    const b = window.nomadBubbles[window.currentSelectedBubbleTab];
+  window.setBubbleWallBehavior = function(behavior, applyToAll = false) {
+    const tabId = window.currentSelectedBubbleTab;
+    const b = window.nomadBubbles[tabId];
     if (!b) return;
-    b.wallBehavior = behavior;
+
+    if (applyToAll) {
+      window.BUBBLE_KEYS.forEach(k => {
+        if (window.nomadBubbles[k]) {
+          window.nomadBubbles[k].wallBehavior = behavior;
+        }
+      });
+    } else {
+      b.wallBehavior = behavior;
+    }
+
     window.setBubbleWallBehaviorUI(behavior);
     if (behavior === 'bounce') {
       const vw = window.innerWidth;
@@ -918,9 +1190,24 @@
       if (b.x > rightLimit) b.x = rightLimit;
       if (b.y < topLimit) b.y = topLimit;
       if (b.y > bottomLimit) b.y = bottomLimit;
-      window.applyBubbleConfigUI(window.currentSelectedBubbleTab);
+      window.applyBubbleConfigUI(tabId);
     }
     window.saveBubbleConfig();
+
+    if (navigator.vibrate) try { navigator.vibrate(25); } catch (_) {}
+    if (typeof window.showMapThemeToast === 'function') {
+      const title = (window.BUBBLE_METADATA && window.BUBBLE_METADATA[tabId]?.title) || tabId.toUpperCase();
+      const msg = (behavior === 'wrap')
+        ? (applyToAll ? '🌀 Screen Wrap: All Bubbles Wrap Edges' : `🌀 Screen Wrap: ${title} Wraps Screen Edges`)
+        : (applyToAll ? '🧱 Wall Barrier: All Bubbles Bounce Off Edges' : `🧱 Wall Barrier: ${title} Bounces Off Walls`);
+      window.showMapThemeToast({ name: msg, type: 'perspective' });
+    }
+  };
+
+  window.applyWallBehaviorToAll = function() {
+    const tabId = window.currentSelectedBubbleTab;
+    const behavior = (window.nomadBubbles[tabId] && window.nomadBubbles[tabId].wallBehavior) || 'bounce';
+    window.setBubbleWallBehavior(behavior, true);
   };
 
   window.setBubbleWallBehaviorUI = function(behavior) {
@@ -1095,7 +1382,9 @@
     }
 
     window.syncAtmoMetricButtonsUI();
+    window.applyBubbleConfigUI('atmo');
     window.renderAtmoBubble();
+    window.startAtmoTickerTimer();
     window.saveBubbleConfig();
   };
 
@@ -1110,17 +1399,114 @@
     if (pressBtn) pressBtn.classList.toggle('is-selected', b.showPressure !== false);
   };
 
+  window.setAtmoDisplayFormat = function(format) {
+    const b = window.nomadBubbles.atmo;
+    if (!b) return;
+    b.displayFormat = format;
+    window.syncAtmoDisplayFormatUI();
+    window.applyBubbleConfigUI('atmo');
+    window.renderAtmoBubble();
+    window.startAtmoTickerTimer();
+    window.saveBubbleConfig();
+  };
+
+  window.setAtmoTickerPace = function(pace) {
+    const b = window.nomadBubbles.atmo;
+    if (!b) return;
+    b.tickerSpeed = pace;
+    window.syncAtmoTickerPaceUI();
+    window.startAtmoTickerTimer();
+    window.saveBubbleConfig();
+  };
+
+  window.syncAtmoDisplayFormatUI = function() {
+    const b = window.nomadBubbles.atmo;
+    const tickerBtn = document.getElementById('atmo-format-ticker');
+    const stackBtn = document.getElementById('atmo-format-stack');
+    const paceGroup = document.getElementById('atmo-ticker-pace-group');
+    const isTicker = (b.displayFormat !== 'stack');
+    if (tickerBtn) tickerBtn.classList.toggle('is-selected', isTicker);
+    if (stackBtn) stackBtn.classList.toggle('is-selected', !isTicker);
+    if (paceGroup) paceGroup.style.display = isTicker ? 'block' : 'none';
+  };
+
+  window.syncAtmoTickerPaceUI = function() {
+    const b = window.nomadBubbles.atmo;
+    const pace = b.tickerSpeed || 2.5;
+    const fastBtn = document.getElementById('atmo-pace-fast');
+    const steadyBtn = document.getElementById('atmo-pace-steady');
+    const calmBtn = document.getElementById('atmo-pace-calm');
+    if (fastBtn) fastBtn.classList.toggle('is-selected', pace === 1.5);
+    if (steadyBtn) steadyBtn.classList.toggle('is-selected', pace === 2.5);
+    if (calmBtn) calmBtn.classList.toggle('is-selected', pace === 4.0);
+  };
+
+  let atmoTickerIntervalId = null;
+  window.startAtmoTickerTimer = function() {
+    if (atmoTickerIntervalId) clearInterval(atmoTickerIntervalId);
+    const b = window.nomadBubbles.atmo;
+    if (!b) return;
+    const intervalMs = Math.round(Math.max(1000, (b.tickerSpeed || 2.5) * 1000));
+    atmoTickerIntervalId = setInterval(() => {
+      const atmoB = window.nomadBubbles.atmo;
+      if (!atmoB || atmoB.active === false || atmoB.displayFormat === 'stack') return;
+      const activeMetrics = [
+        atmoB.showHumidity !== false && 'humidity',
+        atmoB.showUv !== false && 'uv',
+        atmoB.showPressure !== false && 'pressure'
+      ].filter(Boolean);
+      if (activeMetrics.length <= 1) return;
+
+      const hero = document.getElementById('atmo-ticker-hero');
+      if (hero) hero.classList.add('atmo-ticker-transitioning');
+      setTimeout(() => {
+        atmoB.currentTickerIndex = ((atmoB.currentTickerIndex || 0) + 1) % activeMetrics.length;
+        window.renderAtmoBubble();
+        if (hero) hero.classList.remove('atmo-ticker-transitioning');
+      }, 140);
+    }, intervalMs);
+  };
+
+  // Resume ticker loop whenever the page or PWA is brought back to the foreground
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      if (typeof window.startAtmoTickerTimer === 'function') window.startAtmoTickerTimer();
+      if (typeof window.renderAtmoBubble === 'function') window.renderAtmoBubble();
+    }
+  });
+
   // Telemetry Rendering Handlers for All 6 Bubbles
+  window.renderSpeedBubble = function(speedText) {
+    const valEl = document.getElementById('speed-bubble-value');
+    if (!valEl) return;
+    if (speedText !== undefined) valEl.innerText = String(speedText);
+    const b = window.nomadBubbles && window.nomadBubbles.speed;
+    if (b) {
+      valEl.style.fontSize = window.calculateDynamicBubbleFontSize(
+        valEl.innerText,
+        b.size || 90,
+        b.shape || 'circle',
+        { maxScale: 0.42 }
+      );
+    }
+  };
+
   window.renderCompassBubble = function(heading) {
     const el = document.getElementById('compass-bubble-value');
     if (!el) return;
-    if (heading === null || isNaN(heading)) {
-      el.innerText = '--°';
-      return;
-    }
-    el.innerText = `${Math.round(heading)}°`;
-    if (window.nomadBubbles.compass.active !== false) {
-      window.applyBubbleConfigUI('compass');
+    const h = (typeof heading === 'number' && !isNaN(heading))
+      ? heading
+      : ((typeof window.currentHeading === 'number' && !isNaN(window.currentHeading)) ? window.currentHeading : 0);
+    const valText = `${Math.round(h)}°`;
+    el.innerText = valText;
+    const b = window.nomadBubbles && window.nomadBubbles.compass;
+    if (b) {
+      el.style.fontSize = window.calculateDynamicBubbleFontSize(
+        valText,
+        b.size || 90,
+        b.shape || 'pentagon',
+        { maxScale: 0.40 }
+      );
     }
   };
 
@@ -1130,10 +1516,19 @@
     const meters = (typeof altMeters === 'number') ? altMeters : window.rawAltitudeMeters;
     if (meters === null || isNaN(meters)) {
       el.innerText = '--';
-      return;
+    } else {
+      const isM = (window.altitudeUnit === 'm');
+      el.innerText = isM ? Math.round(meters).toLocaleString() : Math.round(meters * 3.28084).toLocaleString();
     }
-    const feet = Math.round(meters * 3.28084);
-    el.innerText = feet.toLocaleString();
+    const b = window.nomadBubbles && window.nomadBubbles.altitude;
+    if (b) {
+      el.style.fontSize = window.calculateDynamicBubbleFontSize(
+        el.innerText,
+        b.size || 90,
+        b.shape || 'egg',
+        { maxScale: 0.40 }
+      );
+    }
   };
 
   window.renderTemperatureBubble = function() {
@@ -1141,50 +1536,153 @@
     if (!el) return;
     if (window.rawTempF === null || isNaN(window.rawTempF)) {
       el.innerText = '--°';
-      return;
-    }
-    if (window.isFahrenheit) {
+    } else if (window.isFahrenheit) {
       el.innerText = `${Math.round(window.rawTempF)}°`;
     } else {
       const tempC = (window.rawTempF - 32) * (5 / 9);
       el.innerText = `${Math.round(tempC)}°`;
     }
+    const b = window.nomadBubbles && window.nomadBubbles.temp;
+    if (b) {
+      el.style.fontSize = window.calculateDynamicBubbleFontSize(
+        el.innerText,
+        b.size || 90,
+        b.shape || 'circle',
+        { maxScale: 0.40 }
+      );
+    }
   };
 
   window.renderAtmoBubble = function() {
-    const b = window.nomadBubbles.atmo;
-    const humRow = document.getElementById('atmo-row-humidity');
-    const uvRow = document.getElementById('atmo-row-uv');
-    const pressRow = document.getElementById('atmo-row-pressure');
-    const humVal = document.getElementById('atmo-val-humidity');
-    const uvVal = document.getElementById('atmo-val-uv');
-    const pressVal = document.getElementById('atmo-val-pressure');
+    const b = window.nomadBubbles && window.nomadBubbles.atmo;
+    if (!b) return;
 
-    if (humRow) humRow.style.display = (b.showHumidity !== false) ? 'flex' : 'none';
-    if (uvRow) uvRow.style.display = (b.showUv !== false) ? 'flex' : 'none';
-    if (pressRow) pressRow.style.display = (b.showPressure !== false) ? 'flex' : 'none';
+    const isTicker = (b.displayFormat !== 'stack');
+    const tickerHero = document.getElementById('atmo-ticker-hero');
+    const stack = document.getElementById('atmo-stack-inner');
 
-    if (humVal) {
-      humVal.innerText = (typeof window.rawHumidityPercent === 'number') ? `${Math.round(window.rawHumidityPercent)}%` : '--%';
+    if (tickerHero) tickerHero.style.display = isTicker ? 'flex' : 'none';
+    if (stack) stack.style.display = isTicker ? 'none' : 'flex';
+
+    // Robustly read telemetry from memory, window, or localStorage cache
+    let rawHum = (window.rawHumidityPercent !== null && window.rawHumidityPercent !== undefined && !isNaN(Number(window.rawHumidityPercent)))
+      ? Number(window.rawHumidityPercent) : null;
+    let rawUv = (window.rawUvIndex !== null && window.rawUvIndex !== undefined && !isNaN(Number(window.rawUvIndex)))
+      ? Number(window.rawUvIndex) : null;
+    let rawPress = (window.rawPressureHpa !== null && window.rawPressureHpa !== undefined && !isNaN(Number(window.rawPressureHpa)))
+      ? Number(window.rawPressureHpa) : null;
+
+    if (rawHum === null || rawUv === null || rawPress === null) {
+      try {
+        const cachedW = localStorage.getItem('nomad_v4_weather_cache');
+        if (cachedW) {
+          const cw = JSON.parse(cachedW);
+          if (cw && typeof cw === 'object') {
+            if (rawHum === null && cw.humidity !== undefined && !isNaN(Number(cw.humidity))) rawHum = Number(cw.humidity);
+            if (rawUv === null && cw.uv !== undefined && !isNaN(Number(cw.uv))) rawUv = Number(cw.uv);
+            if (rawPress === null && cw.pressureHpa !== undefined && !isNaN(Number(cw.pressureHpa))) rawPress = Number(cw.pressureHpa);
+          }
+        }
+      } catch (_) {}
     }
-    if (uvVal) {
-      if (typeof window.rawUvIndex === 'number') {
-        const formattedUv = (window.rawUvIndex % 1 === 0) ? window.rawUvIndex.toFixed(0) : window.rawUvIndex.toFixed(1);
-        uvVal.innerText = `UV ${formattedUv}`;
+
+    const humStr = (rawHum !== null) ? `${Math.round(rawHum)}%` : '--%';
+    let uvStr = 'UV --';
+    let uvHeroVal = '--';
+    if (rawUv !== null) {
+      const formattedUv = (rawUv % 1 === 0) ? rawUv.toFixed(0) : rawUv.toFixed(1);
+      uvStr = `UV ${formattedUv}`;
+      uvHeroVal = formattedUv;
+    }
+
+    let pressStr = '--';
+    let pressInHg = '--';
+    let pressHpa = '--';
+    if (rawPress !== null) {
+      const unit = window.customPressureUnit ? window.customPressureUnit : (window.isFahrenheit ? 'in' : 'hPa');
+      if (unit === 'in') {
+        pressInHg = (rawPress * 0.02953).toFixed(2);
+        pressStr = `${pressInHg}in`;
       } else {
-        uvVal.innerText = 'UV --';
+        pressHpa = String(Math.round(rawPress));
+        pressStr = `${pressHpa}hPa`;
       }
     }
-    if (pressVal) {
-      if (window.rawPressureHpa === null || isNaN(window.rawPressureHpa)) {
-        pressVal.innerText = '--';
-      } else {
+
+    if (isTicker) {
+      const tickerVal = document.getElementById('atmo-ticker-value');
+      const tickerLbl = document.getElementById('atmo-ticker-label');
+      if (!tickerVal || !tickerLbl) return;
+
+      const activeMetrics = [
+        b.showHumidity !== false && 'humidity',
+        b.showUv !== false && 'uv',
+        b.showPressure !== false && 'pressure'
+      ].filter(Boolean);
+      if (activeMetrics.length === 0) activeMetrics.push('humidity');
+
+      const currentMetric = activeMetrics[(b.currentTickerIndex || 0) % activeMetrics.length] || 'humidity';
+
+      if (currentMetric === 'humidity') {
+        tickerVal.innerText = humStr;
+        tickerLbl.innerHTML = '<span>💧</span> <span>HUMIDITY</span>';
+      } else if (currentMetric === 'uv') {
+        tickerVal.innerText = uvHeroVal;
+        tickerLbl.innerHTML = '<span>☀️</span> <span>UV INDEX</span>';
+      } else if (currentMetric === 'pressure') {
         const unit = window.customPressureUnit ? window.customPressureUnit : (window.isFahrenheit ? 'in' : 'hPa');
         if (unit === 'in') {
-          const inHg = (window.rawPressureHpa * 0.02953).toFixed(2);
-          pressVal.innerText = `${inHg}in`;
+          tickerVal.innerHTML = `<span class="atmo-val-num">${pressInHg}</span><span class="atmo-val-unit">in</span>`;
         } else {
-          pressVal.innerText = `${Math.round(window.rawPressureHpa)}hPa`;
+          tickerVal.innerHTML = `<span class="atmo-val-num">${pressHpa}</span><span class="atmo-val-unit">hPa</span>`;
+        }
+        tickerLbl.innerHTML = '<span>⏲️</span> <span>BAROMETER</span>';
+      }
+
+      // Dynamic text sizing for tickerVal and tickerLbl based on live value length, bubble size, and shape
+      const curSize = b.size || 95;
+      const textToMeasure = tickerVal.textContent || '';
+      tickerVal.style.fontSize = window.calculateDynamicBubbleFontSize(
+        textToMeasure,
+        curSize,
+        b.shape || 'squirkle',
+        { maxScale: 0.35, hasSubLabel: true }
+      );
+      tickerLbl.style.fontSize = `${Math.max(7.5, curSize * 0.088).toFixed(1)}px`;
+
+      // Update notched shape unit label on SVG if rendered
+      const shapeFrame = document.getElementById('atmo-bubble-shape-frame');
+      if (shapeFrame) {
+        const texts = shapeFrame.querySelectorAll('text');
+        if (texts && texts.length > 0) {
+          texts[0].textContent = (currentMetric === 'humidity') ? 'HUM' : ((currentMetric === 'uv') ? 'UV' : 'BARO');
+        }
+      }
+    } else {
+      const humRow = document.getElementById('atmo-row-humidity');
+      const uvRow = document.getElementById('atmo-row-uv');
+      const pressRow = document.getElementById('atmo-row-pressure');
+      const humVal = document.getElementById('atmo-val-humidity');
+      const uvVal = document.getElementById('atmo-val-uv');
+      const pressVal = document.getElementById('atmo-val-pressure');
+
+      if (humRow) humRow.style.display = (b.showHumidity !== false) ? 'flex' : 'none';
+      if (uvRow) uvRow.style.display = (b.showUv !== false) ? 'flex' : 'none';
+      if (pressRow) pressRow.style.display = (b.showPressure !== false) ? 'flex' : 'none';
+
+      if (humVal) humVal.innerText = humStr;
+      if (uvVal) uvVal.innerText = uvStr;
+      if (pressVal) pressVal.innerText = pressStr;
+
+      const curSize = b.size || 95;
+      const stack = document.getElementById('atmo-stack-inner');
+      if (stack) stack.style.fontSize = `${Math.max(9.0, curSize * 0.125).toFixed(1)}px`;
+
+      const shapeFrame = document.getElementById('atmo-bubble-shape-frame');
+      if (shapeFrame) {
+        const texts = shapeFrame.querySelectorAll('text');
+        if (texts && texts.length > 0) {
+          texts[0].textContent = 'AIR';
         }
       }
     }
@@ -1195,19 +1693,181 @@
     const lonEl = document.getElementById('coords-lon');
     if (!latEl || !lonEl) return;
 
-    if (lat === null || lon === null || isNaN(lat) || isNaN(lon)) {
+    const actualLat = (typeof lat === 'number' && !isNaN(lat)) ? lat : window.lastLat;
+    const actualLon = (typeof lon === 'number' && !isNaN(lon)) ? lon : window.lastLon;
+
+    if (actualLat === null || actualLon === null || isNaN(actualLat) || isNaN(actualLon)) {
       latEl.innerText = '--.---° N';
       lonEl.innerText = '--.---° W';
-      return;
+    } else {
+      const latAbs = Math.abs(actualLat).toFixed(3);
+      const latDir = actualLat >= 0 ? 'N' : 'S';
+      latEl.innerText = `${latAbs}° ${latDir}`;
+
+      const lonAbs = Math.abs(actualLon).toFixed(3);
+      const lonDir = actualLon >= 0 ? 'E' : 'W';
+      lonEl.innerText = `${lonAbs}° ${lonDir}`;
     }
 
-    const latAbs = Math.abs(lat).toFixed(3);
-    const latDir = lat >= 0 ? 'N' : 'S';
-    latEl.innerText = `${latAbs}° ${latDir}`;
+    const b = window.nomadBubbles && window.nomadBubbles.coords;
+    if (b) {
+      const s = b.size || 90;
+      const fs = window.calculateDynamicBubbleFontSize(latEl.innerText, s, b.shape || 'square', {
+        maxScale: 0.13,
+        minPx: 8.5
+      });
+      latEl.style.fontSize = fs;
+      lonEl.style.fontSize = fs;
+    }
+  };
 
-    const lonAbs = Math.abs(lon).toFixed(3);
-    const lonDir = lon >= 0 ? 'E' : 'W';
-    lonEl.innerText = `${lonAbs}° ${lonDir}`;
+  // Inter-Bubble Collision Mode (Pinball Bounce vs Ghost Mode)
+  window.setInterBubbleCollision = function(mode) {
+    if (!window.nomadBubbleGlobalSettings) window.nomadBubbleGlobalSettings = {};
+    window.nomadBubbleGlobalSettings.interBubbleCollision = mode;
+    localStorage.setItem('nomad_v4_bubble_globals', JSON.stringify(window.nomadBubbleGlobalSettings));
+    window.syncInterBubbleCollisionUI();
+
+    if (navigator.vibrate) try { navigator.vibrate(25); } catch (_) {}
+    if (typeof window.showMapThemeToast === 'function') {
+      window.showMapThemeToast({
+        name: (mode === 'ghost')
+          ? '👻 Ghost Mode Active: Bubbles Pass Through Each Other'
+          : '⚡ Pinball Bounce Active: Elastic Inter-Bubble Collision',
+        type: 'perspective'
+      });
+    }
+  };
+
+  window.syncInterBubbleCollisionUI = function() {
+    const mode = (window.nomadBubbleGlobalSettings && window.nomadBubbleGlobalSettings.interBubbleCollision) || 'bounce';
+    const bounceBtn = document.getElementById('bubble-interact-bounce');
+    const ghostBtn = document.getElementById('bubble-interact-ghost');
+    if (bounceBtn) bounceBtn.classList.toggle('is-selected', mode === 'bounce');
+    if (ghostBtn) ghostBtn.classList.toggle('is-selected', mode === 'ghost');
+
+    const keys = window.BUBBLE_KEYS || [];
+    keys.forEach(k => {
+      const el = document.getElementById(`${k}-bubble`);
+      if (el) el.classList.toggle('is-ghost-mode', mode === 'ghost');
+    });
+  };
+
+  // Measurement Units Management (Imperial vs Metric)
+  window.syncUnitUI = function() {
+    const tabId = window.currentSelectedBubbleTab;
+    const titleEl = document.getElementById('bubble-units-title');
+    const opt1 = document.getElementById('bubble-unit-opt-1');
+    const opt2 = document.getElementById('bubble-unit-opt-2');
+    const group = document.getElementById('bubble-units-active-group');
+
+    if (!opt1 || !opt2 || !group) return;
+
+    if (tabId === 'speed') {
+      group.style.display = 'flex';
+      if (titleEl) titleEl.innerText = 'Speed Measurement Unit';
+      opt1.innerText = 'MPH (Imperial)';
+      opt2.innerText = 'KM/H (Metric)';
+      opt1.classList.toggle('is-selected', window.isMph !== false);
+      opt2.classList.toggle('is-selected', window.isMph === false);
+    } else if (tabId === 'temp') {
+      group.style.display = 'flex';
+      if (titleEl) titleEl.innerText = 'Temperature Measurement Unit';
+      opt1.innerText = '°F Fahrenheit';
+      opt2.innerText = '°C Celsius';
+      opt1.classList.toggle('is-selected', window.isFahrenheit !== false);
+      opt2.classList.toggle('is-selected', window.isFahrenheit === false);
+    } else if (tabId === 'altitude') {
+      group.style.display = 'flex';
+      if (titleEl) titleEl.innerText = 'Altitude Measurement Unit';
+      opt1.innerText = 'Feet (FT)';
+      opt2.innerText = 'Meters (M)';
+      const isM = (window.altitudeUnit === 'm');
+      opt1.classList.toggle('is-selected', !isM);
+      opt2.classList.toggle('is-selected', isM);
+    } else if (tabId === 'atmo') {
+      group.style.display = 'flex';
+      if (titleEl) titleEl.innerText = 'Barometer Measurement Unit';
+      opt1.innerText = 'inHg (in)';
+      opt2.innerText = 'hPa / mbar';
+      const isHpa = (window.customPressureUnit === 'hPa' || (!window.customPressureUnit && !window.isFahrenheit));
+      opt1.classList.toggle('is-selected', !isHpa);
+      opt2.classList.toggle('is-selected', isHpa);
+    } else {
+      group.style.display = 'none';
+      if (titleEl) titleEl.innerText = 'System Measurement Units';
+    }
+  };
+
+  window.toggleActiveBubbleUnit = function(optionIndex) {
+    const tabId = window.currentSelectedBubbleTab;
+    let toastName = '';
+    if (tabId === 'speed') {
+      window.isMph = (optionIndex === 1);
+      toastName = window.isMph ? 'Speed Unit: MPH' : 'Speed Unit: KM/H';
+      window.applyBubbleConfigUI('speed');
+      if (typeof window.updateSpeedometer === 'function') window.updateSpeedometer();
+    } else if (tabId === 'temp') {
+      window.isFahrenheit = (optionIndex === 1);
+      toastName = window.isFahrenheit ? 'Temp Unit: °F' : 'Temp Unit: °C';
+      window.applyBubbleConfigUI('temp');
+      window.renderTemperatureBubble();
+      if (typeof window.updateWeatherDisplay === 'function') window.updateWeatherDisplay();
+    } else if (tabId === 'altitude') {
+      window.altitudeUnit = (optionIndex === 1) ? 'ft' : 'm';
+      toastName = (window.altitudeUnit === 'ft') ? 'Altitude Unit: Feet (FT)' : 'Altitude Unit: Meters (M)';
+      localStorage.setItem('nomad_v4_altitude_unit', window.altitudeUnit);
+      window.applyBubbleConfigUI('altitude');
+      window.renderAltitudeBubble();
+    } else if (tabId === 'atmo') {
+      window.customPressureUnit = (optionIndex === 1) ? 'in' : 'hPa';
+      toastName = (window.customPressureUnit === 'in') ? 'Barometer Unit: inHg' : 'Barometer Unit: hPa / mbar';
+      window.applyBubbleConfigUI('atmo');
+      window.renderAtmoBubble();
+      if (typeof window.updateWeatherDisplay === 'function') window.updateWeatherDisplay();
+    }
+    window.syncUnitUI();
+    window.saveBubbleConfig();
+
+    if (navigator.vibrate) try { navigator.vibrate(25); } catch (_) {}
+    if (toastName && typeof window.showMapThemeToast === 'function') {
+      window.showMapThemeToast({ name: toastName, type: 'perspective' });
+    }
+  };
+
+  window.setGlobalUnitSystem = function(system) {
+    const isImperial = (system === 'imperial');
+    window.isMph = isImperial;
+    window.isFahrenheit = isImperial;
+    window.altitudeUnit = isImperial ? 'ft' : 'm';
+    localStorage.setItem('nomad_v4_altitude_unit', window.altitudeUnit);
+    window.customPressureUnit = isImperial ? 'in' : 'hPa';
+
+    if (!window.nomadBubbleGlobalSettings) window.nomadBubbleGlobalSettings = {};
+    window.nomadBubbleGlobalSettings.globalUnitSystem = system;
+    localStorage.setItem('nomad_v4_bubble_globals', JSON.stringify(window.nomadBubbleGlobalSettings));
+
+    window.applyBubbleConfigUI('speed');
+    window.applyBubbleConfigUI('temp');
+    window.applyBubbleConfigUI('altitude');
+    window.applyBubbleConfigUI('atmo');
+
+    if (typeof window.updateSpeedometer === 'function') window.updateSpeedometer();
+    window.renderTemperatureBubble();
+    window.renderAltitudeBubble();
+    window.renderAtmoBubble();
+    if (typeof window.updateWeatherDisplay === 'function') window.updateWeatherDisplay();
+
+    window.syncUnitUI();
+    window.saveBubbleConfig();
+
+    if (navigator.vibrate) try { navigator.vibrate(25); } catch (_) {}
+    if (typeof window.showMapThemeToast === 'function') {
+      window.showMapThemeToast({
+        name: isImperial ? 'Telemetry Units: All Imperial (MPH, °F, FT, inHg)' : 'Telemetry Units: All Metric (KM/H, °C, M, hPa)',
+        type: 'perspective'
+      });
+    }
   };
 
 })();

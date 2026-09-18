@@ -17,7 +17,9 @@
 ---
 
 ## NOMAD Version 4: Hyperspace Roadmap & Concepts
-- **Hyperspace Kinetic Data Bubbles & Geometry**: Floating, bouncing data bubbles/shapes (circle, egg/oval, triangle, square, squirkle, pentagon, sextagon, septagon, octagon) displaying telemetry data with customizable kinetic physics, speed, trajectory, size, and transparency.
+- **Hyperspace Kinetic Data Bubbles & Geometry**: Floating, bouncing data bubbles/shapes (circle, egg/oval, triangle, square, squirkle, pentagon, sextagon, septagon, octagon, plus planned wobbling rectangle) displaying telemetry data with customizable kinetic physics, speed, trajectory, size, and transparency.
+- **Curated Optimal Shape Pairings**: Pre-configuring each telemetry bubble with its ideal aesthetic default geometry (e.g. Speed = Egg/Oval, Weather/Temp = Squirkle, Compass = Pentagon, Coords = Wobble Rectangle), while retaining complete user customization.
+- **Wobbling Rectangle Shape Geometry**: A specialized rectangular geometry designed to naturally cradle two-line coordinate readings (Latitude & Longitude) with kinetic wobble physics.
 - **Stationary vs Kinetic Mode**: Long-press on data bubbles to configure shape, color, border/edge color, transparency, and pin/place on map grid or release into kinetic bounce.
 - **Safe Zone Bubble**: Dedicated protective boundary around the Chevron / Galaga Fighter so data elements bounce off without obscuring vehicle navigation.
 - **Dynamic Address Gradients & Split Views**: Reversible gradient styling, top/bottom address placement toggle, and landscape split-screen modes.
@@ -272,5 +274,29 @@
   - **Offline PWA & Service Worker Cache Manifest**: Updated `sw.js` cache to `nomad-hyperspace-v4-09182026-pwa`, adding all 4 modular scripts to `ASSETS_TO_CACHE` for continuous offline PWA operation.
   - **Version Registry Updated**: Updated `window.NOMAD_VERSION` in `version.js` to `v4.09182026.0605` in strict compliance with the US Eastern Time registry mandate.
 
-### Post-v4 Wishlist / Deferred
+### v4 Step 20: Telemetry Data Bridge Restoration & Bubble Synchronization [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **Bidirectional Telemetry Property Bridge**: Established direct, reactive getter/setter properties on `window` (`window.currentHeading`, `window.lastLat`, `window.lastLon`, `window.rawAltitudeMeters`, `window.rawTempF`, `window.isFahrenheit`, `window.isMph`, `window.rawSpeedMps`, `window.rawPressureHpa`, `window.rawHumidityPercent`, `window.rawUvIndex`, `window.customPressureUnit`), restoring live data flow across modular boundaries.
+  - **Stationary Compass Resiliency**: Made `renderCompassBubble` gracefully fall back to `currentHeading || 0` and cardinal orientation `N` when stationary at 0 MPH, eliminating blank `--°` readings upon initialization.
+  - **Weather & Elevation Ground Sync**: Linked Open-Meteo elevation data directly into `rawAltitudeMeters` when GPS satellite/barometric altitude is unavailable indoors or in desktop preview, immediately lighting up the Altitude bubble with ground-truth feet.
+  - **Live Weather & Atmo Population**: Hooked Open-Meteo current conditions directly into `renderTemperatureBubble` and `renderAtmoBubble`, instantaneously updating temperature, relative humidity, UV index, and barometric pressure.
+  - **Bootstrap Re-Rendering**: Added comprehensive telemetry refresh triggers at the conclusion of `bootstrapNomad()`, ensuring all 6 active bubbles render real data immediately upon app initialization.
+  - **Version Registry Updated**: Updated `NOMAD_VERSION` to `v4.09182026.0706` in `version.js` and refreshed `sw.js` cache.
+
+### v4 Step 21: Inter-Bubble Physics, Edge Wrap Dynamics, Weather Proxy & Universal Unit Systems [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **Same-Origin Server Atmospheric Proxy (`/api/weather`)**: Created high-reliability proxy in `server.js` forwarding Open-Meteo requests to bypass client ad-blockers, tracking prevention, and iframe restrictions, with automatic seamless client-side fallback.
+  - **Inter-Bubble Elastic Collision Engine**: Implemented full 2D momentum-conserving elastic collision physics between all active kinetic bubbles (`resolveBubbleCollisions`) with user toggle between "⚡ Pinball Bounce" and "👻 Ghost Mode" (pass through with ethereal luminescence shimmer).
+  - **Screen Edge Wrap & Wall Deflection Dynamics**: Added customizable boundary behavior (`bounce` vs `wrap`) allowing bubbles to bounce off perimeter bounds or seamlessly wrap around screen edges like classic Asteroids physics, complete with a 1-tap "Apply All" batch action.
+  - **Vehicle Safe Zone "Glide Under" & "Deflect" Batch Control**: Added global batch action ("Apply All") for vehicle forcefield deflection or gliding underneath.
+  - **Atmospheric Triad Hero Ticker & 3-Row Stack**: Implemented dual atmospheric layout modes: an auto-cycling Hero Ticker (1.5s Fast, 2.5s Steady, 4.0s Calm) and a simultaneous 3-Row Stack layout, with granular metric inclusion toggles for Humidity, UV, and Barometer.
+  - **Universal Telemetry Unit Switching**: Added per-bubble unit toggles (Speed: MPH/KMH, Temp: °F/°C, Altitude: FT/M, Barometer: inHg/hPa) plus a master 1-tap global switcher ("All Imperial" vs "All Metric").
+  - **Bubble Active / Inactive Status**: Added quick visibility state toggles (`👁️ Active` vs `💤 Inactive`) in the Hyperspace modal with live dot status on tab buttons.
+  - **Version Registry Updated**: Updated `NOMAD_VERSION` to `v4.09182026.1440` in `version.js` and refreshed `sw.js` cache to match.
+
+### Upcoming Backlog & Wishlist
+- **Optimal Pre-Made Bubble Shape Defaults & Curated Geometry**: Curate and assign the ideal default shape for each telemetry bubble out of the box (e.g., Speed = Egg/Oval, Temp = Squirkle, Compass = Pentagon, Altitude = Diamond/Hexagon, Atmo = Circle/Octagon, Coords = Wobble Rectangle), giving each data element immediate visual identity while preserving user customizability.
+- **Wobbling Rectangle Shape Geometry**: Introduce a dedicated kinetic rectangular shape with soft rounded corners and kinetic wobble physics, tailor-made to frame stacked two-line coordinate pairs (Latitude & Longitude) without clipping.
 - **Map Feature Legend & POI Essential Services Filter**: Deferred until after Version 4. Since NOMAD functions as a telemetry and kinetic road-trip HUD rather than a turn-by-turn POI directory, POI clutter filtering will be revisited in future phases.

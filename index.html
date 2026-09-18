@@ -316,6 +316,9 @@
       line-height: 1;
       width: 100%;
       height: 100%;
+      padding: 10%;
+      box-sizing: border-box;
+      overflow: hidden;
       text-shadow: none !important;
     }
 
@@ -327,10 +330,23 @@
     .kinetic-bubble-value {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       font-weight: 300; /* Sleek, elegant, unbolded modern telemetry typography */
-      font-size: 2.75rem; /* Upgraded 10% from 2.5rem */
+      font-size: 2.75rem; /* Base fallback, overridden dynamically by font sizing engine */
       line-height: 1;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.02em;
       text-shadow: none !important;
+      white-space: nowrap;
+      max-width: 100%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Ghost Mode Ethereal Shimmer */
+    .kinetic-bubble.is-ghost-mode {
+      opacity: 0.80 !important;
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.32)) !important;
+      transition: opacity 0.25s ease, filter 0.25s ease;
     }
 
     .kinetic-bubble-unit {
@@ -451,6 +467,79 @@
       justify-content: center;
       width: 100%;
       text-shadow: none !important;
+    }
+    .atmo-ticker-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      text-align: center;
+      user-select: none;
+      overflow: hidden;
+      transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .atmo-ticker-value {
+      font-weight: 600;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      max-width: 100%;
+      overflow: hidden;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95);
+      display: inline-flex;
+      align-items: baseline;
+      justify-content: center;
+    }
+    .atmo-val-num {
+      font-variant-numeric: tabular-nums;
+    }
+    .atmo-val-unit {
+      font-size: 0.52em;
+      opacity: 0.85;
+      margin-left: 2px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .atmo-ticker-label {
+      font-size: 0.60rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.82;
+      margin-top: 3px;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      max-width: 100%;
+      overflow: hidden;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    }
+    .bubble-apply-all-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 6px;
+      padding: 2px 7px;
+      font-size: 0.68rem;
+      color: #94a3b8;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .bubble-apply-all-btn:hover {
+      background: rgba(0, 212, 255, 0.15);
+      border-color: #00d4ff;
+      color: #00d4ff;
+    }
+    .atmo-ticker-transitioning {
+      opacity: 0.15;
+      transform: scale(0.90);
     }
     .atmo-metric-row {
       display: inline-flex;
@@ -2416,7 +2505,13 @@
         <div class="kinetic-bubble-shape-wrap kinetic-shape-squirkle" id="atmo-bubble-shape-frame"></div>
         <div class="kinetic-pin-indicator" id="atmo-bubble-pin" style="display: none; z-index: 3;">📌</div>
         <div class="kinetic-bubble-inner" id="atmo-bubble-content" style="padding: 6px;">
-          <div class="atmo-metric-stack" id="atmo-stack-inner">
+          <!-- Hero Ticker Mode (Large cycling metric) -->
+          <div class="atmo-ticker-hero" id="atmo-ticker-hero" style="display: flex;">
+            <div class="atmo-ticker-value" id="atmo-ticker-value">--</div>
+            <div class="atmo-ticker-label" id="atmo-ticker-label">💧 HUMIDITY</div>
+          </div>
+          <!-- Compact Triad Mode (3 stacked rows) -->
+          <div class="atmo-metric-stack" id="atmo-stack-inner" style="display: none;">
             <div class="atmo-metric-row" id="atmo-row-humidity"><span>💧</span> <span id="atmo-val-humidity">--%</span></div>
             <div class="atmo-metric-row" id="atmo-row-uv"><span>☀️</span> <span id="atmo-val-uv">UV --</span></div>
             <div class="atmo-metric-row" id="atmo-row-pressure"><span>⏲️</span> <span id="atmo-val-pressure">--</span></div>
@@ -2691,7 +2786,22 @@
 
       <!-- Atmospheric Triad Selector: Visible ONLY when Atmo tab is active -->
       <div id="atmo-options-section" style="display: none; margin-top: 14px;">
-        <div class="config-section-label">Atmospheric Stats to Display</div>
+        <div class="config-section-label">Atmospheric Display Layout</div>
+        <div class="bubble-mode-toggle-group">
+          <button class="bubble-mode-btn is-selected" id="atmo-format-ticker" onclick="setAtmoDisplayFormat('ticker')">🔄 Hero Ticker</button>
+          <button class="bubble-mode-btn" id="atmo-format-stack" onclick="setAtmoDisplayFormat('stack')">📊 3-Row Stack</button>
+        </div>
+
+        <div id="atmo-ticker-pace-group" style="margin-top: 12px;">
+          <div class="config-section-label">Ticker Cycle Pace</div>
+          <div class="bubble-mode-toggle-group">
+            <button class="bubble-mode-btn" id="atmo-pace-fast" onclick="setAtmoTickerPace(1.5)">1.5s Fast</button>
+            <button class="bubble-mode-btn is-selected" id="atmo-pace-steady" onclick="setAtmoTickerPace(2.5)">2.5s Steady</button>
+            <button class="bubble-mode-btn" id="atmo-pace-calm" onclick="setAtmoTickerPace(4.0)">4.0s Calm</button>
+          </div>
+        </div>
+
+        <div class="config-section-label" style="margin-top: 12px;">Atmospheric Stats in Rotation</div>
         <div class="bubble-mode-toggle-group atmo-metric-toggle-group">
           <button class="bubble-mode-btn is-selected" id="atmo-btn-humidity" onclick="toggleAtmoMetric('humidity')">💧 Humidity</button>
           <button class="bubble-mode-btn is-selected" id="atmo-btn-uv" onclick="toggleAtmoMetric('uv')">☀️ UV</button>
@@ -2712,17 +2822,52 @@
       </div>
 
       <!-- Vehicle Safe Zone Options: Bounce OFF vs Pass Underneath -->
-      <div class="config-section-label" style="margin-top: 14px;" id="bubble-safezone-title">Vehicle Safe Zone Interaction</div>
-      <div class="bubble-mode-toggle-group" id="bubble-safezone-group">
-        <button class="bubble-mode-btn is-selected" id="bubble-safezone-bounce" onclick="setBubbleSafeZoneBehavior('bounce')">🛡️ Deflect</button>
-        <button class="bubble-mode-btn" id="bubble-safezone-under" onclick="setBubbleSafeZoneBehavior('under')">🌌 Glide Under</button>
+      <div id="bubble-safezone-section" style="margin-top: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+          <div class="config-section-label" id="bubble-safezone-title" style="margin: 0;">Vehicle Safe Zone Interaction</div>
+          <button type="button" class="bubble-apply-all-btn" onclick="applySafeZoneToAll()" title="Apply this safe zone setting to all active bubbles">Apply All</button>
+        </div>
+        <div class="bubble-mode-toggle-group" id="bubble-safezone-group">
+          <button type="button" class="bubble-mode-btn is-selected" id="bubble-safezone-bounce" onclick="setBubbleSafeZoneBehavior('bounce')">🛡️ Deflect</button>
+          <button type="button" class="bubble-mode-btn" id="bubble-safezone-under" onclick="setBubbleSafeZoneBehavior('under')">🌌 Glide Under</button>
+        </div>
       </div>
 
       <!-- Screen Wall Barrier Interaction: Bounce Off Walls vs Pass Through & Wrap -->
-      <div class="config-section-label" style="margin-top: 14px;" id="bubble-wall-title">Screen Wall Barrier Interaction</div>
-      <div class="bubble-mode-toggle-group" id="bubble-wall-group">
-        <button class="bubble-mode-btn is-selected" id="bubble-wall-bounce" onclick="setBubbleWallBehavior('bounce')">🧱 Bounce Walls</button>
-        <button class="bubble-mode-btn" id="bubble-wall-wrap" onclick="setBubbleWallBehavior('wrap')">🌀 Wrap Edge</button>
+      <div id="bubble-wall-section" style="margin-top: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+          <div class="config-section-label" id="bubble-wall-title" style="margin: 0;">Screen Wall Barrier Interaction</div>
+          <button type="button" class="bubble-apply-all-btn" onclick="applyWallBehaviorToAll()" title="Apply this wall barrier setting to all active bubbles">Apply All</button>
+        </div>
+        <div class="bubble-mode-toggle-group" id="bubble-wall-group">
+          <button type="button" class="bubble-mode-btn is-selected" id="bubble-wall-bounce" onclick="setBubbleWallBehavior('bounce')">🧱 Bounce Walls</button>
+          <button type="button" class="bubble-mode-btn" id="bubble-wall-wrap" onclick="setBubbleWallBehavior('wrap')">🌀 Wrap Edge</button>
+        </div>
+      </div>
+
+      <!-- Inter-Bubble Interaction: Pinball Bounce vs Ghost Mode (Pass Through) -->
+      <div id="bubble-interact-section" style="margin-top: 14px;">
+        <div class="config-section-label" id="bubble-interact-title" style="margin-bottom: 6px;">Bubble-to-Bubble Interaction</div>
+        <div class="bubble-mode-toggle-group" id="bubble-interact-group">
+          <button type="button" class="bubble-mode-btn is-selected" id="bubble-interact-bounce" onclick="setInterBubbleCollision('bounce')">⚡ Pinball Bounce</button>
+          <button type="button" class="bubble-mode-btn" id="bubble-interact-ghost" onclick="setInterBubbleCollision('ghost')">👻 Ghost Mode</button>
+        </div>
+      </div>
+
+      <!-- Telemetry Units & System (Imperial / US vs Metric / SI) -->
+      <div class="config-section-label" style="margin-top: 14px;" id="bubble-units-title">Measurement Units</div>
+      <!-- Tab-Specific Active Unit Selector -->
+      <div class="bubble-mode-toggle-group" id="bubble-units-active-group">
+        <button class="bubble-mode-btn is-selected" id="bubble-unit-opt-1" onclick="toggleActiveBubbleUnit(1)">Imperial</button>
+        <button class="bubble-mode-btn" id="bubble-unit-opt-2" onclick="toggleActiveBubbleUnit(2)">Metric</button>
+      </div>
+      <!-- Global Quick Switch -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.72rem; color: #94a3b8; padding: 0 4px;">
+        <span>All Telemetry:</span>
+        <div style="display: flex; gap: 6px;">
+          <button type="button" id="btn-global-imperial" onclick="setGlobalUnitSystem('imperial')" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: 6px; padding: 2px 8px; font-size: 0.70rem; color: #fff; cursor: pointer;">All Imperial</button>
+          <button type="button" id="btn-global-metric" onclick="setGlobalUnitSystem('metric')" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: 6px; padding: 2px 8px; font-size: 0.70rem; color: #fff; cursor: pointer;">All Metric</button>
+        </div>
       </div>
 
       <!-- 3 Preset Sizes: Compact (90px), Standard (125px), Hero (160px) -->
@@ -2881,10 +3026,32 @@
     let hasInitialGeocode = false;
     let rawAltitudeMeters = null;
     let rawAccuracyMeters = null;
+    let rawTempF = null;
+    let isFahrenheit = true;
+    let rawSpeedMps = 0;
+    let isMph = true;
+    let rawPressureHpa = null;
+    let rawHumidityPercent = null;
+    let rawUvIndex = null;
+    let customPressureUnit = null;
     let lastWeatherFetchTime = 0;
     let lastWeatherLat = null, lastWeatherLon = null;
     let lastGeocodeTime = 0;
     let wakeLock = null;
+
+    // Bidirectional real-time telemetry bridge for decoupled modular engines
+    Object.defineProperty(window, 'currentHeading', { get() { return currentHeading; }, set(v) { currentHeading = v; }, configurable: true });
+    Object.defineProperty(window, 'lastLat', { get() { return lastLat; }, set(v) { lastLat = v; }, configurable: true });
+    Object.defineProperty(window, 'lastLon', { get() { return lastLon; }, set(v) { lastLon = v; }, configurable: true });
+    Object.defineProperty(window, 'rawAltitudeMeters', { get() { return rawAltitudeMeters; }, set(v) { rawAltitudeMeters = v; }, configurable: true });
+    Object.defineProperty(window, 'rawTempF', { get() { return rawTempF; }, set(v) { rawTempF = v; }, configurable: true });
+    Object.defineProperty(window, 'isFahrenheit', { get() { return isFahrenheit; }, set(v) { isFahrenheit = v; }, configurable: true });
+    Object.defineProperty(window, 'isMph', { get() { return isMph; }, set(v) { isMph = v; }, configurable: true });
+    Object.defineProperty(window, 'rawSpeedMps', { get() { return rawSpeedMps; }, set(v) { rawSpeedMps = v; }, configurable: true });
+    Object.defineProperty(window, 'rawPressureHpa', { get() { return rawPressureHpa; }, set(v) { rawPressureHpa = v; }, configurable: true });
+    Object.defineProperty(window, 'rawHumidityPercent', { get() { return rawHumidityPercent; }, set(v) { rawHumidityPercent = v; }, configurable: true });
+    Object.defineProperty(window, 'rawUvIndex', { get() { return rawUvIndex; }, set(v) { rawUvIndex = v; }, configurable: true });
+    Object.defineProperty(window, 'customPressureUnit', { get() { return customPressureUnit; }, set(v) { customPressureUnit = v; }, configurable: true });
 
     let currentInterstateShield = null;
     let currentRouteShield = null;
@@ -3139,10 +3306,6 @@
       }
     }
 
-    let rawTempF = null;
-    let isFahrenheit = true;
-    let rawSpeedMps = 0;
-    let isMph = true;
     let currentSpeedLimitMph = null; // Live posted speed limit (or inferred based on road type)
 
     const stateAbbreviations = {
@@ -5456,11 +5619,6 @@
       }
     }
 
-    let rawPressureHpa = null;
-    let rawHumidityPercent = null;
-    let rawUvIndex = null;
-    let customPressureUnit = null; // null = follow isFahrenheit ('in' if true, 'hPa' if false), or 'in'/'hPa'
-
     function togglePressureUnit(event) {
       if (event) event.stopPropagation();
       if (rawPressureHpa === null) return;
@@ -5516,6 +5674,7 @@
         if (speedValueEl) speedValueEl.classList.remove('speed-near-limit', 'speed-over-limit');
         if (speedBubbleVal) speedBubbleVal.innerText = '0';
         if (speedBubbleUnit) speedBubbleUnit.innerText = isMph ? 'MPH' : 'KM/H';
+        if (typeof renderSpeedBubble === 'function') renderSpeedBubble();
         return;
       }
 
@@ -5527,6 +5686,7 @@
         if (speedValueEl) speedValueEl.classList.remove('speed-near-limit', 'speed-over-limit');
         if (speedBubbleVal) speedBubbleVal.innerText = '0';
         if (speedBubbleUnit) speedBubbleUnit.innerText = isMph ? 'MPH' : 'KM/H';
+        if (typeof renderSpeedBubble === 'function') renderSpeedBubble();
         return;
       }
 
@@ -5542,6 +5702,7 @@
         if (speedBubbleVal) speedBubbleVal.innerText = kmh;
         if (speedBubbleUnit) speedBubbleUnit.innerText = 'KM/H';
       }
+      if (typeof renderSpeedBubble === 'function') renderSpeedBubble();
 
       // SPEED LIMIT ALERT LOGIC (Solid Colors, Zero Pulsing)
       if (currentSpeedLimitMph && currentSpeedLimitMph > 0 && liveMph >= 15) {
@@ -5748,6 +5909,7 @@
       const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
       return directions[Math.round(angle / 45) % 8];
     }
+    window.getCardinalDirection = getCardinalDirection;
 
     function pushHeadingHistory(heading) {
       const now = Date.now();
@@ -6090,89 +6252,162 @@
       }
     }
 
-    async function fetchWeatherAndElevation(lat, lon) {
+    async function fetchWeatherAndElevation(lat, lon, force = false) {
       const now = Date.now();
       const timeThresholdMs = weatherTimeIntervalMinutes * 60 * 1000;
-      let shouldFetch = false;
+      let shouldFetch = force;
 
-      if (lastWeatherFetchTime === 0) {
-        shouldFetch = true;
-      } else {
-        const timePassed = now - lastWeatherFetchTime;
-        if (timePassed >= timeThresholdMs) shouldFetch = true;
-        if (!shouldFetch && weatherDistanceIntervalMiles > 0 && lastWeatherLat !== null && lastWeatherLon !== null) {
-          const metersMoved = getDistanceFromLatLonInMeters(lastWeatherLat, lastWeatherLon, lat, lon);
-          const milesMoved = metersMoved * 0.000621371;
-          if (milesMoved >= weatherDistanceIntervalMiles) shouldFetch = true;
+      if (!shouldFetch) {
+        if (lastWeatherFetchTime === 0 || rawHumidityPercent === null || rawPressureHpa === null || rawTempF === null) {
+          shouldFetch = true;
+        } else {
+          const timePassed = now - lastWeatherFetchTime;
+          if (timePassed >= timeThresholdMs) shouldFetch = true;
+          if (!shouldFetch && weatherDistanceIntervalMiles > 0 && lastWeatherLat !== null && lastWeatherLon !== null) {
+            const metersMoved = getDistanceFromLatLonInMeters(lastWeatherLat, lastWeatherLon, lat, lon);
+            const milesMoved = metersMoved * 0.000621371;
+            if (milesMoved >= weatherDistanceIntervalMiles) shouldFetch = true;
+          }
         }
       }
 
       if (!shouldFetch) return;
-      lastWeatherFetchTime = now;
-      lastWeatherLat = lat;
-      lastWeatherLon = lon;
 
       try {
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,uv_index,surface_pressure,pressure_msl&temperature_unit=fahrenheit&timezone=auto`;
-        const response = await fetch(url);
-        const data = await response.json();
+        let data = null;
 
-        if (data.elevation !== undefined) {
-          const feet = Math.round(data.elevation * 3.28084);
-          document.getElementById('elevation').innerText = `Elevation: ${feet.toLocaleString()} ft`;
+        // Priority 1: Same-origin server proxy (bypasses browser ad-blockers, tracking protection, and iframe restrictions)
+        try {
+          const serverRes = await fetch(`/api/weather?lat=${lat}&lon=${lon}`);
+          if (serverRes.ok) {
+            data = await serverRes.json();
+          }
+        } catch (serverErr) {
+          console.warn('Server weather proxy unreachable, falling back to direct API:', serverErr);
         }
 
-        if (data.current) {
-          rawTempF = data.current.temperature_2m;
-          renderTemperature();
+        // Priority 2: Direct Open-Meteo client fallback
+        if (!data || !data.current) {
+          const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,uv_index,surface_pressure,pressure_msl&temperature_unit=fahrenheit&timezone=auto`;
+          const response = await fetch(url);
+          if (response.ok) {
+            data = await response.json();
+          }
+        }
 
-          const info = getWeatherInfo(data.current.weather_code);
-          document.getElementById('weather-desc').innerHTML = `
+        if (!data || !data.current) {
+          lastWeatherFetchTime = 0; // Allow retry on next position update
+          return;
+        }
+
+        lastWeatherFetchTime = now;
+        lastWeatherLat = lat;
+        lastWeatherLon = lon;
+
+        if (data.elevation !== undefined) {
+          if (rawAltitudeMeters === null || isNaN(rawAltitudeMeters)) {
+            rawAltitudeMeters = data.elevation;
+          }
+          const feet = Math.round((rawAltitudeMeters || data.elevation) * 3.28084);
+          const elvEl = document.getElementById('elevation');
+          if (elvEl) elvEl.innerText = `Elevation: ${feet.toLocaleString()} ft`;
+          if (typeof renderAltitudeBubble === 'function') {
+            renderAltitudeBubble(rawAltitudeMeters);
+          }
+        }
+
+        // 1. Synchronize all raw atmospheric telemetry variables in memory and window simultaneously
+        rawTempF = data.current.temperature_2m;
+        window.rawTempF = rawTempF;
+
+        if (data.current.pressure_msl !== undefined && data.current.pressure_msl !== null) {
+          rawPressureHpa = data.current.pressure_msl;
+        } else if (data.current.surface_pressure !== undefined && data.current.surface_pressure !== null) {
+          rawPressureHpa = data.current.surface_pressure;
+        }
+        window.rawPressureHpa = rawPressureHpa;
+
+        if (data.current.relative_humidity_2m !== undefined && data.current.relative_humidity_2m !== null) {
+          rawHumidityPercent = data.current.relative_humidity_2m;
+          window.rawHumidityPercent = rawHumidityPercent;
+        }
+
+        if (data.current.uv_index !== undefined && data.current.uv_index !== null) {
+          rawUvIndex = data.current.uv_index;
+          window.rawUvIndex = rawUvIndex;
+        }
+
+        // 2. Persist full atmospheric snapshot to localStorage
+        try {
+          localStorage.setItem('nomad_v4_weather_cache', JSON.stringify({
+            tempF: rawTempF,
+            humidity: rawHumidityPercent,
+            uv: rawUvIndex,
+            pressureHpa: rawPressureHpa,
+            elevationMeters: rawAltitudeMeters,
+            weatherCode: data.current.weather_code,
+            lat: lat,
+            lon: lon,
+            timestamp: now
+          }));
+        } catch (_) {}
+
+        // 3. Render all UI displays now that all values are in sync
+        renderTemperature();
+        if (typeof renderTemperatureBubble === 'function') {
+          renderTemperatureBubble();
+        }
+
+        const info = getWeatherInfo(data.current.weather_code);
+        const descEl = document.getElementById('weather-desc');
+        if (descEl) {
+          descEl.innerHTML = `
             <div class="weather-desc-container">
               ${info.icon} <span>${info.text}</span>
             </div>
           `;
+        }
 
-          // Barometric Pressure
-          if (data.current.pressure_msl !== undefined && data.current.pressure_msl !== null) {
-            rawPressureHpa = data.current.pressure_msl;
-          } else if (data.current.surface_pressure !== undefined && data.current.surface_pressure !== null) {
-            rawPressureHpa = data.current.surface_pressure;
-          }
-          renderPressure();
+        renderPressure();
 
-          // Humidity
-          if (data.current.relative_humidity_2m !== undefined) {
-            rawHumidityPercent = data.current.relative_humidity_2m;
-            document.getElementById('humidity-val').innerText = `${Math.round(data.current.relative_humidity_2m)}%`;
-          }
+        const humEl = document.getElementById('humidity-val');
+        if (humEl && rawHumidityPercent !== null) {
+          humEl.innerText = `${Math.round(rawHumidityPercent)}%`;
+        }
 
-          // UV Index
-          if (data.current.uv_index !== undefined) {
-            rawUvIndex = data.current.uv_index;
-            const uv = data.current.uv_index;
-            let uvColor = '#ffb703';
-            if (uv < 3) uvColor = '#4cd964';
-            else if (uv < 6) uvColor = '#ffb703';
-            else if (uv < 8) uvColor = '#fb8500';
-            else uvColor = '#ff3b30';
+        if (rawUvIndex !== null) {
+          const uv = rawUvIndex;
+          let uvColor = '#ffb703';
+          if (uv < 3) uvColor = '#4cd964';
+          else if (uv < 6) uvColor = '#ffb703';
+          else if (uv < 8) uvColor = '#fb8500';
+          else uvColor = '#ff3b30';
 
-            const uvDisplay = (uv % 1 === 0) ? uv.toFixed(0) : uv.toFixed(1);
+          const uvDisplay = (uv % 1 === 0) ? uv.toFixed(0) : uv.toFixed(1);
 
-            document.getElementById('uv-icon-wrap').innerHTML = `
+          const uvIcon = document.getElementById('uv-icon-wrap');
+          if (uvIcon) {
+            uvIcon.innerHTML = `
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${uvColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
                 <circle cx="12" cy="12" r="4"/>
                 <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
               </svg>
             `;
-            document.getElementById('uv-val').innerHTML = `<span style="color: ${uvColor};">${uvDisplay}<span style="font-size: 0.9em; font-weight: 500; margin-left: 1px;">uv</span></span>`;
           }
-
-          if (typeof renderAtmoBubble === 'function') {
-            renderAtmoBubble();
+          const uvVal = document.getElementById('uv-val');
+          if (uvVal) {
+            uvVal.innerHTML = `<span style="color: ${uvColor};">${uvDisplay}<span style="font-size: 0.9em; font-weight: 500; margin-left: 1px;">uv</span></span>`;
           }
         }
-      } catch (err) {}
+
+        // 4. Update the ATMOS kinetic bubble with fully synchronized telemetry
+        if (typeof window.renderAtmoBubble === 'function') {
+          window.renderAtmoBubble();
+        }
+      } catch (err) {
+        lastWeatherFetchTime = 0; // Reset so next position update can retry
+        console.warn('Weather fetch error, retrying on next update:', err);
+      }
     }
 
     function updateHeading(heading, fromDeviceOrientation = false) {
@@ -6317,6 +6552,9 @@
         updateHeading(heading, false);
       } else {
         renderTelemetryBadge();
+        if (typeof renderCompassBubble === 'function') {
+          renderCompassBubble(currentHeading);
+        }
       }
 
       renderSpeed();
@@ -6442,17 +6680,56 @@
       }
     }
 
-    if (window.DeviceOrientationEvent) {
-      window.addEventListener('deviceorientation', (event) => {
-        if (event.webkitCompassHeading) {
-          updateHeading(event.webkitCompassHeading, true);
-        }
-      });
+    function handleOrientationEvent(event) {
+      if (event.webkitCompassHeading !== undefined && event.webkitCompassHeading !== null) {
+        // iOS Safari provides true compass heading directly in degrees
+        updateHeading(event.webkitCompassHeading, true);
+      } else if (event.alpha !== null && !isNaN(event.alpha)) {
+        // W3C Device Orientation standard (Android & modern browsers):
+        // alpha represents rotation around Z-axis (0 = North, increasing counter-clockwise, so compass heading is 360 - alpha)
+        const compassHeading = (360 - event.alpha) % 360;
+        updateHeading(compassHeading, true);
+      }
     }
+
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientationabsolute', handleOrientationEvent, { passive: true });
+      window.addEventListener('deviceorientation', handleOrientationEvent, { passive: true });
+    }
+
+    function requestOrientationSensorPermission() {
+      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission()
+          .then(res => {
+            if (res === 'granted') {
+              window.addEventListener('deviceorientation', handleOrientationEvent, { passive: true });
+            }
+          })
+          .catch(() => {});
+      }
+    }
+    window.addEventListener('touchstart', requestOrientationSensorPermission, { once: true, passive: true });
+    window.addEventListener('click', requestOrientationSensorPermission, { once: true });
 
     function bootstrapNomad() {
       if (window.__nomadInitialized) return;
       window.__nomadInitialized = true;
+
+      // Restore cached weather & atmospheric telemetry if available so bubbles populate instantly
+      try {
+        const cachedW = localStorage.getItem('nomad_v4_weather_cache');
+        if (cachedW) {
+          const cw = JSON.parse(cachedW);
+          if (cw && typeof cw === 'object') {
+            if (rawTempF === null && cw.tempF !== undefined) { rawTempF = cw.tempF; window.rawTempF = cw.tempF; }
+            if (rawHumidityPercent === null && cw.humidity !== undefined) { rawHumidityPercent = cw.humidity; window.rawHumidityPercent = cw.humidity; }
+            if (rawUvIndex === null && cw.uv !== undefined) { rawUvIndex = cw.uv; window.rawUvIndex = cw.uv; }
+            if (rawPressureHpa === null && cw.pressureHpa !== undefined) { rawPressureHpa = cw.pressureHpa; window.rawPressureHpa = cw.pressureHpa; }
+            if (rawAltitudeMeters === null && cw.elevationMeters !== undefined) { rawAltitudeMeters = cw.elevationMeters; window.rawAltitudeMeters = cw.elevationMeters; }
+          }
+        }
+      } catch (_) {}
+
       applyLayoutInversion(isLayoutInverted, false);
       initMap();
       applyHudScale(hudScale);
@@ -6461,6 +6738,20 @@
       requestWakeLock();
       setupInteractions();
       initKineticSpeedBubble();
+      if (typeof renderCompassBubble === 'function') renderCompassBubble(currentHeading);
+      if (typeof renderAltitudeBubble === 'function') renderAltitudeBubble(rawAltitudeMeters);
+      if (typeof renderTemperatureBubble === 'function') renderTemperatureBubble();
+      if (typeof renderAtmoBubble === 'function') renderAtmoBubble();
+      if (lastLat !== null && lastLon !== null && typeof renderCoordsBubble === 'function') {
+        renderCoordsBubble(lastLat, lastLon);
+      }
+
+      // Proactively fetch weather for current position or default hub so data is never stalled
+      if (lastLat !== null && lastLon !== null) {
+        fetchWeatherAndElevation(lastLat, lastLon);
+      } else {
+        fetchWeatherAndElevation(42.3765, -71.2356);
+      }
     }
 
     if (document.readyState === 'loading') {

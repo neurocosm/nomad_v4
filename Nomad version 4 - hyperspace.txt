@@ -25,4 +25,4 @@ For the nomad version 4 transformation the Chevron or the Galaga fighter will be
 -  so in essence we are combining the best ideas of the map the visualizations arcade and fidgets. 
 -  another option in the data-bubble long press would be transparency!!!
 -  For the nomad version 4 transformation the Chevron or the Galaga fighter will be in its own sphere or bubble that is a safe zone so the element bubbles cannot pass over it and make it unseeable to the map
--  
+-  Optimal Pre-Made Shape Defaults & Rectangular Wobble Geometry: Go through each telemetry data bubble and pre-configure it with the ideal curated default shape tailored for its specific data type (e.g. Speed = Egg/Oval, Weather = Squirkle, Compass = Pentagon, etc., while allowing users to freely customize). Explore introducing a new dynamic Rectangle/Wobble shape geometry that naturally cradles dual-line coordinate pairs (Latitude and Longitude) with kinetic wobble physics.
