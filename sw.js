@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nomad-hyperspace-v4-09162026-pwa';
+const CACHE_NAME = 'nomad-hyperspace-v4-09182026-pwa';
 
 const ASSETS_TO_CACHE = [
   './',
@@ -14,6 +14,10 @@ const ASSETS_TO_CACHE = [
   './manifest.json',
   './version.js',
   './kinetic-console.js',
+  './js/vehicle-safezone.js',
+  './js/location-bar.js',
+  './js/modals.js',
+  './js/kinetic-bubbles.js',
   './icons/apple-touch-icon.png',
   './icons/icon-192.png',
   './icons/icon-512.png',

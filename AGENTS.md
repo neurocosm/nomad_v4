@@ -259,5 +259,18 @@
   - **Flexible CSS Grid Systems**: Upgraded segmented controls to fluid responsive grids (`repeat(3, minmax(0, 1fr))` for tabs, presets, and atmo triad; `repeat(2, minmax(0, 1fr))` for spin/keel dynamics; `repeat(4, minmax(0, 1fr))` for shapes) with `min-width: 0` on button children, preventing text or icon blowout on narrow mobile screens.
   - **Concise Button Labels & Compact Ticks**: Refined button copy and slider ticks (`Compact/Standard/Hero`, `0% Clear/18% Sheer/45% Frost/80% Tint`, `Keel/Off/Speed/Gyro`, `Deflect/Glide Under`, `Bounce Walls/Wrap Edge`) to fit single-line presentation without word wrapping or button clipping.
 
+### v4 Step 19: Dedicated Modular JavaScript Architecture & Offline PWA Manifest [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **Modular Architecture Separation**: Successfully decoupled the monolithic ~7,800-line `index.html` codebase into 4 dedicated, maintainable, single-responsibility JavaScript modules in `/js/`:
+    - `/js/vehicle-safezone.js`: Vehicle Chevron & Galaga Fighter SVG vector rendering, 3D perspective pitch alignment, vehicle mode switching, and forcefield boundary radius calculation (`window.getNomadVehicleSafeZone`).
+    - `/js/location-bar.js`: Reverse geocoding street name abbreviations, auto-shrink typography engine, map link sharing with visual toast, and top/bottom cockpit layout inversion.
+    - `/js/modals.js`: Universal modal controllers (About modal with PWA install prompts, Weather refresh settings modal, and Hyperspace configuration modal).
+    - `/js/kinetic-bubbles.js`: Full 6-bubble telemetry state machine, 60fps kinetic physics loop, boundary wall deflection and edge wrap, dynamic shape frame spin engine (Keel buoyant sway, GPS speed banking, Gyro compass sync), pointer drag/flick inertia, instant hover catch, and live telemetry DOM renderers.
+  - **Global State Coordination Bridge**: Implemented a lightweight, robust bridge linking modules through `window.NomadState` and shared telemetry globals, eliminating race conditions while preserving backward compatibility.
+  - **Streamlined `index.html` Entry Point**: Reduced `index.html` by over 1,300 lines of complex inline logic, creating a clean, organized entry point where features can be developed and refined surgically.
+  - **Offline PWA & Service Worker Cache Manifest**: Updated `sw.js` cache to `nomad-hyperspace-v4-09182026-pwa`, adding all 4 modular scripts to `ASSETS_TO_CACHE` for continuous offline PWA operation.
+  - **Version Registry Updated**: Updated `window.NOMAD_VERSION` in `version.js` to `v4.09182026.0605` in strict compliance with the US Eastern Time registry mandate.
+
 ### Post-v4 Wishlist / Deferred
 - **Map Feature Legend & POI Essential Services Filter**: Deferred until after Version 4. Since NOMAD functions as a telemetry and kinetic road-trip HUD rather than a turn-by-turn POI directory, POI clutter filtering will be revisited in future phases.
