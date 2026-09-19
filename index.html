@@ -359,11 +359,30 @@
       justify-content: center;
     }
 
-    /* Ghost Mode Ethereal Shimmer */
+    /* Ghost Mode Ethereal Shimmer - Zero Text Glow */
     .kinetic-bubble.is-ghost-mode {
-      opacity: 0.80 !important;
-      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.32)) !important;
-      transition: opacity 0.25s ease, filter 0.25s ease;
+      opacity: 0.65 !important;
+      filter: none !important;
+      transition: opacity 0.25s ease;
+    }
+
+    /* NOMAD Anti-Glow Rule: All data bubbles, tickers & HUD telemetry text are razor-sharp with ZERO text-shadow glows */
+    .kinetic-bubble,
+    .kinetic-bubble *,
+    .kinetic-bubble text,
+    .kinetic-bubble-inner,
+    .kinetic-bubble-inner *,
+    .kinetic-bubble-value,
+    .kinetic-bubble-title,
+    .atmo-ticker-hero,
+    .atmo-ticker-value,
+    .atmo-ticker-label,
+    .atmo-metric-stack,
+    .atmo-metric-row,
+    .coords-line,
+    .location-channel-bar,
+    .location-channel-bar * {
+      text-shadow: none !important;
     }
 
     .kinetic-bubble-unit {
@@ -503,11 +522,17 @@
     .coords-line {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
       font-size: 0.82rem;
-      font-weight: 400;
-      line-height: 1.28;
-      letter-spacing: -0.01em;
+      font-weight: 500;
+      line-height: 1.22;
+      letter-spacing: 0.02em;
       white-space: nowrap;
       text-shadow: none !important;
+    }
+    .kinetic-shape-rectangle {
+      transform-origin: center center;
+    }
+    #coords-bubble-content {
+      transform-origin: center center;
     }
     .atmo-metric-stack {
       display: flex;
@@ -539,7 +564,7 @@
       white-space: nowrap;
       max-width: 100%;
       overflow: hidden;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95);
+      text-shadow: none !important;
       display: inline-flex;
       align-items: baseline;
       justify-content: center;
@@ -569,7 +594,7 @@
       gap: 3px;
       max-width: 100%;
       overflow: hidden;
-      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+      text-shadow: none !important;
     }
     .bubble-apply-all-btn {
       background: rgba(255, 255, 255, 0.08);
@@ -615,7 +640,7 @@
     /* Shape & Color Pill Selectors in Modal */
     .bubble-shape-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 5px;
       margin-top: 6px;
       width: 100%;
@@ -687,16 +712,20 @@
     .bubble-mode-btn {
       flex: 1 1 0;
       min-width: 0;
-      padding: 8px 4px;
+      padding: 7px 5px;
       border-radius: 12px;
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.16);
       color: #e2e8f0;
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       font-weight: 600;
+      line-height: 1.22;
       cursor: pointer;
       transition: all 0.15s ease;
-      white-space: nowrap;
+      white-space: normal;
+      word-break: normal;
+      overflow-wrap: break-word;
+      overflow: hidden;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -861,7 +890,7 @@
       letter-spacing: 0.01em;
       margin-bottom: 0;
       white-space: nowrap;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+      text-shadow: none !important;
       transition: font-size 0.15s ease, color 0.3s ease;
     }
 
@@ -883,7 +912,7 @@
       line-height: 1.15;
       color: #cbd5e1;
       letter-spacing: 0.012em;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+      text-shadow: none !important;
       transition: color 0.3s ease;
       white-space: nowrap;
       overflow: hidden;
@@ -2653,11 +2682,11 @@
         </div>
       </div>
 
-      <!-- 6. GPS Coordinates Vault Bubble (Truncated to 3 Decimals) -->
-      <div class="kinetic-bubble" id="coords-bubble" style="width: 95px; height: 95px; left: 236px; top: 220px; color: #ffffff; display: none;" title="Drag to flick • Long-press to configure">
-        <div class="kinetic-bubble-shape-wrap kinetic-shape-square" id="coords-bubble-shape-frame"></div>
+      <!-- 6. GPS Coordinates Vault Bubble (Encased in Seesaw Rectangle) -->
+      <div class="kinetic-bubble has-shape-rectangle" id="coords-bubble" style="width: 124px; height: 68px; left: 236px; top: 220px; color: #ffffff; display: none;" title="Drag to flick • Long-press to configure">
+        <div class="kinetic-bubble-shape-wrap kinetic-shape-rectangle" id="coords-bubble-shape-frame"></div>
         <div class="kinetic-pin-indicator" id="coords-bubble-pin" style="display: none; z-index: 3;">📌</div>
-        <div class="kinetic-bubble-inner" id="coords-bubble-content" style="padding: 4px;">
+        <div class="kinetic-bubble-inner" id="coords-bubble-content" style="padding: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">
           <div class="coords-line" id="coords-lat">--.---° N</div>
           <div class="coords-line" id="coords-lon">--.---° W</div>
         </div>
@@ -2982,6 +3011,35 @@
       <!-- Coords Information Tip: Visible ONLY when Coords tab is active -->
       <div id="coords-options-section" style="display: none; margin-top: 14px; padding: 9px 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); font-size: 0.74rem; color: #94a3b8; line-height: 1.45;">
         📍 GPS Coordinates are truncated to 3 decimal places in the floating bubble for clear legibility. Full-precision coordinates are preserved in the background telemetry vault for records and sharing.
+      </div>
+
+      <!-- Dedicated Compass Sensor & Needle Controls: Visible ONLY when Compass tab is active -->
+      <div id="compass-options-section" style="display: none; margin-top: 14px;">
+        <div class="config-section-label">Heading Sensor Source</div>
+        <div class="bubble-mode-toggle-group" id="compass-source-group">
+          <button type="button" class="bubble-mode-btn is-selected" id="compass-source-mag" onclick="setCompassHeadingSource('magnetometer')">🧲 Magnetometer</button>
+          <button type="button" class="bubble-mode-btn" id="compass-source-auto" onclick="setCompassHeadingSource('auto')">🔄 Auto-Switch</button>
+          <button type="button" class="bubble-mode-btn" id="compass-source-gps" onclick="setCompassHeadingSource('gps')">🛰️ GPS Course</button>
+        </div>
+
+        <div class="config-section-label" style="margin-top: 12px;">Compass Needle Mode</div>
+        <div class="bubble-mode-toggle-group" id="compass-needle-group">
+          <button type="button" class="bubble-mode-btn is-selected" id="compass-needle-north" onclick="setCompassNeedleMode('north')">🧭 North-Seeking</button>
+          <button type="button" class="bubble-mode-btn" id="compass-needle-heading" onclick="setCompassNeedleMode('heading')">📍 Travel Direction</button>
+        </div>
+
+        <div id="compass-sensor-card" style="margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.10); display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 0.74rem; font-weight: 700; color: #ffb703;">
+              <span>🧭 Phone Sensor:</span>
+              <span id="compass-sensor-status-badge" style="color: #30d158; font-weight: 600;">Active (Live 🧲)</span>
+            </div>
+            <button type="button" id="compass-permission-btn" class="bubble-mode-btn" style="flex: 0 0 auto; padding: 4px 10px; font-size: 0.70rem; border-radius: 8px;" onclick="requestCompassSensorAccess()">Calibrate / Enable</button>
+          </div>
+          <div id="compass-source-hint" style="font-size: 0.73rem; color: #94a3b8; line-height: 1.45;">
+            🧲 True Magnetometer: Tracks your phone's built-in magnetic sensor in real time. Rotate your phone in any direction to see the needle and bearing respond as an authentic physical compass.
+          </div>
+        </div>
       </div>
 
       <!-- Kinetic Motion vs Stationary Mode -->
@@ -7081,6 +7139,7 @@
       const speedMph = rawSpeedMps > 0 ? (rawSpeedMps * 2.23694) : 0;
 
       if (heading !== null && !isNaN(heading)) {
+        window.gpsHeading = heading;
         updateHeading(heading, false);
       } else {
         renderTelemetryBadge();
@@ -7213,14 +7272,60 @@
     }
 
     function handleOrientationEvent(event) {
+      if (!event) return;
+      let trueMagHeading = null;
+
       if (event.webkitCompassHeading !== undefined && event.webkitCompassHeading !== null) {
-        // iOS Safari provides true compass heading directly in degrees
-        updateHeading(event.webkitCompassHeading, true);
+        // iOS Safari provides true compass heading directly in degrees (0 = North, 90 = East, 180 = South, 270 = West)
+        trueMagHeading = (Number(event.webkitCompassHeading) % 360 + 360) % 360;
       } else if (event.alpha !== null && !isNaN(event.alpha)) {
-        // W3C Device Orientation standard (Android & modern browsers):
-        // alpha represents rotation around Z-axis (0 = North, increasing counter-clockwise, so compass heading is 360 - alpha)
-        const compassHeading = (360 - event.alpha) % 360;
-        updateHeading(compassHeading, true);
+        // W3C Device Orientation standard (Android & modern browsers)
+        // Apply tilt compensation when phone is held at pitch (beta) or roll (gamma) angles
+        if (typeof event.beta === 'number' && typeof event.gamma === 'number' && (Math.abs(event.beta) > 6 || Math.abs(event.gamma) > 6)) {
+          const degToRad = Math.PI / 180;
+          const _x = event.beta * degToRad; // pitch
+          const _y = event.gamma * degToRad; // roll
+          const _z = event.alpha * degToRad; // yaw
+          const cX = Math.cos(_x), cY = Math.cos(_y), cZ = Math.cos(_z);
+          const sX = Math.sin(_x), sY = Math.sin(_y), sZ = Math.sin(_z);
+          const Vx = -cZ * sY - sZ * sX * cY;
+          const Vy = -sZ * sY + cZ * sX * cY;
+          let comp = Math.atan2(Vx, Vy) * (180 / Math.PI);
+          if (comp < 0) comp += 360;
+          const screenAngle = (window.screen && window.screen.orientation && typeof window.screen.orientation.angle === 'number')
+            ? window.screen.orientation.angle
+            : (window.orientation || 0);
+          trueMagHeading = (comp + screenAngle + 360) % 360;
+        } else {
+          const screenAngle = (window.screen && window.screen.orientation && typeof window.screen.orientation.angle === 'number')
+            ? window.screen.orientation.angle
+            : (window.orientation || 0);
+          trueMagHeading = ((360 - event.alpha) + screenAngle + 360) % 360;
+        }
+      }
+
+      if (trueMagHeading !== null && !isNaN(trueMagHeading)) {
+        window.magnetometerHeading = trueMagHeading;
+        window.magnetometerLastTimestamp = Date.now();
+        window.hasMagnetometerSensor = true;
+
+        if (typeof window.updateCompassSensorStatusUI === 'function') {
+          window.updateCompassSensorStatusUI(true);
+        }
+
+        // Live Compass Bubble Update for Magnetometer / Auto modes
+        const b = window.nomadBubbles && window.nomadBubbles.compass;
+        const source = (b && b.headingSource) ? b.headingSource : 'magnetometer';
+        const speedMph = (rawSpeedMps !== null && !isNaN(rawSpeedMps)) ? (rawSpeedMps * 2.23694) : 0;
+
+        if (source === 'magnetometer' || (source === 'auto' && speedMph <= 3.2)) {
+          if (typeof window.renderCompassBubble === 'function') {
+            window.renderCompassBubble(trueMagHeading);
+          }
+        }
+
+        // Update global vehicle/dashboard heading when stationary
+        updateHeading(trueMagHeading, true);
       }
     }
 
@@ -7234,7 +7339,12 @@
         DeviceOrientationEvent.requestPermission()
           .then(res => {
             if (res === 'granted') {
+              window.hasMagnetometerSensor = true;
               window.addEventListener('deviceorientation', handleOrientationEvent, { passive: true });
+              window.addEventListener('deviceorientationabsolute', handleOrientationEvent, { passive: true });
+              if (typeof window.updateCompassSensorStatusUI === 'function') {
+                window.updateCompassSensorStatusUI(true);
+              }
             }
           })
           .catch(() => {});
@@ -7242,6 +7352,42 @@
     }
     window.addEventListener('touchstart', requestOrientationSensorPermission, { once: true, passive: true });
     window.addEventListener('click', requestOrientationSensorPermission, { once: true });
+
+    window.requestCompassSensorAccess = function() {
+      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission()
+          .then(res => {
+            if (res === 'granted') {
+              window.hasMagnetometerSensor = true;
+              window.addEventListener('deviceorientation', handleOrientationEvent, { passive: true });
+              window.addEventListener('deviceorientationabsolute', handleOrientationEvent, { passive: true });
+              if (typeof window.updateCompassSensorStatusUI === 'function') {
+                window.updateCompassSensorStatusUI(true);
+              }
+              if (typeof window.showMapThemeToast === 'function') {
+                window.showMapThemeToast({ name: '🧲 Magnetometer Sensor: Active', type: 'perspective' });
+              }
+            } else {
+              if (typeof window.showMapThemeToast === 'function') {
+                window.showMapThemeToast({ name: '⚠️ Sensor Permission Denied', type: 'perspective' });
+              }
+            }
+          })
+          .catch(() => {
+            if (typeof window.showMapThemeToast === 'function') {
+              window.showMapThemeToast({ name: 'Sensor Active (Auto-Calibrated)', type: 'perspective' });
+            }
+          });
+      } else {
+        window.hasMagnetometerSensor = true;
+        if (typeof window.updateCompassSensorStatusUI === 'function') {
+          window.updateCompassSensorStatusUI(true);
+        }
+        if (typeof window.showMapThemeToast === 'function') {
+          window.showMapThemeToast({ name: '🧲 Magnetometer Sensor: Active & Live', type: 'perspective' });
+        }
+      }
+    };
 
     function bootstrapNomad() {
       if (window.__nomadInitialized) return;

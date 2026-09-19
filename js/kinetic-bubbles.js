@@ -40,7 +40,9 @@
       key: 'compass', active: true, shape: 'egg', color: '#ffb703', opacity: 18, size: 90,
       mode: 'kinetic', wallBehavior: 'bounce', safeZoneBehavior: 'bounce',
       spinMode: 'keel', spinRate: 2, currentRotation: 0, angularVelocity: 0, keelTime: 1.2,
-      speedLevel: 3, x: 230, y: 150, vx: -0.75, vy: 0.80, isDragging: false, isHovered: false
+      speedLevel: 3, x: 230, y: 150, vx: -0.75, vy: 0.80, isDragging: false, isHovered: false,
+      headingSource: 'magnetometer', // 'magnetometer' (True Phone Sensor) | 'auto' (Smart Hybrid) | 'gps' (Course Over Ground)
+      needleMode: 'north' // 'north' (True North-Seeking Needle) | 'heading' (Travel Direction Pointer)
     },
     altitude: {
       key: 'altitude', active: true, shape: 'squirkle', color: '#30d158', opacity: 18, size: 90,
@@ -105,6 +107,10 @@
             Object.assign(window.nomadBubbles[k], parsedMulti[k]);
           }
         });
+        if (window.nomadBubbles.compass) {
+          if (!window.nomadBubbles.compass.headingSource) window.nomadBubbles.compass.headingSource = 'magnetometer';
+          if (!window.nomadBubbles.compass.needleMode) window.nomadBubbles.compass.needleMode = 'north';
+        }
       } else {
         // Fallback for legacy single-bubble storage
         const savedLegacy = localStorage.getItem('nomad_v4_speed_bubble');
@@ -215,10 +221,10 @@
       </defs>
 
       <!-- Top Notch Floating Typography -->
-      ${hasTopText ? `<text x="50" y="${topY}" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${topFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="${topLetterSpacing}" style="text-shadow: 0 1px 3px rgba(0,0,0,0.85);">${topText}</text>` : ''}
+      ${hasTopText ? `<text x="50" y="${topY}" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${topFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="${topLetterSpacing}" style="text-shadow: none;">${topText}</text>` : ''}
 
       <!-- Bottom Notch Floating Typography -->
-      ${hasBottomText ? `<text x="50" y="${bottomY}" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${bottomFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="${bottomLetterSpacing}" style="text-shadow: 0 1px 3px rgba(0,0,0,0.85);">${bottomText}</text>` : ''}
+      ${hasBottomText ? `<text x="50" y="${bottomY}" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${bottomFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="${bottomLetterSpacing}" style="text-shadow: none;">${bottomText}</text>` : ''}
     `;
 
     switch (shape) {
@@ -411,9 +417,16 @@
 
     if (bubbleKey === 'compass') {
       channelLabel = 'CMPS';
-      const h = (typeof window.currentHeading === 'number' && !isNaN(window.currentHeading) && window.currentHeading !== 0)
-        ? window.currentHeading
-        : (window.map && typeof window.map.getBearing === 'function' ? ((window.map.getBearing() % 360 + 360) % 360) : 0);
+      const bComp = window.nomadBubbles && window.nomadBubbles.compass;
+      const src = (bComp && bComp.headingSource) ? bComp.headingSource : 'magnetometer';
+      let h = 0;
+      if (src === 'magnetometer' && typeof window.magnetometerHeading === 'number') {
+        h = window.magnetometerHeading;
+      } else if (typeof window.currentHeading === 'number' && !isNaN(window.currentHeading) && window.currentHeading !== 0) {
+        h = window.currentHeading;
+      } else if (window.map && typeof window.map.getBearing === 'function') {
+        h = ((window.map.getBearing() % 360 + 360) % 360);
+      }
       const getCard = (typeof window.getCardinalDirection === 'function') 
         ? window.getCardinalDirection 
         : (a => ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.round((a || 0) / 45) % 8]);
@@ -609,7 +622,9 @@
       b.currentRotation = speedBank;
       shapeFrame.style.transform = `rotate(${b.currentRotation.toFixed(1)}deg)`;
     } else if (b.spinMode === 'gyro') {
-      const targetHeading = typeof window.currentHeading === 'number' ? window.currentHeading : 0;
+      const targetHeading = (typeof window.magnetometerHeading === 'number')
+        ? window.magnetometerHeading
+        : (typeof window.currentHeading === 'number' ? window.currentHeading : 0);
       b.currentRotation = targetHeading;
       shapeFrame.style.transform = `rotate(${targetHeading.toFixed(1)}deg)`;
     } else {
@@ -941,8 +956,16 @@
         }
         window.saveBubbleConfig();
       } else {
-        // Quick tap without drag: for ATMOS bubble in ticker mode, tap immediately advances to the next active metric!
-        if (bubbleKey === 'atmo' && b.displayFormat !== 'stack') {
+        // Quick tap without drag:
+        // For COMPASS bubble, tap cycles through heading sensor sources (Magnetometer -> Auto-Switch -> GPS)
+        if (bubbleKey === 'compass') {
+          const currentSource = b.headingSource || 'magnetometer';
+          const nextSource = (currentSource === 'magnetometer') ? 'auto' : ((currentSource === 'auto') ? 'gps' : 'magnetometer');
+          window.setCompassHeadingSource(nextSource);
+          if (navigator.vibrate) {
+            try { navigator.vibrate(15); } catch (_) {}
+          }
+        } else if (bubbleKey === 'atmo' && b.displayFormat !== 'stack') {
           const activeMetrics = [
             b.showHumidity !== false && 'humidity',
             b.showUv !== false && 'uv',
@@ -1129,6 +1152,10 @@
     if (coordsSection) {
       coordsSection.style.display = (tabId === 'coords') ? 'block' : 'none';
     }
+    const compassSection = document.getElementById('compass-options-section');
+    if (compassSection) {
+      compassSection.style.display = (tabId === 'compass') ? 'block' : 'none';
+    }
 
     // 4. Sync modal controls for this bubble
     window.syncModalControlsForTab(tabId);
@@ -1218,6 +1245,9 @@
       window.syncAtmoMetricButtonsUI();
       window.syncAtmoDisplayFormatUI();
       window.syncAtmoTickerPaceUI();
+    }
+    if (tabId === 'compass') {
+      if (typeof window.syncCompassOptionsUI === 'function') window.syncCompassOptionsUI();
     }
 
     // Sync inter-bubble collision and unit controls
@@ -1664,22 +1694,71 @@
     }
   };
 
+  let lastCompassNeedleAngle = null;
+  function unwrapCompassAngle(targetDeg, prevDeg) {
+    if (prevDeg === null || isNaN(prevDeg)) return targetDeg;
+    let diff = (targetDeg - prevDeg) % 360;
+    if (diff < -180) diff += 360;
+    if (diff > 180) diff -= 360;
+    return prevDeg + diff;
+  }
+
   window.renderCompassBubble = function(heading) {
     const el = document.getElementById('compass-bubble-value');
     if (!el) return;
-    let h = (typeof heading === 'number' && !isNaN(heading))
-      ? heading
-      : ((typeof window.currentHeading === 'number' && !isNaN(window.currentHeading) && window.currentHeading !== 0)
-        ? window.currentHeading
-        : (window.map && typeof window.map.getBearing === 'function' ? ((window.map.getBearing() % 360 + 360) % 360) : 0));
-    
+    const b = window.nomadBubbles && window.nomadBubbles.compass;
+    const source = (b && b.headingSource) ? b.headingSource : 'magnetometer';
+    const needleMode = (b && b.needleMode) ? b.needleMode : 'north';
+
+    let h;
+    const speedMph = (window.rawSpeedMps !== null && !isNaN(window.rawSpeedMps)) ? (window.rawSpeedMps * 2.23694) : 0;
+
+    if (source === 'magnetometer') {
+      if (typeof window.magnetometerHeading === 'number' && !isNaN(window.magnetometerHeading)) {
+        h = window.magnetometerHeading;
+      } else if (typeof heading === 'number' && !isNaN(heading)) {
+        h = heading;
+      } else {
+        h = (typeof window.currentHeading === 'number' && !isNaN(window.currentHeading)) ? window.currentHeading : 0;
+      }
+    } else if (source === 'gps') {
+      if (typeof window.gpsHeading === 'number' && !isNaN(window.gpsHeading)) {
+        h = window.gpsHeading;
+      } else if (typeof heading === 'number' && !isNaN(heading)) {
+        h = heading;
+      } else {
+        h = (typeof window.currentHeading === 'number' && !isNaN(window.currentHeading)) ? window.currentHeading : 0;
+      }
+    } else {
+      // 'auto' (Smart Hybrid)
+      if (speedMph > 3.2 && typeof window.gpsHeading === 'number' && !isNaN(window.gpsHeading)) {
+        h = window.gpsHeading;
+      } else if (typeof window.magnetometerHeading === 'number' && !isNaN(window.magnetometerHeading)) {
+        h = window.magnetometerHeading;
+      } else if (typeof heading === 'number' && !isNaN(heading)) {
+        h = heading;
+      } else {
+        h = (typeof window.currentHeading === 'number' && !isNaN(window.currentHeading)) ? window.currentHeading : 0;
+      }
+    }
+
+    h = (h % 360 + 360) % 360;
+
     const valText = `${Math.round(h)}°`;
-    el.innerText = valText;
+    if (el.innerText !== valText) {
+      el.innerText = valText;
+    }
 
     // Rotate authentic magnetic compass needle
     const needle = document.getElementById('compass-bubble-needle');
     if (needle) {
-      needle.style.transform = `rotate(${h.toFixed(1)}deg)`;
+      // In 'north' (True North-Seeking Needle): Red needle points directly to physical North!
+      // When facing h degrees (e.g. 90° East), North is at -90° (270°).
+      // In 'heading' (Heading Pointer): Needle points in direction of travel.
+      const rawTargetRot = (needleMode === 'north') ? -h : h;
+      const smoothRot = unwrapCompassAngle(rawTargetRot, lastCompassNeedleAngle);
+      lastCompassNeedleAngle = smoothRot;
+      needle.style.transform = `rotate(${smoothRot.toFixed(1)}deg)`;
     }
 
     // Update cardinal heading label (N, NE, E, SE, S, SW, W, NW)
@@ -1688,10 +1767,12 @@
       const getCard = (typeof window.getCardinalDirection === 'function')
         ? window.getCardinalDirection
         : (a => ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.round((a || 0) / 45) % 8]);
-      cardEl.innerText = getCard(h);
+      const card = getCard(h);
+      if (cardEl.innerText !== card) {
+        cardEl.innerText = card;
+      }
     }
 
-    const b = window.nomadBubbles && window.nomadBubbles.compass;
     if (b) {
       el.style.fontSize = window.calculateDynamicBubbleFontSize(
         valText,
@@ -2061,6 +2142,85 @@
         name: isImperial ? 'Telemetry Units: All Imperial (MPH, °F, FT, inHg)' : 'Telemetry Units: All Metric (KM/H, °C, M, hPa)',
         type: 'perspective'
       });
+    }
+  };
+
+  // Compass Telemetry Heading Source & Needle Mode Controls
+  window.setCompassHeadingSource = function(source) {
+    const b = window.nomadBubbles && window.nomadBubbles.compass;
+    if (!b) return;
+    b.headingSource = source; // 'magnetometer' | 'auto' | 'gps'
+    window.syncCompassOptionsUI();
+    window.renderCompassBubble();
+    window.saveBubbleConfig();
+
+    let toastName = 'Compass: True Magnetometer';
+    if (source === 'gps') toastName = 'Compass: GPS Course Over Ground';
+    else if (source === 'auto') toastName = 'Compass: Auto-Switch (Smart Hybrid)';
+
+    if (navigator.vibrate) try { navigator.vibrate(25); } catch (_) {}
+    if (typeof window.showMapThemeToast === 'function') {
+      window.showMapThemeToast({ name: toastName, type: 'perspective' });
+    }
+  };
+
+  window.setCompassNeedleMode = function(mode) {
+    const b = window.nomadBubbles && window.nomadBubbles.compass;
+    if (!b) return;
+    b.needleMode = mode; // 'north' | 'heading'
+    window.syncCompassOptionsUI();
+    window.renderCompassBubble();
+    window.saveBubbleConfig();
+
+    let toastName = (mode === 'north') ? 'Needle: North-Seeking (True Compass)' : 'Needle: Heading Pointer';
+    if (navigator.vibrate) try { navigator.vibrate(25); } catch (_) {}
+    if (typeof window.showMapThemeToast === 'function') {
+      window.showMapThemeToast({ name: toastName, type: 'perspective' });
+    }
+  };
+
+  window.syncCompassOptionsUI = function() {
+    const b = window.nomadBubbles && window.nomadBubbles.compass;
+    if (!b) return;
+    const source = b.headingSource || 'magnetometer';
+    const needleMode = b.needleMode || 'north';
+
+    const magBtn = document.getElementById('compass-source-mag');
+    const autoBtn = document.getElementById('compass-source-auto');
+    const gpsBtn = document.getElementById('compass-source-gps');
+    if (magBtn) magBtn.classList.toggle('is-selected', source === 'magnetometer');
+    if (autoBtn) autoBtn.classList.toggle('is-selected', source === 'auto');
+    if (gpsBtn) gpsBtn.classList.toggle('is-selected', source === 'gps');
+
+    const northBtn = document.getElementById('compass-needle-north');
+    const headingBtn = document.getElementById('compass-needle-heading');
+    if (northBtn) northBtn.classList.toggle('is-selected', needleMode === 'north');
+    if (headingBtn) headingBtn.classList.toggle('is-selected', needleMode === 'heading');
+
+    const hintEl = document.getElementById('compass-source-hint');
+    if (hintEl) {
+      if (source === 'magnetometer') {
+        hintEl.innerText = "🧲 True Magnetometer: Tracks your phone's built-in magnetic sensor in real time. Rotate your phone in any direction to see the needle and bearing respond as an authentic physical compass.";
+      } else if (source === 'gps') {
+        hintEl.innerText = "🛰️ GPS Course: Tracks satellite course-over-ground vector (vehicle direction of travel). Best when phone is mounted in a vehicle.";
+      } else {
+        hintEl.innerText = "🔄 Auto-Switch (Smart Hybrid): Uses GPS Course while in motion (> 3.2 MPH), and automatically switches to True Magnetometer when stationary or on foot.";
+      }
+    }
+
+    window.updateCompassSensorStatusUI();
+  };
+
+  window.updateCompassSensorStatusUI = function(isActive) {
+    const badge = document.getElementById('compass-sensor-status-badge');
+    if (!badge) return;
+    const hasMag = isActive || window.hasMagnetometerSensor || (typeof window.magnetometerHeading === 'number');
+    if (hasMag) {
+      badge.innerText = 'Active (Live 🧲)';
+      badge.style.color = '#30d158';
+    } else {
+      badge.innerText = 'Standby (Move Phone)';
+      badge.style.color = '#ffb703';
     }
   };
 
