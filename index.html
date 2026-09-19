@@ -155,9 +155,9 @@
       top: max(12px, env(safe-area-inset-top));
       bottom: auto;
       z-index: 25;
-      width: 36px;
-      height: 36px;
-      min-height: 36px;
+      width: var(--top-btn-size, 36px);
+      height: var(--top-btn-size, 36px);
+      min-height: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -170,12 +170,27 @@
       cursor: pointer;
       user-select: none;
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-      transition: top 0.4s cubic-bezier(0.25, 1, 0.5, 1), bottom 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.15s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+      transition: top 0.4s cubic-bezier(0.25, 1, 0.5, 1), bottom 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.15s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, width 0.2s ease, height 0.2s ease;
       -webkit-tap-highlight-color: transparent;
       outline: none;
       padding: 0;
       box-sizing: border-box;
       opacity: var(--hud-badge-opacity, 1);
+    }
+
+    #interstate-badge-container {
+      width: var(--top-btn-theme-size, 36px);
+      height: var(--top-btn-theme-size, 36px);
+    }
+
+    #fullscreen-btn {
+      width: var(--top-btn-fullscreen-size, 36px);
+      height: var(--top-btn-fullscreen-size, 36px);
+    }
+
+    #fighter-toggle-btn {
+      width: var(--top-btn-fighter-size, 36px);
+      height: var(--top-btn-fighter-size, 36px);
     }
 
     /* Inverted Cockpit Layout: Controls docked at bottom */
@@ -212,8 +227,10 @@
 
     .top-corner-btn .minimal-corner-svg,
     .map-overlay-fullscreen svg {
-      width: 17px;
-      height: 17px;
+      width: 48%;
+      height: 48%;
+      max-width: 26px;
+      max-height: 26px;
       display: block;
       pointer-events: none;
     }
@@ -384,7 +401,7 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
     }
 
-    /* Universal Bubble Tabs: 2-Row 3x2 Segmented Glass Grid */
+    /* Universal Bubble Tabs: 3-Row 3-Column Segmented Glass Grid */
     .bubble-tabs-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -796,12 +813,12 @@
     }
 
     .location-channel-bar .street-value {
-      font-size: clamp(1.2rem, 3.8vw, 1.85rem);
+      font-size: clamp(1.32rem, 4.2vw, 2.05rem);
       font-weight: 400;
       line-height: 1.12;
       color: #ffffff;
       letter-spacing: 0.01em;
-      margin-bottom: 2px;
+      margin-bottom: 3px;
       white-space: nowrap;
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
       transition: font-size 0.15s ease, color 0.3s ease;
@@ -819,12 +836,12 @@
       align-items: center;
       justify-content: center;
       flex-wrap: nowrap;
-      gap: 6px;
-      font-size: clamp(0.82rem, 2.4vw, 1.05rem);
-      font-weight: 400;
+      gap: 7px;
+      font-size: clamp(0.96rem, 2.85vw, 1.22rem);
+      font-weight: 500;
       line-height: 1.15;
       color: #cbd5e1;
-      letter-spacing: 0.01em;
+      letter-spacing: 0.012em;
       text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
       transition: color 0.3s ease;
       white-space: nowrap;
@@ -2541,7 +2558,8 @@
         <div class="kinetic-bubble-shape-wrap kinetic-shape-circle" id="compass-bubble-shape-frame"></div>
         <div class="kinetic-pin-indicator" id="compass-bubble-pin" style="display: none; z-index: 3;">📌</div>
         <div class="kinetic-bubble-inner">
-          <div class="kinetic-compass-needle-wrap" id="compass-bubble-needle" style="width: 22px; height: 22px; margin-bottom: 2px; transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1); transform-origin: center center; display: flex; align-items: center; justify-content: center;">
+          <div class="kinetic-bubble-value" id="compass-bubble-value" style="line-height: 1; margin-bottom: 2px;">0°</div>
+          <div class="kinetic-compass-needle-wrap" id="compass-bubble-needle" style="width: 22px; height: 22px; margin-top: 1px; margin-bottom: 1px; transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1); transform-origin: center center; display: flex; align-items: center; justify-content: center;">
             <svg viewBox="0 0 24 24" width="20" height="20" style="filter: drop-shadow(0 1px 3px rgba(0,0,0,0.65)); overflow: visible;">
               <polygon points="12,2 15.5,12 12,9.5" fill="#ff3b30"/>
               <polygon points="12,2 8.5,12 12,9.5" fill="#ff6961"/>
@@ -2550,8 +2568,7 @@
               <circle cx="12" cy="12" r="1.6" fill="#1c1c1e" stroke="#ffffff" stroke-width="0.8"/>
             </svg>
           </div>
-          <div class="kinetic-bubble-value" id="compass-bubble-value" style="line-height: 1;">0°</div>
-          <div class="kinetic-bubble-unit" id="compass-bubble-cardinal" style="font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; opacity: 0.85; margin-top: 2px; color: currentColor;">N</div>
+          <div class="kinetic-bubble-unit" id="compass-bubble-cardinal" style="font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; opacity: 0.85; margin-top: 1px; color: currentColor;">N</div>
         </div>
       </div>
 
@@ -2599,6 +2616,17 @@
         <div class="kinetic-bubble-inner" id="coords-bubble-content" style="padding: 4px;">
           <div class="coords-line" id="coords-lat">--.---° N</div>
           <div class="coords-line" id="coords-lon">--.---° W</div>
+        </div>
+      </div>
+
+      <!-- 7. Route Badges & Highway Shields Kinetic Bubble (Interstate & State Route) -->
+      <div class="kinetic-bubble" id="shields-bubble" style="width: 88px; height: 88px; left: 20px; top: 380px; color: #00d4ff; display: none;" title="Drag to flick • Long-press to configure">
+        <div class="kinetic-bubble-shape-wrap kinetic-shape-circle" id="shields-bubble-shape-frame" style="display: none;"></div>
+        <div class="kinetic-pin-indicator" id="shields-bubble-pin" style="display: none; z-index: 3;">📌</div>
+        <div class="kinetic-bubble-inner" id="shields-bubble-content" style="padding: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+          <div id="shields-bubble-render-wrap" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.55));">
+            <!-- Dynamic SVG Highway / State Route Shield injected via JavaScript -->
+          </div>
         </div>
       </div>
 
@@ -2853,7 +2881,17 @@
           <span class="bubble-tab-icon">📍</span>
           <span class="bubble-tab-label">LALO</span>
         </button>
-        <button class="bubble-tab-btn bubble-tab-vehicle-btn" id="bubble-tab-vehicle" data-tab="vehicle" onclick="switchBubbleTab('vehicle')" style="grid-column: span 2;">
+        <button class="bubble-tab-btn" id="bubble-tab-shields" data-tab="shields" onclick="switchBubbleTab('shields')">
+          <span class="bubble-tab-status" id="bubble-tab-status-shields"></span>
+          <span class="bubble-tab-icon">🛡️</span>
+          <span class="bubble-tab-label">Badges</span>
+        </button>
+        <button class="bubble-tab-btn" id="bubble-tab-topcontrols" data-tab="topcontrols" onclick="switchBubbleTab('topcontrols')">
+          <span class="bubble-tab-status is-active" id="bubble-tab-status-topcontrols"></span>
+          <span class="bubble-tab-icon">🎛️</span>
+          <span class="bubble-tab-label">Top Row</span>
+        </button>
+        <button class="bubble-tab-btn bubble-tab-vehicle-btn" id="bubble-tab-vehicle" data-tab="vehicle" onclick="switchBubbleTab('vehicle')">
           <span class="bubble-tab-status is-active" id="bubble-tab-status-vehicle"></span>
           <span class="bubble-tab-icon">🛸</span>
           <span class="bubble-tab-label">Vehicle &amp; Moon</span>
@@ -3162,9 +3200,138 @@
           <button type="button" class="bubble-mode-btn" id="satellite-speed-4" onclick="setVehicleSatelliteSpeed(4)">Warp (4x)</button>
         </div>
 
+        <!-- Moon Collision Color Shift Toggle -->
+        <div class="config-section-label" style="margin-top: 14px;">Bubble Deflection Moon Color Morph</div>
+        <div class="bubble-mode-toggle-group" id="vehicle-satellite-shift-group">
+          <button type="button" class="bubble-mode-btn is-selected" id="satellite-shift-on" onclick="setVehicleSatelliteColorShiftOnHit(true)">🎨 Adopt Bubble Color</button>
+          <button type="button" class="bubble-mode-btn" id="satellite-shift-off" onclick="setVehicleSatelliteColorShiftOnHit(false)">🔒 Lock Static Color</button>
+        </div>
+
         <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 0.72rem; color: #94a3b8;">Reverses direction when data bubbles deflect!</span>
+          <span style="font-size: 0.72rem; color: #94a3b8;">Reverses direction &amp; syncs color when data bubbles deflect!</span>
           <button type="button" class="bubble-apply-all-btn" onclick="reverseVehicleSatelliteSpin()" style="white-space:nowrap; padding: 4px 8px;">🔄 Reverse Spin</button>
+        </div>
+      </div>
+
+      <!-- Dedicated Section: Route Shields / Badges (Interstate & State Routes) -->
+      <div id="shields-options-section" style="display: none;">
+        <div class="config-section-label">Route Badges Status</div>
+        <div class="bubble-mode-toggle-group" id="shields-active-group">
+          <button type="button" class="bubble-mode-btn is-selected" id="shields-status-active" onclick="setRouteShieldsActive(true)">👁️ Active</button>
+          <button type="button" class="bubble-mode-btn" id="shields-status-inactive" onclick="setRouteShieldsActive(false)">💤 Inactive</button>
+        </div>
+
+        <div class="config-section-label" style="margin-top: 14px;">Shield Motion Mode</div>
+        <div class="bubble-mode-toggle-group" id="shields-mode-group">
+          <button type="button" class="bubble-mode-btn is-selected" id="shields-mode-kinetic" onclick="setRouteShieldsMode('kinetic')">🚀 Kinetic Bounce</button>
+          <button type="button" class="bubble-mode-btn" id="shields-mode-stationary" onclick="setRouteShieldsMode('stationary')">📌 Pinned Corner</button>
+        </div>
+
+        <div class="config-section-label" style="margin-top: 14px;">Shield Bubble Dimensions</div>
+        <div class="bubble-mode-toggle-group" id="shields-preset-size-group">
+          <button type="button" class="bubble-mode-btn" id="shields-size-preset-compact" onclick="setRouteShieldsSize(72)">Compact (72px)</button>
+          <button type="button" class="bubble-mode-btn is-selected" id="shields-size-preset-standard" onclick="setRouteShieldsSize(88)">Standard (88px)</button>
+          <button type="button" class="bubble-mode-btn" id="shields-size-preset-hero" onclick="setRouteShieldsSize(108)">Hero (108px)</button>
+        </div>
+
+        <div class="slider-row" style="margin-top: 10px;">
+          <div class="slider-label-row">
+            <span>Fine-Tune Size</span>
+            <span id="shields-size-val-label" class="slider-val-badge">88px</span>
+          </div>
+          <input type="range" min="64" max="130" step="2" value="88" id="shields-size-slider" class="hud-range-slider" oninput="setRouteShieldsSize(this.value)">
+        </div>
+
+        <div class="config-section-label" style="margin-top: 14px;">Authentic Shield Styling</div>
+        <div style="font-size: 0.75rem; color: #94a3b8; line-height: 1.4; padding: 4px 6px; background: rgba(255,255,255,0.04); border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
+          Route shields are pre-configured to official MUTCD geometries:
+          <div style="margin-top: 5px; display: flex; align-items: center; gap: 8px;">
+            <span style="display: inline-block; width: 14px; height: 14px; background: #0033cc; border-top: 4px solid #cc0000; border-radius: 2px;"></span>
+            <strong style="color: #ffffff;">Interstate:</strong> Official Red, White &amp; Blue Cutout Shield
+          </div>
+          <div style="margin-top: 4px; display: flex; align-items: center; gap: 8px;">
+            <span style="display: inline-block; width: 14px; height: 14px; background: #ffffff; border: 2px solid #000000; border-radius: 3px;"></span>
+            <strong style="color: #ffffff;">State Route:</strong> Solid MUTCD White Rounded Inset Plate
+          </div>
+        </div>
+
+        <div id="shields-safezone-section" style="margin-top: 14px;">
+          <div class="config-section-label" style="margin-bottom: 6px;">Vehicle Safe-Zone Interaction</div>
+          <div class="bubble-mode-toggle-group" id="shields-safezone-group">
+            <button type="button" class="bubble-mode-btn is-selected" id="shields-safezone-bounce" onclick="setRouteShieldsSafeZoneBehavior('bounce')">🛡️ Deflect</button>
+            <button type="button" class="bubble-mode-btn" id="shields-safezone-under" onclick="setRouteShieldsSafeZoneBehavior('under')">🌌 Glide Under</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dedicated Section: Top Row Controls (Map Theme, Fullscreen, Chevron/Fighter) -->
+      <div id="topcontrols-options-section" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <div class="config-section-label" style="margin: 0;">Top Row Controls Dimensions</div>
+          <button type="button" class="bubble-apply-all-btn" id="btn-sync-all-top-controls" onclick="syncAllTopControlsToMaster()" title="Adjust all top row controls to match the Master size">Make All Same</button>
+        </div>
+        <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 12px;">
+          Configure sizing for each top control independently or synchronize all 3 across the cockpit header.
+        </div>
+
+        <!-- 1. Map Theme Switcher (Top-Left) -->
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.82rem; color: #ffffff;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: rgba(0,212,255,0.18); border: 1px solid #00d4ff; color: #00d4ff; font-size: 0.7rem;">🗺️</span>
+              <span>Map Theme Switcher</span>
+              <span style="font-size: 0.65rem; color: #00d4ff; font-weight: 700; background: rgba(0,212,255,0.12); padding: 2px 6px; border-radius: 4px;">Top-Left</span>
+            </div>
+            <span id="top-ctrl-theme-label" class="slider-val-badge">36px</span>
+          </div>
+          <input type="range" min="1" max="5" step="1" value="2" id="slider-top-theme" class="hud-range-slider" oninput="setTopControlSliderSize('theme', this.value)">
+          <div class="slider-ticks-row" style="margin-top: 4px;">
+            <span>30px</span>
+            <span>36px</span>
+            <span>42px</span>
+            <span>48px</span>
+            <span>56px</span>
+          </div>
+        </div>
+
+        <!-- 2. Fullscreen / Min-Max Button (Top-Center) -->
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.82rem; color: #ffffff;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); color: #ffffff; font-size: 0.7rem;">⛶</span>
+              <span>Fullscreen Min / Max</span>
+              <span style="font-size: 0.65rem; color: #cbd5e1; font-weight: 700; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px;">Top-Center</span>
+            </div>
+            <span id="top-ctrl-fullscreen-label" class="slider-val-badge">36px</span>
+          </div>
+          <input type="range" min="1" max="5" step="1" value="2" id="slider-top-fullscreen" class="hud-range-slider" oninput="setTopControlSliderSize('fullscreen', this.value)">
+          <div class="slider-ticks-row" style="margin-top: 4px;">
+            <span>30px</span>
+            <span>36px</span>
+            <span>42px</span>
+            <span>48px</span>
+            <span>56px</span>
+          </div>
+        </div>
+
+        <!-- 3. Chevron / Galaga Fighter Mode Toggle (Top-Right) -->
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.82rem; color: #ffffff;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: rgba(255,0,85,0.18); border: 1px solid #ff0055; color: #ff0055; font-size: 0.7rem;">👾</span>
+              <span>Vehicle Chevron / Fighter</span>
+              <span style="font-size: 0.65rem; color: #ff0055; font-weight: 700; background: rgba(255,0,85,0.12); padding: 2px 6px; border-radius: 4px;">Top-Right</span>
+            </div>
+            <span id="top-ctrl-fighter-label" class="slider-val-badge">36px</span>
+          </div>
+          <input type="range" min="1" max="5" step="1" value="2" id="slider-top-fighter" class="hud-range-slider" oninput="setTopControlSliderSize('fighter', this.value)">
+          <div class="slider-ticks-row" style="margin-top: 4px;">
+            <span>30px</span>
+            <span>36px</span>
+            <span>42px</span>
+            <span>48px</span>
+            <span>56px</span>
+          </div>
         </div>
       </div>
         <button class="modal-close-btn" style="flex: 1;" onclick="closeKineticBubbleModal()">Done</button>
@@ -3520,7 +3687,7 @@
       if (!el || !card) return;
 
       const maxAllowedWidth = Math.max(140, card.clientWidth - 36);
-      let fontSize = window.innerWidth < 480 ? 24 : 28;
+      let fontSize = window.innerWidth < 480 ? 26 : 32;
       el.style.fontSize = `${fontSize}px`;
       const minFontSize = 14;
 
@@ -3928,6 +4095,8 @@
         </div>
       `;
     }
+    window.createInterstateSVG = createInterstateSVG;
+    window.createRouteSVG = createRouteSVG;
 
     let currentSecondaryRouteShield = null;
     let dualRouteFlipIndex = 0;
@@ -4137,6 +4306,12 @@
           }
         }
       }
+
+      window.currentInterstateShield = currentInterstateShield;
+      window.currentRouteShield = currentRouteShield;
+      if (typeof window.renderShieldsBubbleContent === 'function') {
+        window.renderShieldsBubbleContent();
+      }
     }
 
     async function rotateNextAutoFidget() {
@@ -4312,6 +4487,7 @@
       currentSignedHighwayDirections[cleanNum] = newDirection;
       return newDirection;
     }
+    window.getHighwayDirection = getHighwayDirection;
 
     function getAdaptiveCardinalLabel(angle) {
       if (angle === null || isNaN(angle)) return { text: "NORTH", isShort: false };

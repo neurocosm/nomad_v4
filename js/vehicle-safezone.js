@@ -280,6 +280,7 @@
     safeZoneRadius: 68,        // 68px radius (136px diameter)
     satelliteActive: true,     // Orbiting Scanner Dot Active
     satelliteColor: '#00d4ff', // Default Holo Cyan
+    satelliteColorShiftOnHit: true, // Color of deflecting data bubble transfers to moon
     satelliteSize: 8,          // 8px standard
     satelliteSpeedLevel: 2,    // 1: Gentle, 2: Cruising, 3: Rapid, 4: Warp
     orbitAngle: 0,
@@ -379,31 +380,52 @@
   };
 
   /**
-   * Reverses orbit direction when a kinetic bubble deflects off the safe-zone forcefield
+   * Reverses orbit direction and optionally shifts moon color when a kinetic bubble deflects off the safe-zone forcefield
    */
-  window.triggerSafeZoneDeflectionFlip = function(bubbleKey) {
+  window.triggerSafeZoneDeflectionFlip = function(bubbleKey, bubbleColor) {
     const cfg = window.nomadVehicleConfig;
     if (!cfg || !cfg.satelliteActive) return;
 
     const now = Date.now();
-    if (now - (cfg.lastDeflectionTime || 0) < 350) return;
+    if (now - (cfg.lastDeflectionTime || 0) < 320) return;
     cfg.lastDeflectionTime = now;
 
     // Reverse orbital direction
     cfg.orbitDirection = (cfg.orbitDirection || 1) * -1;
 
+    // If dynamic collision color shift is enabled, morph moon color to match deflecting bubble
+    if (cfg.satelliteColorShiftOnHit !== false && bubbleColor) {
+      cfg.satelliteColor = bubbleColor;
+      window.applyVehicleSafeZoneConfig();
+      // Sync swatches in modal UI if open
+      const swatches = document.querySelectorAll('#vehicle-satellite-swatches .bubble-color-swatch');
+      swatches.forEach(s => {
+        const col = s.getAttribute('data-color');
+        s.classList.toggle('is-selected', col && col.toLowerCase() === bubbleColor.toLowerCase());
+      });
+    }
+
     // Momentary kinetic pop pulse on the satellite moon
     const moon = document.getElementById('safe-zone-satellite-moon');
     if (moon) {
-      moon.style.transform = 'scale(2.0)';
-      moon.style.filter = 'brightness(1.6)';
+      moon.style.transform = 'scale(2.2)';
+      moon.style.filter = 'brightness(1.8)';
       setTimeout(() => {
         if (moon) {
           moon.style.transform = 'scale(1)';
           moon.style.filter = 'none';
         }
-      }, 160);
+      }, 180);
     }
+  };
+
+  /**
+   * Sets whether the moon adopts the color of whatever data bubble hits it
+   */
+  window.setVehicleSatelliteColorShiftOnHit = function(enabled) {
+    window.nomadVehicleConfig.satelliteColorShiftOnHit = !!enabled;
+    window.saveVehicleConfig();
+    window.syncVehicleModalUI();
   };
 
   /**
@@ -554,6 +576,15 @@
         btn.classList.toggle('is-selected', (cfg.satelliteSpeedLevel || 2) === lvl);
       }
     });
+
+    // 8. Moon Collision Color Shift Toggle
+    const btnShiftOn = document.getElementById('satellite-shift-on');
+    const btnShiftOff = document.getElementById('satellite-shift-off');
+    if (btnShiftOn && btnShiftOff) {
+      const isShift = cfg.satelliteColorShiftOnHit !== false;
+      btnShiftOn.classList.toggle('is-selected', isShift);
+      btnShiftOff.classList.toggle('is-selected', !isShift);
+    }
   };
 
   /**

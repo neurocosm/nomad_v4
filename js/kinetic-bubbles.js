@@ -142,6 +142,19 @@
       window.renderCoordsBubble(window.lastLat, window.lastLon);
     }
 
+    // Initialize Top Row Controls dimensions
+    if (typeof window.applyTopControlSizes === 'function') {
+      window.applyTopControlSizes();
+    }
+
+    // Initialize Route Badges / Highway Shields Bubble
+    if (typeof window.applyShieldsConfigUI === 'function') {
+      window.applyShieldsConfigUI();
+      if (typeof window.setupShieldsInteractions === 'function') {
+        window.setupShieldsInteractions();
+      }
+    }
+
     // 5. Start unified kinetic physics animation loop
     window.startKineticBubbleLoop();
   };
@@ -501,6 +514,21 @@
         window.updateSatelliteMoonOrbit();
       }
 
+      // Route Badges / Highway Shields kinetic physics
+      if (window.nomadShieldsConfig && window.nomadShieldsConfig.active !== false) {
+        const sb = window.nomadShieldsConfig;
+        if (sb.mode === 'kinetic' && !sb.isDragging && !sb.isHovered) {
+          if (typeof window.updateShieldsPhysics === 'function') {
+            window.updateShieldsPhysics();
+          }
+        }
+        const el = document.getElementById('shields-bubble');
+        if (el) {
+          el.style.left = `${sb.x}px`;
+          el.style.top = `${sb.y}px`;
+        }
+      }
+
       // Flush coordinates to DOM
       window.BUBBLE_KEYS.forEach(k => {
         const b = window.nomadBubbles[k];
@@ -698,9 +726,9 @@
           b.vx = (b.vx / curSpeed) * 1.4;
           b.vy = (b.vy / curSpeed) * 1.4;
 
-          // Trigger orbit spin reversal and pulse on satellite moon
+          // Trigger orbit spin reversal, color morphing, and pulse on satellite moon
           if (typeof window.triggerSafeZoneDeflectionFlip === 'function') {
-            window.triggerSafeZoneDeflectionFlip(b.key);
+            window.triggerSafeZoneDeflectionFlip(b.key, b.color);
           }
         }
       }
@@ -1000,7 +1028,8 @@
    * Modal Tab Navigation
    */
   window.switchBubbleTab = function(tabId) {
-    if (tabId !== 'vehicle' && !window.BUBBLE_KEYS.includes(tabId)) return;
+    const validTabs = [...window.BUBBLE_KEYS, 'vehicle', 'shields', 'topcontrols'];
+    if (!validTabs.includes(tabId)) return;
     window.currentSelectedBubbleTab = tabId;
 
     // 1. Update tab buttons active states and status indicators
@@ -1011,6 +1040,16 @@
       if (statusDot) statusDot.classList.toggle('is-active', window.nomadBubbles[k].active !== false);
     });
 
+    const shieldsTabBtn = document.getElementById('bubble-tab-shields');
+    if (shieldsTabBtn) shieldsTabBtn.classList.toggle('is-active', tabId === 'shields');
+    const shieldsStatusDot = document.getElementById('bubble-tab-status-shields');
+    if (shieldsStatusDot) shieldsStatusDot.classList.toggle('is-active', window.nomadShieldsConfig && window.nomadShieldsConfig.active !== false);
+
+    const topControlsTabBtn = document.getElementById('bubble-tab-topcontrols');
+    if (topControlsTabBtn) topControlsTabBtn.classList.toggle('is-active', tabId === 'topcontrols');
+    const topControlsStatusDot = document.getElementById('bubble-tab-status-topcontrols');
+    if (topControlsStatusDot) topControlsStatusDot.classList.toggle('is-active', true);
+
     const vehicleTabBtn = document.getElementById('bubble-tab-vehicle');
     if (vehicleTabBtn) vehicleTabBtn.classList.toggle('is-active', tabId === 'vehicle');
     const vehicleStatusDot = document.getElementById('bubble-tab-status-vehicle');
@@ -1018,12 +1057,16 @@
 
     const bubbleControls = document.getElementById('bubble-specific-controls');
     const vehicleSection = document.getElementById('vehicle-options-section');
+    const shieldsSection = document.getElementById('shields-options-section');
+    const topcontrolsSection = document.getElementById('topcontrols-options-section');
 
     if (tabId === 'vehicle') {
       const titleEl = document.getElementById('bubble-modal-title');
       if (titleEl) titleEl.innerText = 'Vehicle & Safe-Zone Config';
 
       if (bubbleControls) bubbleControls.style.display = 'none';
+      if (shieldsSection) shieldsSection.style.display = 'none';
+      if (topcontrolsSection) topcontrolsSection.style.display = 'none';
       if (vehicleSection) vehicleSection.style.display = 'block';
 
       if (typeof window.syncVehicleModalUI === 'function') {
@@ -1032,8 +1075,40 @@
       return;
     }
 
+    if (tabId === 'shields') {
+      const titleEl = document.getElementById('bubble-modal-title');
+      if (titleEl) titleEl.innerText = 'Route Badges & Highway Shields';
+
+      if (bubbleControls) bubbleControls.style.display = 'none';
+      if (vehicleSection) vehicleSection.style.display = 'none';
+      if (topcontrolsSection) topcontrolsSection.style.display = 'none';
+      if (shieldsSection) shieldsSection.style.display = 'block';
+
+      if (typeof window.syncRouteShieldsUI === 'function') {
+        window.syncRouteShieldsUI();
+      }
+      return;
+    }
+
+    if (tabId === 'topcontrols') {
+      const titleEl = document.getElementById('bubble-modal-title');
+      if (titleEl) titleEl.innerText = 'Top Row Controls Dimensions';
+
+      if (bubbleControls) bubbleControls.style.display = 'none';
+      if (vehicleSection) vehicleSection.style.display = 'none';
+      if (shieldsSection) shieldsSection.style.display = 'none';
+      if (topcontrolsSection) topcontrolsSection.style.display = 'block';
+
+      if (typeof window.syncTopControlsUI === 'function') {
+        window.syncTopControlsUI();
+      }
+      return;
+    }
+
     if (bubbleControls) bubbleControls.style.display = 'block';
     if (vehicleSection) vehicleSection.style.display = 'none';
+    if (shieldsSection) shieldsSection.style.display = 'none';
+    if (topcontrolsSection) topcontrolsSection.style.display = 'none';
 
     // 2. Update modal title
     const meta = window.BUBBLE_METADATA[tabId];
@@ -2001,6 +2076,443 @@
         type: 'perspective'
       });
     }
+  };
+
+  /* =========================================================================
+   * ROUTE BADGES & HIGHWAY SHIELDS KINETIC BUBBLE ENGINE
+   * ========================================================================= */
+  try {
+    const savedShields = localStorage.getItem('nomad_v4_shields_bubble');
+    window.nomadShieldsConfig = savedShields ? JSON.parse(savedShields) : {
+      active: true,
+      mode: 'kinetic',
+      size: 88,
+      safeZoneBehavior: 'bounce',
+      wallBehavior: 'bounce',
+      speedLevel: 3,
+      x: 32,
+      y: 380,
+      vx: 0.65,
+      vy: -0.60,
+      isDragging: false,
+      isHovered: false
+    };
+  } catch (e) {
+    window.nomadShieldsConfig = {
+      active: true,
+      mode: 'kinetic',
+      size: 88,
+      safeZoneBehavior: 'bounce',
+      wallBehavior: 'bounce',
+      speedLevel: 3,
+      x: 32,
+      y: 380,
+      vx: 0.65,
+      vy: -0.60,
+      isDragging: false,
+      isHovered: false
+    };
+  }
+
+  window.saveShieldsConfig = function() {
+    try {
+      localStorage.setItem('nomad_v4_shields_bubble', JSON.stringify(window.nomadShieldsConfig));
+    } catch(e) {}
+  };
+
+  window.setRouteShieldsActive = function(active) {
+    window.nomadShieldsConfig.active = !!active;
+    window.saveShieldsConfig();
+    window.applyShieldsConfigUI();
+    window.syncRouteShieldsUI();
+    const statusDot = document.getElementById('bubble-tab-status-shields');
+    if (statusDot) statusDot.classList.toggle('is-active', window.nomadShieldsConfig.active !== false);
+  };
+
+  window.setRouteShieldsMode = function(mode) {
+    window.nomadShieldsConfig.mode = mode;
+    window.saveShieldsConfig();
+    window.applyShieldsConfigUI();
+    window.syncRouteShieldsUI();
+  };
+
+  window.setRouteShieldsSize = function(size) {
+    const s = Math.max(64, Math.min(130, parseInt(size, 10) || 88));
+    window.nomadShieldsConfig.size = s;
+    window.saveShieldsConfig();
+    window.applyShieldsConfigUI();
+    window.syncRouteShieldsUI();
+  };
+
+  window.setRouteShieldsSafeZoneBehavior = function(behavior) {
+    window.nomadShieldsConfig.safeZoneBehavior = behavior;
+    window.saveShieldsConfig();
+    window.applyShieldsConfigUI();
+    window.syncRouteShieldsUI();
+  };
+
+  window.syncRouteShieldsUI = function() {
+    const cfg = window.nomadShieldsConfig;
+    if (!cfg) return;
+
+    // Active status buttons
+    const btnActive = document.getElementById('shields-status-active');
+    const btnInactive = document.getElementById('shields-status-inactive');
+    if (btnActive && btnInactive) {
+      btnActive.classList.toggle('is-selected', cfg.active !== false);
+      btnInactive.classList.toggle('is-selected', cfg.active === false);
+    }
+
+    // Motion mode buttons
+    const btnKinetic = document.getElementById('shields-mode-kinetic');
+    const btnStationary = document.getElementById('shields-mode-stationary');
+    if (btnKinetic && btnStationary) {
+      btnKinetic.classList.toggle('is-selected', cfg.mode === 'kinetic');
+      btnStationary.classList.toggle('is-selected', cfg.mode === 'stationary');
+    }
+
+    // Presets
+    const pCompact = document.getElementById('shields-size-preset-compact');
+    const pStandard = document.getElementById('shields-size-preset-standard');
+    const pHero = document.getElementById('shields-size-preset-hero');
+    if (pCompact && pStandard && pHero) {
+      pCompact.classList.toggle('is-selected', cfg.size === 72);
+      pStandard.classList.toggle('is-selected', cfg.size === 88);
+      pHero.classList.toggle('is-selected', cfg.size === 108);
+    }
+
+    // Slider and label
+    const slider = document.getElementById('shields-size-slider');
+    const label = document.getElementById('shields-size-val-label');
+    if (slider) slider.value = cfg.size || 88;
+    if (label) label.innerText = `${cfg.size || 88}px`;
+
+    // Safe zone deflection
+    const btnBounce = document.getElementById('shields-safezone-bounce');
+    const btnUnder = document.getElementById('shields-safezone-under');
+    if (btnBounce && btnUnder) {
+      btnBounce.classList.toggle('is-selected', cfg.safeZoneBehavior === 'bounce');
+      btnUnder.classList.toggle('is-selected', cfg.safeZoneBehavior === 'under');
+    }
+  };
+
+  window.applyShieldsConfigUI = function() {
+    const cfg = window.nomadShieldsConfig;
+    const el = document.getElementById('shields-bubble');
+    if (!el || !cfg) return;
+
+    el.style.display = (cfg.active !== false) ? 'flex' : 'none';
+    el.style.width = `${cfg.size}px`;
+    el.style.height = `${cfg.size}px`;
+
+    const pin = document.getElementById('shields-bubble-pin');
+    if (pin) pin.style.display = (cfg.mode === 'stationary') ? 'block' : 'none';
+
+    window.renderShieldsBubbleContent();
+  };
+
+  window.renderShieldsBubbleContent = function() {
+    const wrap = document.getElementById('shields-bubble-render-wrap');
+    if (!wrap) return;
+
+    const interstate = window.currentInterstateShield || '95';
+    const stateRoute = window.currentRouteShield || '128';
+    const heading = window.currentHeading;
+
+    let svgHtml = '';
+    if (interstate && typeof window.createInterstateSVG === 'function') {
+      const dir = (typeof window.getHighwayDirection === 'function') ? window.getHighwayDirection(interstate, heading, 'interstate') : '';
+      svgHtml = window.createInterstateSVG(interstate, dir);
+    } else if (stateRoute && typeof window.createRouteSVG === 'function') {
+      const dir = (typeof window.getHighwayDirection === 'function') ? window.getHighwayDirection(stateRoute, heading, 'state') : '';
+      svgHtml = window.createRouteSVG(stateRoute, dir);
+    }
+
+    wrap.innerHTML = svgHtml;
+  };
+
+  window.updateShieldsPhysics = function() {
+    const sb = window.nomadShieldsConfig;
+    if (!sb || sb.active === false) return;
+    const el = document.getElementById('shields-bubble');
+    if (!el) return;
+
+    const size = sb.size || 88;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const speedMultiplier = 0.4 + ((sb.speedLevel || 3) * 0.45);
+
+    sb.x += sb.vx * speedMultiplier;
+    sb.y += sb.vy * speedMultiplier;
+
+    if (sb.wallBehavior === 'wrap') {
+      const leadMargin = size * 0.45;
+      const emergeMargin = size * 0.55;
+      if (sb.vx > 0 && sb.x > (vw - leadMargin)) sb.x = -emergeMargin;
+      else if (sb.vx < 0 && sb.x < -leadMargin) sb.x = vw - emergeMargin;
+      if (sb.vy > 0 && sb.y > (vh - leadMargin)) sb.y = -emergeMargin;
+      else if (sb.vy < 0 && sb.y < -leadMargin) sb.y = vh - emergeMargin;
+    } else {
+      const topLimit = 0;
+      const bottomLimit = Math.max(0, vh - size);
+      const leftLimit = 0;
+      const rightLimit = Math.max(0, vw - size);
+
+      if (sb.x <= leftLimit) {
+        sb.x = leftLimit;
+        sb.vx = Math.abs(sb.vx);
+      } else if (sb.x >= rightLimit) {
+        sb.x = rightLimit;
+        sb.vx = -Math.abs(sb.vx);
+      }
+
+      if (sb.y <= topLimit) {
+        sb.y = topLimit;
+        sb.vy = Math.abs(sb.vy);
+      } else if (sb.y >= bottomLimit) {
+        sb.y = bottomLimit;
+        sb.vy = -Math.abs(sb.vy);
+      }
+    }
+
+    if (sb.safeZoneBehavior === 'bounce' && typeof window.getNomadVehicleSafeZone === 'function') {
+      const safeZone = window.getNomadVehicleSafeZone();
+      if (safeZone) {
+        const bubbleCenterX = sb.x + size / 2;
+        const bubbleCenterY = sb.y + size / 2;
+        const dx = bubbleCenterX - safeZone.x;
+        const dy = bubbleCenterY - safeZone.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const minSafeDist = (size / 2) + safeZone.radius;
+
+        if (dist < minSafeDist && dist > 0.001) {
+          const nx = dx / dist;
+          const ny = dy / dist;
+          const overlap = minSafeDist - dist;
+          sb.x += nx * overlap;
+          sb.y += ny * overlap;
+
+          const dot = (sb.vx * nx) + (sb.vy * ny);
+          sb.vx = sb.vx - 2 * dot * nx;
+          sb.vy = sb.vy - 2 * dot * ny;
+
+          const curSpeed = Math.sqrt(sb.vx * sb.vx + sb.vy * sb.vy) || 1;
+          sb.vx = (sb.vx / curSpeed) * 1.4;
+          sb.vy = (sb.vy / curSpeed) * 1.4;
+
+          if (typeof window.triggerSafeZoneDeflectionFlip === 'function') {
+            window.triggerSafeZoneDeflectionFlip('shields', '#00d4ff');
+          }
+        }
+      }
+    }
+  };
+
+  window.setupShieldsInteractions = function() {
+    const el = document.getElementById('shields-bubble');
+    if (!el || el._hasShieldsInteractions) return;
+    el._hasShieldsInteractions = true;
+
+    const sb = window.nomadShieldsConfig;
+    const state = {
+      dragStartX: 0,
+      dragStartY: 0,
+      initialX: 0,
+      initialY: 0,
+      lastDragTime: 0,
+      dragVelocityX: 0,
+      dragVelocityY: 0,
+      longPressTimer: null
+    };
+
+    el.addEventListener('mouseenter', () => { sb.isHovered = true; });
+    el.addEventListener('mouseleave', () => { sb.isHovered = false; });
+
+    el.addEventListener('mousedown', (e) => {
+      onPointerDown(e.clientX, e.clientY);
+      const onMouseMove = (ev) => onPointerMove(ev.clientX, ev.clientY, ev);
+      const onMouseUp = () => {
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', onMouseUp);
+        onPointerUp();
+      };
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+    });
+
+    el.addEventListener('touchstart', (e) => {
+      if (e.touches && e.touches.length === 1) {
+        sb.isHovered = true;
+        onPointerDown(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+
+    el.addEventListener('touchmove', (e) => {
+      if (e.touches && e.touches.length === 1) {
+        onPointerMove(e.touches[0].clientX, e.touches[0].clientY, e);
+      }
+    }, { passive: false });
+
+    el.addEventListener('touchend', () => {
+      sb.isHovered = false;
+      onPointerUp();
+    });
+
+    el.addEventListener('touchcancel', () => {
+      sb.isHovered = false;
+      onPointerUp();
+    });
+
+    function onPointerDown(clientX, clientY) {
+      state.dragStartX = clientX;
+      state.dragStartY = clientY;
+      state.initialX = sb.x;
+      state.initialY = sb.y;
+      state.lastDragTime = Date.now();
+      state.dragVelocityX = 0;
+      state.dragVelocityY = 0;
+      sb.isDragging = false;
+
+      el.classList.add('is-longpressing');
+      clearTimeout(state.longPressTimer);
+      state.longPressTimer = setTimeout(() => {
+        sb.isDragging = false;
+        el.classList.remove('is-longpressing');
+        if (navigator.vibrate) try { navigator.vibrate(35); } catch(e) {}
+        if (typeof window.openKineticBubbleModal === 'function') {
+          window.openKineticBubbleModal('shields');
+        }
+      }, 600);
+    }
+
+    function onPointerMove(clientX, clientY, event) {
+      const dx = clientX - state.dragStartX;
+      const dy = clientY - state.dragStartY;
+
+      if (Math.abs(dx) > 12 || Math.abs(dy) > 12) {
+        clearTimeout(state.longPressTimer);
+        el.classList.remove('is-longpressing');
+        sb.isDragging = true;
+        el.classList.add('is-dragging');
+
+        const now = Date.now();
+        const dt = Math.max(16, now - state.lastDragTime);
+        const newX = state.initialX + dx;
+        const newY = state.initialY + dy;
+
+        state.dragVelocityX = (newX - sb.x) / (dt / 16);
+        state.dragVelocityY = (newY - sb.y) / (dt / 16);
+
+        sb.x = newX;
+        sb.y = newY;
+        state.lastDragTime = now;
+
+        el.style.left = `${sb.x}px`;
+        el.style.top = `${sb.y}px`;
+      }
+    }
+
+    function onPointerUp() {
+      clearTimeout(state.longPressTimer);
+      el.classList.remove('is-longpressing');
+      if (sb.isDragging) {
+        sb.isDragging = false;
+        el.classList.remove('is-dragging');
+
+        if (sb.mode === 'kinetic') {
+          const flickX = Math.max(-3.5, Math.min(3.5, state.dragVelocityX * 0.7));
+          const flickY = Math.max(-3.5, Math.min(3.5, state.dragVelocityY * 0.7));
+          if (Math.abs(flickX) > 0.4 || Math.abs(flickY) > 0.4) {
+            sb.vx = flickX;
+            sb.vy = flickY;
+          }
+        }
+        window.saveShieldsConfig();
+      }
+    }
+  };
+
+  /* =========================================================================
+   * TOP ROW CONTROLS SIZING ENGINE (Map Theme, Fullscreen, Chevron/Fighter)
+   * ========================================================================= */
+  const TOP_CONTROL_SIZE_STEPS = [30, 36, 42, 48, 56];
+
+  try {
+    const savedTop = localStorage.getItem('nomad_v4_top_controls');
+    window.nomadTopControlSettings = savedTop ? JSON.parse(savedTop) : {
+      themeStep: 2, // 36px
+      fullscreenStep: 2, // 36px
+      fighterStep: 2 // 36px
+    };
+  } catch(e) {
+    window.nomadTopControlSettings = { themeStep: 2, fullscreenStep: 2, fighterStep: 2 };
+  }
+
+  window.applyTopControlSizes = function() {
+    const cfg = window.nomadTopControlSettings;
+    const themePx = TOP_CONTROL_SIZE_STEPS[(cfg.themeStep - 1)] || 36;
+    const fsPx = TOP_CONTROL_SIZE_STEPS[(cfg.fullscreenStep - 1)] || 36;
+    const fighterPx = TOP_CONTROL_SIZE_STEPS[(cfg.fighterStep - 1)] || 36;
+
+    document.documentElement.style.setProperty('--top-btn-theme-size', `${themePx}px`);
+    document.documentElement.style.setProperty('--top-btn-fullscreen-size', `${fsPx}px`);
+    document.documentElement.style.setProperty('--top-btn-fighter-size', `${fighterPx}px`);
+  };
+
+  window.setTopControlSliderSize = function(type, stepVal) {
+    const step = parseInt(stepVal, 10) || 2;
+    if (type === 'theme') window.nomadTopControlSettings.themeStep = step;
+    else if (type === 'fullscreen') window.nomadTopControlSettings.fullscreenStep = step;
+    else if (type === 'fighter') window.nomadTopControlSettings.fighterStep = step;
+
+    try {
+      localStorage.setItem('nomad_v4_top_controls', JSON.stringify(window.nomadTopControlSettings));
+    } catch(e) {}
+
+    window.applyTopControlSizes();
+    window.syncTopControlsUI();
+  };
+
+  window.syncAllTopControlsToMaster = function() {
+    const masterStep = window.nomadTopControlSettings.themeStep || 2;
+    window.nomadTopControlSettings.fullscreenStep = masterStep;
+    window.nomadTopControlSettings.fighterStep = masterStep;
+
+    try {
+      localStorage.setItem('nomad_v4_top_controls', JSON.stringify(window.nomadTopControlSettings));
+    } catch(e) {}
+
+    window.applyTopControlSizes();
+    window.syncTopControlsUI();
+
+    if (navigator.vibrate) try { navigator.vibrate(25); } catch(_) {}
+    if (typeof window.showMapThemeToast === 'function') {
+      const px = TOP_CONTROL_SIZE_STEPS[masterStep - 1] || 36;
+      window.showMapThemeToast({ name: `All Top Controls Synced: ${px}px`, type: 'perspective' });
+    }
+  };
+
+  window.syncTopControlsUI = function() {
+    const cfg = window.nomadTopControlSettings;
+    const themeSlider = document.getElementById('slider-top-theme');
+    const fsSlider = document.getElementById('slider-top-fullscreen');
+    const fighterSlider = document.getElementById('slider-top-fighter');
+
+    const themeLabel = document.getElementById('top-ctrl-theme-label');
+    const fsLabel = document.getElementById('top-ctrl-fullscreen-label');
+    const fighterLabel = document.getElementById('top-ctrl-fighter-label');
+
+    const themePx = TOP_CONTROL_SIZE_STEPS[(cfg.themeStep - 1)] || 36;
+    const fsPx = TOP_CONTROL_SIZE_STEPS[(cfg.fullscreenStep - 1)] || 36;
+    const fighterPx = TOP_CONTROL_SIZE_STEPS[(cfg.fighterStep - 1)] || 36;
+
+    if (themeSlider) themeSlider.value = cfg.themeStep;
+    if (fsSlider) fsSlider.value = cfg.fullscreenStep;
+    if (fighterSlider) fighterSlider.value = cfg.fighterStep;
+
+    if (themeLabel) themeLabel.innerText = `${themePx}px`;
+    if (fsLabel) fsLabel.innerText = `${fsPx}px`;
+    if (fighterLabel) fighterLabel.innerText = `${fighterPx}px`;
   };
 
 })();
