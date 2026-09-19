@@ -1789,16 +1789,19 @@
 
     .safe-zone-satellite-moon {
       position: absolute;
-      top: -4px;
-      left: calc(50% - 4px);
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #00d4ff;
-      box-shadow: 0 0 10px #00d4ff, 0 0 4px #ffffff, 0 0 16px rgba(0, 212, 255, 0.7);
-      pointer-events: none;
+      top: -21px;
+      left: calc(50% - 12px);
+      width: 24px;
+      height: 42px;
+      pointer-events: auto;
+      cursor: pointer;
+      touch-action: manipulation;
+      z-index: 25;
       transform: translateZ(0);
-      transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     @keyframes safeZonePulse {
@@ -3208,17 +3211,57 @@
           </div>
         </div>
 
+        <!-- Live Satellite Preview Card -->
+        <div class="satellite-preview-card" id="satellite-preview-card" style="margin-top: 14px; margin-bottom: 12px; background: rgba(8, 14, 26, 0.75); border: 1px solid rgba(0, 212, 255, 0.35); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45); backdrop-filter: blur(10px);">
+          <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.08em; color: #94a3b8;">Live Satellite Preview</span>
+            <span id="satellite-preview-mode-badge" style="font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: rgba(0, 212, 255, 0.15); color: #00d4ff; border: 1px solid rgba(0, 212, 255, 0.3);">🧭 Compass (Points North)</span>
+          </div>
+          <!-- Mini Safe-Zone Stage -->
+          <div style="position: relative; width: 110px; height: 110px; border-radius: 50%; border: 1.5px dashed rgba(0, 212, 255, 0.5); background: radial-gradient(circle, rgba(0, 212, 255, 0.08) 0%, transparent 70%); display: flex; align-items: center; justify-content: center; overflow: visible;">
+            <!-- Mini Vehicle Marker -->
+            <div style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: #ffb703; filter: drop-shadow(0 0 6px rgba(255,183,3,0.7));">
+              <svg viewBox="0 0 24 24" width="24" height="24"><polygon points="12,2 22,20 12,15 2,20" fill="#ffb703" stroke="#ffffff" stroke-width="1.2"/></svg>
+            </div>
+            <!-- Mini Rotating Arm -->
+            <div id="satellite-preview-arm" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; pointer-events: none; transform-origin: center center; transform: rotate(0deg);">
+              <div id="satellite-preview-moon" style="position: absolute; display: flex; align-items: center; justify-content: center;"></div>
+            </div>
+          </div>
+          <!-- Preview Action Buttons -->
+          <div style="display: flex; gap: 8px; margin-top: 10px; width: 100%;">
+            <button type="button" class="bubble-mode-btn" onclick="testRotateSatellitePreview()" style="flex: 1; padding: 6px 8px; font-size: 0.72rem;">🧪 Test Spin / Nudge</button>
+            <button type="button" class="bubble-mode-btn" onclick="toggleVehicleSatelliteMode()" style="flex: 1; padding: 6px 8px; font-size: 0.72rem;">🔄 Toggle Mode</button>
+          </div>
+        </div>
+
         <!-- Satellite Moon / Scanner Active Toggle -->
-        <div class="config-section-label" style="margin-top: 14px;">Orbiting Satellite Moon ("Scanner")</div>
+        <div class="config-section-label" style="margin-top: 14px;">Orbiting Satellite Compass &amp; Indicator</div>
         <div class="bubble-mode-toggle-group" id="vehicle-satellite-active-group">
-          <button type="button" class="bubble-mode-btn is-selected" id="satellite-status-active" onclick="setVehicleSatelliteActive(true)">👁️ Active (Orbiting)</button>
+          <button type="button" class="bubble-mode-btn is-selected" id="satellite-status-active" onclick="setVehicleSatelliteActive(true)">👁️ Active (Visible)</button>
           <button type="button" class="bubble-mode-btn" id="satellite-status-inactive" onclick="setVehicleSatelliteActive(false)">💤 Inactive (Off)</button>
         </div>
 
+        <!-- Satellite Operating Function / Mode -->
+        <div class="config-section-label" style="margin-top: 14px;">Satellite Function &amp; Motion</div>
+        <div class="bubble-mode-toggle-group" id="vehicle-satellite-mode-group">
+          <button type="button" class="bubble-mode-btn is-selected" id="satellite-mode-compass" onclick="setVehicleSatelliteMode('compass')">🧭 Orbital Compass (Points North)</button>
+          <button type="button" class="bubble-mode-btn" id="satellite-mode-orbit" onclick="setVehicleSatelliteMode('orbit')">🌀 Kinetic Orbit (Continuous)</button>
+        </div>
+
+        <!-- Satellite Geometry & Needle Rosette -->
+        <div class="config-section-label" style="margin-top: 14px;">Satellite Indicator Geometry</div>
+        <div class="bubble-mode-toggle-group" id="vehicle-satellite-shape-group">
+          <button type="button" class="bubble-mode-btn is-selected" id="satellite-shape-point" onclick="setVehicleSatelliteShape('point')">♦️ Pointy Needle</button>
+          <button type="button" class="bubble-mode-btn" id="satellite-shape-rosette" onclick="setVehicleSatelliteShape('rosette')">🧭 Compass Rosette</button>
+          <button type="button" class="bubble-mode-btn" id="satellite-shape-orb" onclick="setVehicleSatelliteShape('orb')">⚪ Classic Orb</button>
+        </div>
+
         <!-- Satellite Moon Color Palette -->
-        <div class="config-section-label" style="margin-top: 14px;">Satellite Moon Color</div>
+        <div class="config-section-label" style="margin-top: 14px;">Satellite Indicator Color</div>
         <div class="bubble-color-row" id="vehicle-satellite-swatches">
-          <div class="bubble-color-swatch is-selected" data-color="#00d4ff" style="background: #00d4ff;" onclick="setVehicleSatelliteColor('#00d4ff')" title="Cyan"></div>
+          <div class="bubble-color-swatch" data-color="#ff2a2a" style="background: #ff2a2a;" onclick="setVehicleSatelliteColor('#ff2a2a')" title="Ruby Red (North)"></div>
+          <div class="bubble-color-swatch" data-color="#00d4ff" style="background: #00d4ff;" onclick="setVehicleSatelliteColor('#00d4ff')" title="Cyan"></div>
           <div class="bubble-color-swatch" data-color="#ffb703" style="background: #ffb703;" onclick="setVehicleSatelliteColor('#ffb703')" title="Gold"></div>
           <div class="bubble-color-swatch" data-color="#ff0055" style="background: #ff0055;" onclick="setVehicleSatelliteColor('#ff0055')" title="Hot Pink"></div>
           <div class="bubble-color-swatch" data-color="#30d158" style="background: #30d158;" onclick="setVehicleSatelliteColor('#30d158')" title="Neon Green"></div>
@@ -3228,32 +3271,36 @@
         </div>
 
         <!-- Satellite Moon Dot Dimension -->
-        <div class="config-section-label" style="margin-top: 14px;">Satellite Moon Size</div>
+        <div class="config-section-label" style="margin-top: 14px;">Satellite Indicator Size</div>
         <div class="bubble-mode-toggle-group" id="vehicle-satellite-size-group">
-          <button type="button" class="bubble-mode-btn" id="satellite-size-6" onclick="setVehicleSatelliteSize(6)">Compact (6px)</button>
-          <button type="button" class="bubble-mode-btn is-selected" id="satellite-size-8" onclick="setVehicleSatelliteSize(8)">Standard (8px)</button>
-          <button type="button" class="bubble-mode-btn" id="satellite-size-12" onclick="setVehicleSatelliteSize(12)">Beacon (12px)</button>
+          <button type="button" class="bubble-mode-btn" id="satellite-size-14" onclick="setVehicleSatelliteSize(14)">Compact (14px)</button>
+          <button type="button" class="bubble-mode-btn is-selected" id="satellite-size-20" onclick="setVehicleSatelliteSize(20)">Standard (20px)</button>
+          <button type="button" class="bubble-mode-btn" id="satellite-size-28" onclick="setVehicleSatelliteSize(28)">Hero (28px)</button>
         </div>
 
-        <!-- Orbit Velocity & Speed Sync -->
-        <div class="config-section-label" style="margin-top: 14px;">Orbit Velocity &amp; GPS Speed Sync</div>
-        <div class="bubble-mode-toggle-group" id="vehicle-satellite-speed-group">
-          <button type="button" class="bubble-mode-btn" id="satellite-speed-1" onclick="setVehicleSatelliteSpeed(1)">Gentle (1x)</button>
-          <button type="button" class="bubble-mode-btn is-selected" id="satellite-speed-2" onclick="setVehicleSatelliteSpeed(2)">Cruising (2x)</button>
-          <button type="button" class="bubble-mode-btn" id="satellite-speed-3" onclick="setVehicleSatelliteSpeed(3)">Rapid (3x)</button>
-          <button type="button" class="bubble-mode-btn" id="satellite-speed-4" onclick="setVehicleSatelliteSpeed(4)">Warp (4x)</button>
+        <!-- Orbit Velocity & Speed Sync (only relevant in continuous kinetic orbit mode) -->
+        <div id="vehicle-satellite-speed-section" style="display: none;">
+          <div class="config-section-label" style="margin-top: 14px;">Orbit Velocity &amp; GPS Speed Sync</div>
+          <div class="bubble-mode-toggle-group" id="vehicle-satellite-speed-group">
+            <button type="button" class="bubble-mode-btn" id="satellite-speed-1" onclick="setVehicleSatelliteSpeed(1)">Gentle (1x)</button>
+            <button type="button" class="bubble-mode-btn is-selected" id="satellite-speed-2" onclick="setVehicleSatelliteSpeed(2)">Cruising (2x)</button>
+            <button type="button" class="bubble-mode-btn" id="satellite-speed-3" onclick="setVehicleSatelliteSpeed(3)">Rapid (3x)</button>
+            <button type="button" class="bubble-mode-btn" id="satellite-speed-4" onclick="setVehicleSatelliteSpeed(4)">Warp (4x)</button>
+          </div>
         </div>
 
-        <!-- Moon Collision Color Shift Toggle -->
-        <div class="config-section-label" style="margin-top: 14px;">Bubble Deflection Moon Color Morph</div>
-        <div class="bubble-mode-toggle-group" id="vehicle-satellite-shift-group">
-          <button type="button" class="bubble-mode-btn is-selected" id="satellite-shift-on" onclick="setVehicleSatelliteColorShiftOnHit(true)">🎨 Adopt Bubble Color</button>
-          <button type="button" class="bubble-mode-btn" id="satellite-shift-off" onclick="setVehicleSatelliteColorShiftOnHit(false)">🔒 Lock Static Color</button>
+        <!-- Moon Collision Color Shift Toggle (only applicable in kinetic orbit mode; compass is purely static & distraction-free) -->
+        <div id="vehicle-satellite-shift-section" style="display: none;">
+          <div class="config-section-label" style="margin-top: 14px;">Bubble Deflection Moon Color Morph</div>
+          <div class="bubble-mode-toggle-group" id="vehicle-satellite-shift-group">
+            <button type="button" class="bubble-mode-btn is-selected" id="satellite-shift-on" onclick="setVehicleSatelliteColorShiftOnHit(true)">🎨 Adopt Bubble Color</button>
+            <button type="button" class="bubble-mode-btn" id="satellite-shift-off" onclick="setVehicleSatelliteColorShiftOnHit(false)">🔒 Lock Static Color</button>
+          </div>
         </div>
 
         <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 0.72rem; color: #94a3b8;">Reverses direction &amp; syncs color when data bubbles deflect!</span>
-          <button type="button" class="bubble-apply-all-btn" onclick="reverseVehicleSatelliteSpin()" style="white-space:nowrap; padding: 4px 8px;">🔄 Reverse Spin</button>
+          <span id="vehicle-satellite-helper-text" style="font-size: 0.72rem; color: #94a3b8;">Moves smoothly around the safe-circle perimeter pointing North!</span>
+          <button type="button" id="vehicle-satellite-reverse-btn" class="bubble-apply-all-btn" onclick="reverseVehicleSatelliteSpin()" style="white-space:nowrap; padding: 4px 8px; display: none;">🔄 Reverse Orbit</button>
         </div>
       </div>
 
@@ -5099,6 +5146,7 @@
         isHeadingUp = true;
         showMapThemeToast({ name: '3D Take-Off Drive (58° Pitch)', type: 'perspective' });
       }
+      window.cameraPerspectiveMode = cameraPerspectiveMode;
 
       const compassBtn = document.getElementById('compass-btn');
       const vehicleOverlay = document.getElementById('vehicle-overlay');
@@ -5372,23 +5420,75 @@
 
       const vehicleMarker = document.getElementById('vehicle-overlay');
       let isVehicleTouchHandled = false;
+      let vehiclePressTimer = null;
+      let isVehicleLongPress = false;
+
       if (vehicleMarker) {
         vehicleMarker.addEventListener('contextmenu', (e) => e.preventDefault());
 
         vehicleMarker.addEventListener('touchstart', (e) => {
           isVehicleTouchHandled = true;
-          e.stopPropagation();
-          cyclePerspectiveMode(e);
-        }, { passive: false });
+          isVehicleLongPress = false;
+          if (vehiclePressTimer) clearTimeout(vehiclePressTimer);
+          vehiclePressTimer = setTimeout(() => {
+            isVehicleLongPress = true;
+            if (navigator.vibrate) navigator.vibrate(50);
+            if (typeof openKineticBubbleModal === 'function') {
+              openKineticBubbleModal('vehicle');
+            }
+          }, 500);
+        }, { passive: true });
 
-        vehicleMarker.addEventListener('touchend', () => {
+        vehicleMarker.addEventListener('touchmove', () => {
+          if (vehiclePressTimer) {
+            clearTimeout(vehiclePressTimer);
+            vehiclePressTimer = null;
+          }
+        }, { passive: true });
+
+        vehicleMarker.addEventListener('touchend', (e) => {
+          if (vehiclePressTimer) {
+            clearTimeout(vehiclePressTimer);
+            vehiclePressTimer = null;
+          }
+          if (!isVehicleLongPress) {
+            e.stopPropagation();
+            if (e.cancelable) e.preventDefault();
+            cyclePerspectiveMode(e);
+          }
           setTimeout(() => { isVehicleTouchHandled = false; }, 350);
         });
 
-        vehicleMarker.addEventListener('click', (e) => {
+        vehicleMarker.addEventListener('mousedown', (e) => {
           if (isVehicleTouchHandled) return;
-          e.stopPropagation();
-          cyclePerspectiveMode(e);
+          if (e.button !== 0) return;
+          isVehicleLongPress = false;
+          if (vehiclePressTimer) clearTimeout(vehiclePressTimer);
+          vehiclePressTimer = setTimeout(() => {
+            isVehicleLongPress = true;
+            if (typeof openKineticBubbleModal === 'function') {
+              openKineticBubbleModal('vehicle');
+            }
+          }, 500);
+        });
+
+        vehicleMarker.addEventListener('mouseleave', () => {
+          if (vehiclePressTimer) {
+            clearTimeout(vehiclePressTimer);
+            vehiclePressTimer = null;
+          }
+        });
+
+        vehicleMarker.addEventListener('mouseup', (e) => {
+          if (isVehicleTouchHandled) return;
+          if (vehiclePressTimer) {
+            clearTimeout(vehiclePressTimer);
+            vehiclePressTimer = null;
+          }
+          if (!isVehicleLongPress) {
+            e.stopPropagation();
+            cyclePerspectiveMode(e);
+          }
         });
       }
 
