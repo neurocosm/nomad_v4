@@ -338,8 +338,10 @@
     let unitLabel = (window.isMph === false) ? 'KM/H' : 'MPH';
 
     if (bubbleKey === 'compass') {
-      channelLabel = 'HEADING';
-      const h = (typeof window.currentHeading === 'number' && !isNaN(window.currentHeading)) ? window.currentHeading : 0;
+      channelLabel = 'COMPASS';
+      const h = (typeof window.currentHeading === 'number' && !isNaN(window.currentHeading) && window.currentHeading !== 0)
+        ? window.currentHeading
+        : (window.map && typeof window.map.getBearing === 'function' ? ((window.map.getBearing() % 360 + 360) % 360) : 0);
       const getCard = (typeof window.getCardinalDirection === 'function') 
         ? window.getCardinalDirection 
         : (a => ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.round((a || 0) / 45) % 8]);
@@ -549,16 +551,21 @@
 
     // 1. Boundary Wall Interaction: Pass Through & Wrap vs Bounce Off Walls
     if (b.wallBehavior === 'wrap') {
-      if (b.x > vw) {
-        b.x = -size;
-      } else if (b.x < -size) {
-        b.x = vw;
+      // Continuous Toroidal Screen Wrap: As soon as the leading edge/half penetrates a wall,
+      // it immediately re-emerges on the opposite side with zero dead time.
+      const leadMargin = size * 0.45;
+      const emergeMargin = size * 0.55;
+
+      if (b.vx > 0 && b.x > (vw - leadMargin)) {
+        b.x = -emergeMargin;
+      } else if (b.vx < 0 && b.x < -leadMargin) {
+        b.x = vw - emergeMargin;
       }
 
-      if (b.y > vh) {
-        b.y = -size;
-      } else if (b.y < -size) {
-        b.y = vh;
+      if (b.vy > 0 && b.y > (vh - leadMargin)) {
+        b.y = -emergeMargin;
+      } else if (b.vy < 0 && b.y < -leadMargin) {
+        b.y = vh - emergeMargin;
       }
     } else {
       // Full screen edge-to-edge and corner-to-corner bounce (glides underneath top buttons and bottom location bar)
@@ -1494,18 +1501,37 @@
   window.renderCompassBubble = function(heading) {
     const el = document.getElementById('compass-bubble-value');
     if (!el) return;
-    const h = (typeof heading === 'number' && !isNaN(heading))
+    let h = (typeof heading === 'number' && !isNaN(heading))
       ? heading
-      : ((typeof window.currentHeading === 'number' && !isNaN(window.currentHeading)) ? window.currentHeading : 0);
+      : ((typeof window.currentHeading === 'number' && !isNaN(window.currentHeading) && window.currentHeading !== 0)
+        ? window.currentHeading
+        : (window.map && typeof window.map.getBearing === 'function' ? ((window.map.getBearing() % 360 + 360) % 360) : 0));
+    
     const valText = `${Math.round(h)}°`;
     el.innerText = valText;
+
+    // Rotate authentic magnetic compass needle
+    const needle = document.getElementById('compass-bubble-needle');
+    if (needle) {
+      needle.style.transform = `rotate(${h.toFixed(1)}deg)`;
+    }
+
+    // Update cardinal heading label (N, NE, E, SE, S, SW, W, NW)
+    const cardEl = document.getElementById('compass-bubble-cardinal');
+    if (cardEl) {
+      const getCard = (typeof window.getCardinalDirection === 'function')
+        ? window.getCardinalDirection
+        : (a => ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.round((a || 0) / 45) % 8]);
+      cardEl.innerText = getCard(h);
+    }
+
     const b = window.nomadBubbles && window.nomadBubbles.compass;
     if (b) {
       el.style.fontSize = window.calculateDynamicBubbleFontSize(
         valText,
         b.size || 90,
-        b.shape || 'pentagon',
-        { maxScale: 0.40 }
+        b.shape || 'circle',
+        { maxScale: 0.36 }
       );
     }
   };
@@ -1797,6 +1823,14 @@
       group.style.display = 'none';
       if (titleEl) titleEl.innerText = 'System Measurement Units';
     }
+
+    // Sync Global Unit Pill buttons
+    const btnImp = document.getElementById('btn-global-imperial');
+    const btnMet = document.getElementById('btn-global-metric');
+    const isAllImp = (window.isMph !== false && window.isFahrenheit !== false && window.altitudeUnit !== 'm' && window.customPressureUnit !== 'hPa');
+    const isAllMet = (window.isMph === false && window.isFahrenheit === false && window.altitudeUnit === 'm' && window.customPressureUnit === 'hPa');
+    if (btnImp) btnImp.classList.toggle('is-selected', isAllImp);
+    if (btnMet) btnMet.classList.toggle('is-selected', isAllMet);
   };
 
   window.toggleActiveBubbleUnit = function(optionIndex) {
@@ -1861,7 +1895,18 @@
     window.syncUnitUI();
     window.saveBubbleConfig();
 
-    if (navigator.vibrate) try { navigator.vibrate(25); } catch (_) {}
+    // In-modal visual confirmation badge
+    const feedback = document.getElementById('global-unit-feedback');
+    if (feedback) {
+      feedback.innerText = isImperial ? '✓ Imperial Active' : '✓ Metric Active';
+      feedback.style.opacity = '1';
+      clearTimeout(window._unitFeedbackTimeout);
+      window._unitFeedbackTimeout = setTimeout(() => {
+        if (feedback) feedback.style.opacity = '0';
+      }, 2400);
+    }
+
+    if (navigator.vibrate) try { navigator.vibrate(30); } catch (_) {}
     if (typeof window.showMapThemeToast === 'function') {
       window.showMapThemeToast({
         name: isImperial ? 'Telemetry Units: All Imperial (MPH, °F, FT, inHg)' : 'Telemetry Units: All Metric (KM/H, °C, M, hPa)',

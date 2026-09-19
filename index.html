@@ -448,6 +448,39 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+    .modal-done-btn-top:hover {
+      background: #30d158 !important;
+      color: #000000 !important;
+      transform: scale(1.04);
+      box-shadow: 0 0 10px rgba(48, 209, 88, 0.45);
+    }
+    .modal-done-btn-top:active {
+      transform: scale(0.95);
+    }
+    .unit-global-pill {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 6px;
+      padding: 3px 9px;
+      font-size: 0.70rem;
+      color: #e2e8f0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .unit-global-pill:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.35);
+      color: #ffffff;
+    }
+    .unit-global-pill.is-selected {
+      background: rgba(48, 209, 88, 0.22) !important;
+      border-color: #30d158 !important;
+      color: #30d158 !important;
+      font-weight: 700 !important;
+      box-shadow: 0 0 8px rgba(48, 209, 88, 0.28);
+    }
 
     /* Coords and Atmospherics Telemetry Typography */
     .coords-line {
@@ -687,9 +720,9 @@
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
-      bottom: max(16px, env(safe-area-inset-bottom));
+      bottom: max(4px, env(safe-area-inset-bottom));
       top: auto;
-      width: calc(100% - 28px);
+      width: calc(100% - 24px);
       max-width: 540px;
       z-index: 30;
       box-sizing: border-box;
@@ -711,13 +744,13 @@
     .location-pill-card {
       position: relative;
       width: 100%;
-      border-radius: 18px;
+      border-radius: 20px;
       border: 1px solid #ff7700;
       background: rgba(8, 14, 26, 0.44);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-      padding: 6px 16px 7px 16px;
+      padding: 10px 18px 10px 18px;
       box-sizing: border-box;
       cursor: pointer;
       display: flex;
@@ -2478,7 +2511,17 @@
         <div class="kinetic-bubble-shape-wrap kinetic-shape-circle" id="compass-bubble-shape-frame"></div>
         <div class="kinetic-pin-indicator" id="compass-bubble-pin" style="display: none; z-index: 3;">📌</div>
         <div class="kinetic-bubble-inner">
-          <div class="kinetic-bubble-value" id="compass-bubble-value">0°</div>
+          <div class="kinetic-compass-needle-wrap" id="compass-bubble-needle" style="width: 22px; height: 22px; margin-bottom: 2px; transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1); transform-origin: center center; display: flex; align-items: center; justify-content: center;">
+            <svg viewBox="0 0 24 24" width="20" height="20" style="filter: drop-shadow(0 1px 3px rgba(0,0,0,0.65)); overflow: visible;">
+              <polygon points="12,2 15.5,12 12,9.5" fill="#ff3b30"/>
+              <polygon points="12,2 8.5,12 12,9.5" fill="#ff6961"/>
+              <polygon points="12,22 15.5,12 12,14.5" fill="#8e8e93"/>
+              <polygon points="12,22 8.5,12 12,14.5" fill="#c7c7cc"/>
+              <circle cx="12" cy="12" r="1.6" fill="#1c1c1e" stroke="#ffffff" stroke-width="0.8"/>
+            </svg>
+          </div>
+          <div class="kinetic-bubble-value" id="compass-bubble-value" style="line-height: 1;">0°</div>
+          <div class="kinetic-bubble-unit" id="compass-bubble-cardinal" style="font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; opacity: 0.85; margin-top: 2px; color: currentColor;">N</div>
         </div>
       </div>
 
@@ -2738,7 +2781,12 @@
   <!-- NOMAD V4 HYPERSPACE: KINETIC BUBBLE CONFIGURATION MODAL -->
   <div class="modal-overlay" id="kinetic-bubble-modal" onclick="closeKineticBubbleModal(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
-      <div class="modal-title" id="bubble-modal-title">Speed Bubble Config</div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <div class="modal-title" id="bubble-modal-title" style="margin: 0;">Speed Bubble Config</div>
+        <button type="button" class="modal-done-btn-top" id="modal-done-btn-top" onclick="closeKineticBubbleModal()" style="background: rgba(48, 209, 88, 0.18); border: 1.5px solid #30d158; color: #30d158; font-weight: 700; font-size: 0.76rem; padding: 4px 13px; border-radius: 12px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; transition: all 0.18s ease; display: inline-flex; align-items: center; gap: 4px;">
+          <span>✓</span> DONE
+        </button>
+      </div>
       <div class="modal-body" style="margin-bottom: 8px;">
         Customize kinetic bounce physics, geometric shape, color, and telemetry.
       </div>
@@ -2863,10 +2911,13 @@
       </div>
       <!-- Global Quick Switch -->
       <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.72rem; color: #94a3b8; padding: 0 4px;">
-        <span>All Telemetry:</span>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span>All Telemetry:</span>
+          <span id="global-unit-feedback" style="font-weight: 700; color: #30d158; opacity: 0; transform: translateY(-1px); transition: opacity 0.25s ease;">✓ Applied</span>
+        </div>
         <div style="display: flex; gap: 6px;">
-          <button type="button" id="btn-global-imperial" onclick="setGlobalUnitSystem('imperial')" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: 6px; padding: 2px 8px; font-size: 0.70rem; color: #fff; cursor: pointer;">All Imperial</button>
-          <button type="button" id="btn-global-metric" onclick="setGlobalUnitSystem('metric')" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: 6px; padding: 2px 8px; font-size: 0.70rem; color: #fff; cursor: pointer;">All Metric</button>
+          <button type="button" id="btn-global-imperial" class="unit-global-pill" onclick="setGlobalUnitSystem('imperial')">All Imperial</button>
+          <button type="button" id="btn-global-metric" class="unit-global-pill" onclick="setGlobalUnitSystem('metric')">All Metric</button>
         </div>
       </div>
 
@@ -5890,6 +5941,11 @@
 
       map.on('dragstart', () => { lastUserMapInteractionTime = Date.now(); });
       map.on('zoomstart', (e) => { if (e.originalEvent) lastUserMapInteractionTime = Date.now(); });
+      map.on('rotate', () => {
+        if (typeof window.renderCompassBubble === 'function' && (!window.rawSpeedMps || window.rawSpeedMps <= 1.5)) {
+          window.renderCompassBubble();
+        }
+      });
       map.on('contextmenu', (e) => {
         if (e && e.preventDefault) e.preventDefault();
         if (typeof openKineticBubbleModal === 'function') openKineticBubbleModal();
