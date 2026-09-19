@@ -168,12 +168,17 @@
     const strokeW = 2.4;
     const strokeJoin = 'round';
     const strokeCap = 'round';
-    if (!unitLabel) {
+    if (bubbleKey === 'atmo') {
+      // For the ATMOS bubble, the data metric is already clearly labelled under the numeric reading (e.g. UV INDEX, HUMIDITY, BAROMETER), so omit duplicate top notch
+      unitLabel = '';
+    } else if (unitLabel === null || unitLabel === undefined) {
       unitLabel = (typeof window.isMph !== 'undefined' && !window.isMph) ? 'KM/H' : 'MPH';
     }
 
     const bottomText = channelLabel || '';
     const topText = unitLabel || '';
+    const hasTopText = Boolean(topText && topText.trim().length > 0);
+    const hasBottomText = Boolean(bottomText && bottomText.trim().length > 0);
     const bottomLen = bottomText.length;
     const topLen = topText.length;
 
@@ -204,16 +209,16 @@
       <defs>
         <mask id="nomad-mask-${maskId}">
           <rect x="-10" y="-10" width="120" height="120" fill="#ffffff" />
-          <rect x="${50 - topPillW / 2}" y="${topY - topPillH / 2}" width="${topPillW}" height="${topPillH}" rx="4" fill="#000000" />
-          <rect x="${50 - bottomPillW / 2}" y="${bottomY - bottomPillH / 2}" width="${bottomPillW}" height="${bottomPillH}" rx="4" fill="#000000" />
+          ${hasTopText ? `<rect x="${50 - topPillW / 2}" y="${topY - topPillH / 2}" width="${topPillW}" height="${topPillH}" rx="4" fill="#000000" />` : ''}
+          ${hasBottomText ? `<rect x="${50 - bottomPillW / 2}" y="${bottomY - bottomPillH / 2}" width="${bottomPillW}" height="${bottomPillH}" rx="4" fill="#000000" />` : ''}
         </mask>
       </defs>
 
       <!-- Top Notch Floating Typography -->
-      <text x="50" y="${topY}" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${topFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="${topLetterSpacing}" style="text-shadow: 0 1px 3px rgba(0,0,0,0.85);">${topText}</text>
+      ${hasTopText ? `<text x="50" y="${topY}" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${topFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="${topLetterSpacing}" style="text-shadow: 0 1px 3px rgba(0,0,0,0.85);">${topText}</text>` : ''}
 
       <!-- Bottom Notch Floating Typography -->
-      <text x="50" y="${bottomY}" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${bottomFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="${bottomLetterSpacing}" style="text-shadow: 0 1px 3px rgba(0,0,0,0.85);">${bottomText}</text>
+      ${hasBottomText ? `<text x="50" y="${bottomY}" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${bottomFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="${bottomLetterSpacing}" style="text-shadow: 0 1px 3px rgba(0,0,0,0.85);">${bottomText}</text>` : ''}
     `;
 
     switch (shape) {
@@ -421,17 +426,7 @@
       unitLabel = (window.isFahrenheit === false) ? '°C' : '°F';
     } else if (bubbleKey === 'atmo') {
       channelLabel = 'ATMO';
-      if (b.displayFormat !== 'stack') {
-        const activeMetrics = [
-          b.showHumidity !== false && 'humidity',
-          b.showUv !== false && 'uv',
-          b.showPressure !== false && 'pressure'
-        ].filter(Boolean);
-        const cur = activeMetrics[(b.currentTickerIndex || 0) % (activeMetrics.length || 1)] || 'humidity';
-        unitLabel = (cur === 'humidity') ? 'HUM' : ((cur === 'uv') ? 'UV' : 'BARO');
-      } else {
-        unitLabel = 'AIR';
-      }
+      unitLabel = ''; // For the ATMOS bubble, the data metric is already clearly labelled under the numeric reading, so top notch is omitted.
     } else if (bubbleKey === 'coords') {
       channelLabel = 'LALO';
       unitLabel = 'GPS';
@@ -514,8 +509,10 @@
         window.updateSatelliteMoonOrbit();
       }
 
-      // Route Badges / Highway Shields kinetic physics
-      if (window.nomadShieldsConfig && window.nomadShieldsConfig.active !== false) {
+      // Route Badges / Highway Shields kinetic physics (only runs when undocked/floating)
+      const hasHighway = Boolean(window.currentInterstateShield || window.currentRouteShield);
+      const isShieldFloating = window.nomadShieldsConfig && window.nomadShieldsConfig.dockMode === 'floating';
+      if (window.nomadShieldsConfig && window.nomadShieldsConfig.active !== false && hasHighway && isShieldFloating) {
         const sb = window.nomadShieldsConfig;
         if (sb.mode === 'kinetic' && !sb.isDragging && !sb.isHovered) {
           if (typeof window.updateShieldsPhysics === 'function') {
@@ -526,6 +523,12 @@
         if (el) {
           el.style.left = `${sb.x}px`;
           el.style.top = `${sb.y}px`;
+          if (el.style.display !== 'flex') el.style.display = 'flex';
+        }
+      } else {
+        const el = document.getElementById('shields-bubble');
+        if (el && el.style.display !== 'none') {
+          el.style.display = 'none';
         }
       }
 
@@ -1838,15 +1841,6 @@
         { maxScale: 0.35, hasSubLabel: true }
       );
       tickerLbl.style.fontSize = `${Math.max(7.5, curSize * 0.088).toFixed(1)}px`;
-
-      // Update notched shape unit label on SVG if rendered
-      const shapeFrame = document.getElementById('atmo-bubble-shape-frame');
-      if (shapeFrame) {
-        const texts = shapeFrame.querySelectorAll('text');
-        if (texts && texts.length > 0) {
-          texts[0].textContent = (currentMetric === 'humidity') ? 'HUM' : ((currentMetric === 'uv') ? 'UV' : 'BARO');
-        }
-      }
     } else {
       const humRow = document.getElementById('atmo-row-humidity');
       const uvRow = document.getElementById('atmo-row-uv');
@@ -1866,14 +1860,6 @@
       const curSize = b.size || 95;
       const stack = document.getElementById('atmo-stack-inner');
       if (stack) stack.style.fontSize = `${Math.max(9.0, curSize * 0.125).toFixed(1)}px`;
-
-      const shapeFrame = document.getElementById('atmo-bubble-shape-frame');
-      if (shapeFrame) {
-        const texts = shapeFrame.querySelectorAll('text');
-        if (texts && texts.length > 0) {
-          texts[0].textContent = 'AIR';
-        }
-      }
     }
   };
 
@@ -2083,23 +2069,32 @@
    * ========================================================================= */
   try {
     const savedShields = localStorage.getItem('nomad_v4_shields_bubble');
-    window.nomadShieldsConfig = savedShields ? JSON.parse(savedShields) : {
-      active: true,
-      mode: 'kinetic',
-      size: 88,
-      safeZoneBehavior: 'bounce',
-      wallBehavior: 'bounce',
-      speedLevel: 3,
-      x: 32,
-      y: 380,
-      vx: 0.65,
-      vy: -0.60,
-      isDragging: false,
-      isHovered: false
-    };
+    window.nomadShieldsConfig = savedShields ? JSON.parse(savedShields) : null;
+    if (!window.nomadShieldsConfig || typeof window.nomadShieldsConfig !== 'object') {
+      window.nomadShieldsConfig = {
+        active: true,
+        dockMode: 'docked', // 'docked' (in location pill) or 'floating' (kinetic bubble)
+        mode: 'kinetic',
+        size: 88,
+        safeZoneBehavior: 'bounce',
+        wallBehavior: 'bounce',
+        speedLevel: 3,
+        x: 32,
+        y: 380,
+        vx: 0.65,
+        vy: -0.60,
+        isDragging: false,
+        isHovered: false
+      };
+    } else {
+      if (!window.nomadShieldsConfig.dockMode) {
+        window.nomadShieldsConfig.dockMode = 'docked';
+      }
+    }
   } catch (e) {
     window.nomadShieldsConfig = {
       active: true,
+      dockMode: 'docked',
       mode: 'kinetic',
       size: 88,
       safeZoneBehavior: 'bounce',
@@ -2129,6 +2124,13 @@
     if (statusDot) statusDot.classList.toggle('is-active', window.nomadShieldsConfig.active !== false);
   };
 
+  window.setRouteShieldsDockMode = function(dockMode) {
+    window.nomadShieldsConfig.dockMode = (dockMode === 'floating') ? 'floating' : 'docked';
+    window.saveShieldsConfig();
+    window.applyShieldsConfigUI();
+    window.syncRouteShieldsUI();
+  };
+
   window.setRouteShieldsMode = function(mode) {
     window.nomadShieldsConfig.mode = mode;
     window.saveShieldsConfig();
@@ -2151,6 +2153,13 @@
     window.syncRouteShieldsUI();
   };
 
+  window.setRouteShieldsWallBehavior = function(behavior) {
+    window.nomadShieldsConfig.wallBehavior = (behavior === 'wrap') ? 'wrap' : 'bounce';
+    window.saveShieldsConfig();
+    window.applyShieldsConfigUI();
+    window.syncRouteShieldsUI();
+  };
+
   window.syncRouteShieldsUI = function() {
     const cfg = window.nomadShieldsConfig;
     if (!cfg) return;
@@ -2161,6 +2170,24 @@
     if (btnActive && btnInactive) {
       btnActive.classList.toggle('is-selected', cfg.active !== false);
       btnInactive.classList.toggle('is-selected', cfg.active === false);
+    }
+
+    // Docking buttons
+    const btnDocked = document.getElementById('shields-dock-docked');
+    const btnFloating = document.getElementById('shields-dock-floating');
+    const isDocked = cfg.dockMode !== 'floating';
+    if (btnDocked && btnFloating) {
+      btnDocked.classList.toggle('is-selected', isDocked);
+      btnFloating.classList.toggle('is-selected', !isDocked);
+    }
+
+    const floatingControls = document.getElementById('shields-floating-only-controls');
+    const dockedBanner = document.getElementById('shields-docked-banner');
+    if (floatingControls) {
+      floatingControls.style.display = isDocked ? 'none' : 'block';
+    }
+    if (dockedBanner) {
+      dockedBanner.style.display = isDocked ? 'block' : 'none';
     }
 
     // Motion mode buttons
@@ -2194,46 +2221,161 @@
       btnBounce.classList.toggle('is-selected', cfg.safeZoneBehavior === 'bounce');
       btnUnder.classList.toggle('is-selected', cfg.safeZoneBehavior === 'under');
     }
+
+    // Boundary wall interaction (Deflect / Bounce vs. Pass Through & Wrap)
+    const btnWallBounce = document.getElementById('shields-wall-bounce');
+    const btnWallWrap = document.getElementById('shields-wall-wrap');
+    if (btnWallBounce && btnWallWrap) {
+      btnWallBounce.classList.toggle('is-selected', cfg.wallBehavior !== 'wrap');
+      btnWallWrap.classList.toggle('is-selected', cfg.wallBehavior === 'wrap');
+    }
   };
 
   window.applyShieldsConfigUI = function() {
     const cfg = window.nomadShieldsConfig;
     const el = document.getElementById('shields-bubble');
-    if (!el || !cfg) return;
+    if (!cfg) return;
 
-    el.style.display = (cfg.active !== false) ? 'flex' : 'none';
-    el.style.width = `${cfg.size}px`;
-    el.style.height = `${cfg.size}px`;
+    const hasHighway = Boolean(window.currentInterstateShield || window.currentRouteShield);
+    const isFloating = cfg.dockMode === 'floating';
 
-    const pin = document.getElementById('shields-bubble-pin');
-    if (pin) pin.style.display = (cfg.mode === 'stationary') ? 'block' : 'none';
+    if (el) {
+      el.style.display = (cfg.active !== false && hasHighway && isFloating) ? 'flex' : 'none';
+      el.style.width = `${cfg.size}px`;
+      el.style.height = `${cfg.size}px`;
+
+      const pin = document.getElementById('shields-bubble-pin');
+      if (pin) pin.style.display = (cfg.mode === 'stationary') ? 'block' : 'none';
+    }
 
     window.renderShieldsBubbleContent();
+    if (typeof window.renderDockedRouteShield === 'function') {
+      window.renderDockedRouteShield();
+    }
   };
 
   window.renderShieldsBubbleContent = function() {
     const wrap = document.getElementById('shields-bubble-render-wrap');
+    const el = document.getElementById('shields-bubble');
+    const cfg = window.nomadShieldsConfig;
     if (!wrap) return;
 
-    const interstate = window.currentInterstateShield || '95';
-    const stateRoute = window.currentRouteShield || '128';
-    const heading = window.currentHeading;
+    const interstate = window.currentInterstateShield || null;
+    const stateRoute = window.currentRouteShield || null;
+    const hasHighway = Boolean(interstate || stateRoute);
+    const isFloating = cfg && cfg.dockMode === 'floating';
+    const isActive = !cfg || cfg.active !== false;
 
-    let svgHtml = '';
-    if (interstate && typeof window.createInterstateSVG === 'function') {
-      const dir = (typeof window.getHighwayDirection === 'function') ? window.getHighwayDirection(interstate, heading, 'interstate') : '';
-      svgHtml = window.createInterstateSVG(interstate, dir);
-    } else if (stateRoute && typeof window.createRouteSVG === 'function') {
-      const dir = (typeof window.getHighwayDirection === 'function') ? window.getHighwayDirection(stateRoute, heading, 'state') : '';
-      svgHtml = window.createRouteSVG(stateRoute, dir);
+    if (!hasHighway || !isFloating || !isActive) {
+      wrap.innerHTML = '';
+      if (el) el.style.display = 'none';
+      return;
     }
 
-    wrap.innerHTML = svgHtml;
+    if (el) {
+      if (el.style.display !== 'flex') el.style.display = 'flex';
+    }
+
+    const heading = window.currentHeading;
+    const flipIdx = window.dualRouteFlipIndex || 0;
+
+    let svgHtml = '';
+    try {
+      if (interstate && stateRoute) {
+        if (flipIdx === 0 && typeof window.createInterstateSVG === 'function') {
+          const dir = (typeof window.getHighwayDirection === 'function') ? window.getHighwayDirection(interstate, heading, 'interstate') : '';
+          svgHtml = window.createInterstateSVG(interstate, dir);
+        } else if (typeof window.createRouteSVG === 'function') {
+          const dir = (typeof window.getHighwayDirection === 'function') ? window.getHighwayDirection(stateRoute, heading, 'state') : '';
+          svgHtml = window.createRouteSVG(stateRoute, dir);
+        }
+      } else if (interstate && typeof window.createInterstateSVG === 'function') {
+        const dir = (typeof window.getHighwayDirection === 'function') ? window.getHighwayDirection(interstate, heading, 'interstate') : '';
+        svgHtml = window.createInterstateSVG(interstate, dir);
+      } else if (stateRoute && typeof window.createRouteSVG === 'function') {
+        const dir = (typeof window.getHighwayDirection === 'function') ? window.getHighwayDirection(stateRoute, heading, 'state') : '';
+        svgHtml = window.createRouteSVG(stateRoute, dir);
+      }
+    } catch (e) {
+      console.warn('renderShieldsBubbleContent notice:', e);
+    }
+
+    if (svgHtml) {
+      wrap.innerHTML = svgHtml;
+    }
+  };
+
+  window.renderDockedRouteShield = function() {
+    const dockedEl = document.getElementById('location-docked-shield');
+    if (!dockedEl) return;
+
+    const cfg = window.nomadShieldsConfig;
+    const isDocked = !cfg || cfg.dockMode !== 'floating';
+    const isActive = !cfg || cfg.active !== false;
+    const interstate = window.currentInterstateShield || null;
+    const stateRoute = window.currentRouteShield || null;
+    const hasHighway = Boolean(interstate || stateRoute);
+
+    if (!hasHighway || !isDocked || !isActive) {
+      dockedEl.style.display = 'none';
+      dockedEl.innerHTML = '';
+      if (typeof window.autoShrinkStreetName === 'function') {
+        window.autoShrinkStreetName();
+      }
+      return;
+    }
+
+    const heading = window.currentHeading;
+    const flipIdx = window.dualRouteFlipIndex || 0;
+    let svgHtml = '';
+
+    try {
+      if (interstate && stateRoute) {
+        if (flipIdx === 0 && typeof window.createInterstateSVG === 'function') {
+          const dir = (typeof window.getHighwayDirection === 'function') ? window.getHighwayDirection(interstate, heading, 'interstate') : '';
+          svgHtml = window.createInterstateSVG(interstate, dir);
+        } else if (typeof window.createRouteSVG === 'function') {
+          const dir = (typeof window.getHighwayDirection === 'function') ? window.getHighwayDirection(stateRoute, heading, 'state') : '';
+          svgHtml = window.createRouteSVG(stateRoute, dir);
+        }
+      } else if (interstate && typeof window.createInterstateSVG === 'function') {
+        const dir = (typeof window.getHighwayDirection === 'function') ? window.getHighwayDirection(interstate, heading, 'interstate') : '';
+        svgHtml = window.createInterstateSVG(interstate, dir);
+      } else if (stateRoute && typeof window.createRouteSVG === 'function') {
+        const dir = (typeof window.getHighwayDirection === 'function') ? window.getHighwayDirection(stateRoute, heading, 'state') : '';
+        svgHtml = window.createRouteSVG(stateRoute, dir);
+      }
+    } catch (e) {
+      console.warn('renderDockedRouteShield notice:', e);
+    }
+
+    if (svgHtml) {
+      dockedEl.innerHTML = svgHtml;
+      dockedEl.style.display = 'inline-flex';
+      dockedEl.onclick = function(e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        if (typeof window.openBubbleConfig === 'function') {
+          window.openBubbleConfig('shields');
+        }
+      };
+    } else {
+      dockedEl.style.display = 'none';
+      dockedEl.innerHTML = '';
+    }
+
+    if (typeof window.autoShrinkStreetName === 'function') {
+      window.autoShrinkStreetName();
+    }
   };
 
   window.updateShieldsPhysics = function() {
     const sb = window.nomadShieldsConfig;
-    if (!sb || sb.active === false) return;
+    if (!sb || sb.active === false || sb.dockMode !== 'floating') return;
+    const hasHighway = Boolean(window.currentInterstateShield || window.currentRouteShield);
+    if (!hasHighway) return;
     const el = document.getElementById('shields-bubble');
     if (!el) return;
 

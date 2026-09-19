@@ -66,7 +66,9 @@
     const card = document.getElementById('location-pill-card') || document.getElementById('location-card');
     if (!el || !card) return;
 
-    const maxAllowedWidth = Math.max(140, card.clientWidth - 36);
+    const dockedShield = document.getElementById('location-docked-shield');
+    const shieldOffset = (dockedShield && dockedShield.style.display !== 'none') ? 44 : 0;
+    const maxAllowedWidth = Math.max(120, card.clientWidth - 36 - shieldOffset);
     let fontSize = window.innerWidth < 480 ? 24 : 28;
     el.style.fontSize = `${fontSize}px`;
     const minFontSize = 14;

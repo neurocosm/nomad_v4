@@ -812,13 +812,54 @@
       pointer-events: none;
     }
 
+    .location-street-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      max-width: 100%;
+      margin: 0 auto 3px auto;
+    }
+
+    .location-docked-shield {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.6));
+      transition: transform 0.15s ease, opacity 0.2s ease;
+      pointer-events: auto;
+    }
+
+    .location-docked-shield:active {
+      transform: scale(0.92);
+    }
+
+    .location-docked-shield svg {
+      width: 32px;
+      height: 32px;
+      display: block;
+      overflow: visible;
+    }
+
+    .location-docked-shield .highway-shield-badge {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     .location-channel-bar .street-value {
       font-size: clamp(1.32rem, 4.2vw, 2.05rem);
       font-weight: 400;
       line-height: 1.12;
       color: #ffffff;
       letter-spacing: 0.01em;
-      margin-bottom: 3px;
+      margin-bottom: 0;
       white-space: nowrap;
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
       transition: font-size 0.15s ease, color 0.3s ease;
@@ -2643,7 +2684,10 @@
         <!-- Tap to Copy Toast Centered Inside Pill -->
         <div class="copy-toast-badge" id="copy-toast">COPIED!</div>
         <div class="location-channel-content">
-          <div class="street-value" id="street-name">Locating...</div>
+          <div class="location-street-row" id="location-street-row">
+            <div class="location-docked-shield" id="location-docked-shield" style="display: none;" title="Detected Route Shield (Tap to configure)"></div>
+            <div class="street-value" id="street-name">Locating...</div>
+          </div>
           <div class="location-sub-row" id="location-sub-row">
             <span class="sub-city-state" id="city-state">--</span>
             <span class="loc-divider" id="loc-divider">•</span>
@@ -3221,25 +3265,56 @@
           <button type="button" class="bubble-mode-btn" id="shields-status-inactive" onclick="setRouteShieldsActive(false)">💤 Inactive</button>
         </div>
 
-        <div class="config-section-label" style="margin-top: 14px;">Shield Motion Mode</div>
-        <div class="bubble-mode-toggle-group" id="shields-mode-group">
-          <button type="button" class="bubble-mode-btn is-selected" id="shields-mode-kinetic" onclick="setRouteShieldsMode('kinetic')">🚀 Kinetic Bounce</button>
-          <button type="button" class="bubble-mode-btn" id="shields-mode-stationary" onclick="setRouteShieldsMode('stationary')">📌 Pinned Corner</button>
+        <div class="config-section-label" style="margin-top: 14px;">Shield Display &amp; Placement</div>
+        <div class="bubble-mode-toggle-group" id="shields-dock-group">
+          <button type="button" class="bubble-mode-btn is-selected" id="shields-dock-docked" onclick="setRouteShieldsDockMode('docked')">⚓ Docked in Location Pill</button>
+          <button type="button" class="bubble-mode-btn" id="shields-dock-floating" onclick="setRouteShieldsDockMode('floating')">🚀 Floating Kinetic Bubble</button>
         </div>
 
-        <div class="config-section-label" style="margin-top: 14px;">Shield Bubble Dimensions</div>
-        <div class="bubble-mode-toggle-group" id="shields-preset-size-group">
-          <button type="button" class="bubble-mode-btn" id="shields-size-preset-compact" onclick="setRouteShieldsSize(72)">Compact (72px)</button>
-          <button type="button" class="bubble-mode-btn is-selected" id="shields-size-preset-standard" onclick="setRouteShieldsSize(88)">Standard (88px)</button>
-          <button type="button" class="bubble-mode-btn" id="shields-size-preset-hero" onclick="setRouteShieldsSize(108)">Hero (108px)</button>
+        <!-- Informative Docked Banner -->
+        <div id="shields-docked-banner" style="margin-top: 10px; font-size: 0.74rem; color: #94a3b8; line-height: 1.45; padding: 8px 10px; background: rgba(0, 212, 255, 0.06); border-radius: 8px; border: 1px solid rgba(0, 212, 255, 0.18);">
+          <div style="font-weight: 600; color: #38bdf8; margin-bottom: 2px;">⚓ Location Channel Docked</div>
+          The highway shield is seamlessly integrated beside the route name inside the location pill. When on a highway, other kinetic bubbles glide under the location plaque. Exiting onto local streets automatically collapses the shield.
         </div>
 
-        <div class="slider-row" style="margin-top: 10px;">
-          <div class="slider-label-row">
-            <span>Fine-Tune Size</span>
-            <span id="shields-size-val-label" class="slider-val-badge">88px</span>
+        <!-- Controls relevant when in floating kinetic bubble mode -->
+        <div id="shields-floating-only-controls" style="display: none;">
+          <div class="config-section-label" style="margin-top: 14px;">Shield Motion Mode</div>
+          <div class="bubble-mode-toggle-group" id="shields-mode-group">
+            <button type="button" class="bubble-mode-btn is-selected" id="shields-mode-kinetic" onclick="setRouteShieldsMode('kinetic')">🚀 Kinetic Bounce</button>
+            <button type="button" class="bubble-mode-btn" id="shields-mode-stationary" onclick="setRouteShieldsMode('stationary')">📌 Pinned Corner</button>
           </div>
-          <input type="range" min="64" max="130" step="2" value="88" id="shields-size-slider" class="hud-range-slider" oninput="setRouteShieldsSize(this.value)">
+
+          <div class="config-section-label" style="margin-top: 14px;">Shield Bubble Dimensions</div>
+          <div class="bubble-mode-toggle-group" id="shields-preset-size-group">
+            <button type="button" class="bubble-mode-btn" id="shields-size-preset-compact" onclick="setRouteShieldsSize(72)">Compact (72px)</button>
+            <button type="button" class="bubble-mode-btn is-selected" id="shields-size-preset-standard" onclick="setRouteShieldsSize(88)">Standard (88px)</button>
+            <button type="button" class="bubble-mode-btn" id="shields-size-preset-hero" onclick="setRouteShieldsSize(108)">Hero (108px)</button>
+          </div>
+
+          <div class="slider-row" style="margin-top: 10px;">
+            <div class="slider-label-row">
+              <span>Fine-Tune Size</span>
+              <span id="shields-size-val-label" class="slider-val-badge">88px</span>
+            </div>
+            <input type="range" min="64" max="130" step="2" value="88" id="shields-size-slider" class="hud-range-slider" oninput="setRouteShieldsSize(this.value)">
+          </div>
+
+          <div id="shields-safezone-section" style="margin-top: 14px;">
+            <div class="config-section-label" style="margin-bottom: 6px;">Vehicle Safe-Zone Interaction</div>
+            <div class="bubble-mode-toggle-group" id="shields-safezone-group">
+              <button type="button" class="bubble-mode-btn is-selected" id="shields-safezone-bounce" onclick="setRouteShieldsSafeZoneBehavior('bounce')">🛡️ Deflect</button>
+              <button type="button" class="bubble-mode-btn" id="shields-safezone-under" onclick="setRouteShieldsSafeZoneBehavior('under')">🌌 Glide Under</button>
+            </div>
+          </div>
+
+          <div id="shields-wall-section" style="margin-top: 14px;">
+            <div class="config-section-label" style="margin-bottom: 6px;">Boundary Wall Interaction</div>
+            <div class="bubble-mode-toggle-group" id="shields-wall-group">
+              <button type="button" class="bubble-mode-btn is-selected" id="shields-wall-bounce" onclick="setRouteShieldsWallBehavior('bounce')">🛡️ Deflect Off Walls</button>
+              <button type="button" class="bubble-mode-btn" id="shields-wall-wrap" onclick="setRouteShieldsWallBehavior('wrap')">🌀 Pass Through &amp; Wrap</button>
+            </div>
+          </div>
         </div>
 
         <div class="config-section-label" style="margin-top: 14px;">Authentic Shield Styling</div>
@@ -3252,14 +3327,6 @@
           <div style="margin-top: 4px; display: flex; align-items: center; gap: 8px;">
             <span style="display: inline-block; width: 14px; height: 14px; background: #ffffff; border: 2px solid #000000; border-radius: 3px;"></span>
             <strong style="color: #ffffff;">State Route:</strong> Solid MUTCD White Rounded Inset Plate
-          </div>
-        </div>
-
-        <div id="shields-safezone-section" style="margin-top: 14px;">
-          <div class="config-section-label" style="margin-bottom: 6px;">Vehicle Safe-Zone Interaction</div>
-          <div class="bubble-mode-toggle-group" id="shields-safezone-group">
-            <button type="button" class="bubble-mode-btn is-selected" id="shields-safezone-bounce" onclick="setRouteShieldsSafeZoneBehavior('bounce')">🛡️ Deflect</button>
-            <button type="button" class="bubble-mode-btn" id="shields-safezone-under" onclick="setRouteShieldsSafeZoneBehavior('under')">🌌 Glide Under</button>
           </div>
         </div>
       </div>
@@ -3686,7 +3753,9 @@
       const card = document.getElementById('location-pill-card') || document.getElementById('location-card');
       if (!el || !card) return;
 
-      const maxAllowedWidth = Math.max(140, card.clientWidth - 36);
+      const dockedShield = document.getElementById('location-docked-shield');
+      const shieldOffset = (dockedShield && dockedShield.style.display !== 'none') ? 44 : 0;
+      const maxAllowedWidth = Math.max(120, card.clientWidth - 36 - shieldOffset);
       let fontSize = window.innerWidth < 480 ? 26 : 32;
       el.style.fontSize = `${fontSize}px`;
       const minFontSize = 14;
@@ -4263,112 +4332,8 @@
       }, 1000);
     }
 
-    function isFidgetActive() {
-      if (typeof mapThemes !== 'undefined' && mapThemes[currentThemeIndex]) {
-        return mapThemes[currentThemeIndex].type === 'kinetic-starfield';
-      }
-      return false;
-    }
-
-    function renderRouteBadges() {
-      const interstateContainer = document.getElementById('interstate-badge-container');
-      const routeContainer = document.getElementById('route-badge-container');
-      const inFidget = isFidgetActive();
-
-      if (interstateContainer) {
-        interstateContainer.innerHTML = getMapIconHTML();
-        interstateContainer.classList.remove('has-shield');
-        const isLight = document.getElementById('map-card')?.classList.contains('theme-light-active') || (currentThemeIndex === 1);
-        interstateContainer.setAttribute('title', isLight ? 'Light Navigation • Tap for Dark' : 'Dark Navigation • Tap for Light');
-      }
-
-      if (routeContainer) {
-        let activeShield = currentRouteShield;
-        if (currentSecondaryRouteShield && currentSecondaryRouteShield !== currentRouteShield) {
-          activeShield = dualRouteFlipIndex === 0 ? currentRouteShield : currentSecondaryRouteShield;
-        }
-
-        if (!inFidget && activeShield) {
-          const dir = getHighwayDirection(activeShield, currentHeading, 'state');
-          routeContainer.innerHTML = createRouteSVG(activeShield, dir);
-          routeContainer.classList.add('has-shield');
-          routeContainer.classList.remove('auto-cycling');
-          routeContainer.setAttribute('title', `Route ${activeShield} (Tap to cycle fidget consoles)`);
-        } else {
-          routeContainer.innerHTML = getDieIconHTML();
-          routeContainer.classList.remove('has-shield');
-          if (isAutoCyclingFidgets && inFidget) {
-            routeContainer.classList.add('auto-cycling');
-            routeContainer.setAttribute('title', `Auto-Cycle Active (Die: ${currentDieFace}) - Long-Press to Pause`);
-          } else {
-            routeContainer.classList.remove('auto-cycling');
-            routeContainer.setAttribute('title', 'Cycle Fidget Consoles (Long-Press: Auto-Cycle)');
-          }
-        }
-      }
-
-      window.currentInterstateShield = currentInterstateShield;
-      window.currentRouteShield = currentRouteShield;
-      if (typeof window.renderShieldsBubbleContent === 'function') {
-        window.renderShieldsBubbleContent();
-      }
-    }
-
-    async function rotateNextAutoFidget() {
-      if (!isAutoCyclingFidgets || !isFidgetActive()) return;
-      const fidgets = getFidgetIndices();
-      if (fidgets.length === 0) return;
-      let curPos = fidgets.indexOf(currentThemeIndex);
-      if (curPos === -1) curPos = 0;
-      const nextFidgetIdx = fidgets[(curPos + 1) % fidgets.length];
-
-      await applyThemeByIndex(nextFidgetIdx, true);
-    }
-
-    async function toggleAutoCycleFidgets(forceState) {
-      const nextState = typeof forceState === 'boolean' ? forceState : !isAutoCyclingFidgets;
-      isAutoCyclingFidgets = nextState;
-
-      stopFidgetAutoCycleTimer();
-
-      if (isAutoCyclingFidgets) {
-        if (typeof playFidgetAudio === 'function') playFidgetAudio();
-        if (navigator.vibrate) {
-          try { navigator.vibrate([40, 60, 80]); } catch (_) {}
-        }
-        if (!isFidgetActive()) {
-          const synthIdx = mapThemes.findIndex(t => t.id === 'kinetic-synthomatic');
-          const targetIdx = synthIdx !== -1 ? synthIdx : getFidgetIndices()[0];
-          await applyThemeByIndex(targetIdx, true);
-        } else {
-          startFidgetAutoCycleTimer(true);
-        }
-        currentDieFace = 6;
-        renderRouteBadges();
-        showMapThemeToast({ name: 'AUTO-CYCLE ON (60s Countdown)', type: 'kinetic-starfield' });
-      } else {
-        stopFidgetAutoCycleTimer();
-        if (typeof playFidgetAudio === 'function') playFidgetAudio();
-        if (navigator.vibrate) {
-          try { navigator.vibrate(50); } catch (_) {}
-        }
-        currentDieFace = 5;
-        renderRouteBadges();
-        showMapThemeToast({ name: 'AUTO-CYCLE PAUSED', type: 'kinetic-starfield' });
-      }
-    }
-
-    function startDualRouteFlipper() {
-      if (dualRouteFlipInterval) clearInterval(dualRouteFlipInterval);
-      dualRouteFlipInterval = setInterval(() => {
-        if (currentRouteShield && currentSecondaryRouteShield && currentRouteShield !== currentSecondaryRouteShield) {
-          dualRouteFlipIndex = (dualRouteFlipIndex + 1) % 2;
-          renderRouteBadges();
-        }
-      }, 4000);
-    }
-    startDualRouteFlipper();
-    renderRouteBadges();
+    let currentSignedHighwayDirections = {};
+    window.currentSignedHighwayDirections = currentSignedHighwayDirections;
 
     function getCardinalRoadDirection(heading) {
       if (heading === null || isNaN(heading)) return '';
@@ -4416,8 +4381,6 @@
       
       return 'any';
     }
-
-    let currentSignedHighwayDirections = {};
 
     function getHighwayDirection(routeNumber, heading, highwayType = '') {
       if (heading === null || isNaN(heading)) return '';
@@ -4488,6 +4451,130 @@
       return newDirection;
     }
     window.getHighwayDirection = getHighwayDirection;
+
+    function isFidgetActive() {
+      if (typeof mapThemes !== 'undefined' && mapThemes[currentThemeIndex]) {
+        return mapThemes[currentThemeIndex].type === 'kinetic-starfield';
+      }
+      return false;
+    }
+
+    function renderRouteBadges() {
+      const interstateContainer = document.getElementById('interstate-badge-container');
+      const routeContainer = document.getElementById('route-badge-container');
+      const inFidget = isFidgetActive();
+
+      if (interstateContainer) {
+        interstateContainer.innerHTML = getMapIconHTML();
+        interstateContainer.classList.remove('has-shield');
+        const isLight = document.getElementById('map-card')?.classList.contains('theme-light-active') || (currentThemeIndex === 1);
+        interstateContainer.setAttribute('title', isLight ? 'Light Navigation • Tap for Dark' : 'Dark Navigation • Tap for Light');
+      }
+
+      if (routeContainer) {
+        let activeShield = currentRouteShield;
+        if (currentSecondaryRouteShield && currentSecondaryRouteShield !== currentRouteShield) {
+          activeShield = dualRouteFlipIndex === 0 ? currentRouteShield : currentSecondaryRouteShield;
+        }
+
+        if (!inFidget && activeShield) {
+          const dir = getHighwayDirection(activeShield, currentHeading, 'state');
+          routeContainer.innerHTML = createRouteSVG(activeShield, dir);
+          routeContainer.classList.add('has-shield');
+          routeContainer.classList.remove('auto-cycling');
+          routeContainer.setAttribute('title', `Route ${activeShield} (Tap to cycle fidget consoles)`);
+        } else {
+          routeContainer.innerHTML = getDieIconHTML();
+          routeContainer.classList.remove('has-shield');
+          if (isAutoCyclingFidgets && inFidget) {
+            routeContainer.classList.add('auto-cycling');
+            routeContainer.setAttribute('title', `Auto-Cycle Active (Die: ${currentDieFace}) - Long-Press to Pause`);
+          } else {
+            routeContainer.classList.remove('auto-cycling');
+            routeContainer.setAttribute('title', 'Cycle Fidget Consoles (Long-Press: Auto-Cycle)');
+          }
+        }
+      }
+
+      window.currentInterstateShield = currentInterstateShield;
+      window.currentRouteShield = currentRouteShield;
+      window.currentSecondaryRouteShield = currentSecondaryRouteShield;
+      window.dualRouteFlipIndex = dualRouteFlipIndex;
+      window.hasActiveHighway = Boolean(currentInterstateShield || currentRouteShield);
+      if (typeof window.renderShieldsBubbleContent === 'function') {
+        try {
+          window.renderShieldsBubbleContent();
+        } catch (e) {
+          console.warn('Shields bubble render error:', e);
+        }
+      }
+      if (typeof window.renderDockedRouteShield === 'function') {
+        try {
+          window.renderDockedRouteShield();
+        } catch (e) {
+          console.warn('Docked route shield render error:', e);
+        }
+      }
+    }
+    window.renderRouteBadges = renderRouteBadges;
+
+    async function rotateNextAutoFidget() {
+      if (!isAutoCyclingFidgets || !isFidgetActive()) return;
+      const fidgets = getFidgetIndices();
+      if (fidgets.length === 0) return;
+      let curPos = fidgets.indexOf(currentThemeIndex);
+      if (curPos === -1) curPos = 0;
+      const nextFidgetIdx = fidgets[(curPos + 1) % fidgets.length];
+
+      await applyThemeByIndex(nextFidgetIdx, true);
+    }
+
+    async function toggleAutoCycleFidgets(forceState) {
+      const nextState = typeof forceState === 'boolean' ? forceState : !isAutoCyclingFidgets;
+      isAutoCyclingFidgets = nextState;
+
+      stopFidgetAutoCycleTimer();
+
+      if (isAutoCyclingFidgets) {
+        if (typeof playFidgetAudio === 'function') playFidgetAudio();
+        if (navigator.vibrate) {
+          try { navigator.vibrate([40, 60, 80]); } catch (_) {}
+        }
+        if (!isFidgetActive()) {
+          const synthIdx = mapThemes.findIndex(t => t.id === 'kinetic-synthomatic');
+          const targetIdx = synthIdx !== -1 ? synthIdx : getFidgetIndices()[0];
+          await applyThemeByIndex(targetIdx, true);
+        } else {
+          startFidgetAutoCycleTimer(true);
+        }
+        currentDieFace = 6;
+        renderRouteBadges();
+        showMapThemeToast({ name: 'AUTO-CYCLE ON (60s Countdown)', type: 'kinetic-starfield' });
+      } else {
+        stopFidgetAutoCycleTimer();
+        if (typeof playFidgetAudio === 'function') playFidgetAudio();
+        if (navigator.vibrate) {
+          try { navigator.vibrate(50); } catch (_) {}
+        }
+        currentDieFace = 5;
+        renderRouteBadges();
+        showMapThemeToast({ name: 'AUTO-CYCLE PAUSED', type: 'kinetic-starfield' });
+      }
+    }
+
+    function startDualRouteFlipper() {
+      if (dualRouteFlipInterval) clearInterval(dualRouteFlipInterval);
+      dualRouteFlipInterval = setInterval(() => {
+        const hasDualState = currentRouteShield && currentSecondaryRouteShield && currentRouteShield !== currentSecondaryRouteShield;
+        const hasDualInterstateAndState = currentInterstateShield && currentRouteShield;
+        if (hasDualState || hasDualInterstateAndState) {
+          dualRouteFlipIndex = (dualRouteFlipIndex + 1) % 2;
+          window.dualRouteFlipIndex = dualRouteFlipIndex;
+          renderRouteBadges();
+        }
+      }, 4000);
+    }
+    window.startDualRouteFlipper = startDualRouteFlipper;
 
     function getAdaptiveCardinalLabel(angle) {
       if (angle === null || isNaN(angle)) return { text: "NORTH", isShort: false };
@@ -7076,13 +7163,15 @@
       } catch (_) {}
 
       applyLayoutInversion(isLayoutInverted, false);
-      initMap();
+      try { initMap(); } catch(e) { console.warn('initMap notice:', e); }
       applyHudScale(hudScale);
       applyHudOpacity(hudOpacity);
-      startTracking();
+      try { startTracking(); } catch(e) { console.warn('startTracking notice:', e); }
       requestWakeLock();
       setupInteractions();
-      initKineticSpeedBubble();
+      try { startDualRouteFlipper(); } catch(e) {}
+      try { renderRouteBadges(); } catch(e) {}
+      try { initKineticSpeedBubble(); } catch(e) { console.warn('initKineticSpeedBubble notice:', e); }
       if (typeof renderCompassBubble === 'function') renderCompassBubble(currentHeading);
       if (typeof renderAltitudeBubble === 'function') renderAltitudeBubble(rawAltitudeMeters);
       if (typeof renderTemperatureBubble === 'function') renderTemperatureBubble();
