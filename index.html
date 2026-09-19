@@ -1716,6 +1716,33 @@
       display: none !important;
     }
 
+    /* ORBITING SATELLITE SCANNER MOON (NOMAD V4 HYPERSPACE) */
+    .safe-zone-satellite-arm {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      pointer-events: none;
+      transform-origin: center center;
+      transition: opacity 0.3s ease;
+    }
+
+    .safe-zone-satellite-moon {
+      position: absolute;
+      top: -4px;
+      left: calc(50% - 4px);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #00d4ff;
+      box-shadow: 0 0 10px #00d4ff, 0 0 4px #ffffff, 0 0 16px rgba(0, 212, 255, 0.7);
+      pointer-events: none;
+      transform: translateZ(0);
+      transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
     @keyframes safeZonePulse {
       0%   { transform: scale(0.92); opacity: 0.8; }
       50%  { transform: scale(1.08); opacity: 0.15; }
@@ -2482,9 +2509,12 @@
       <!-- Dedicated Scalable Bottom-Right Pod: Fidget Consoles / State Route Shield -->
       <div class="map-overlay-route" id="route-badge-container" title="Cycle Fidget Consoles" aria-label="Cycle Fidget Consoles" style="display: none !important;"></div>
 
-      <!-- Vehicle Safe Zone Orbit & Protective Bubble (NOMAD v4 Hyperspace) -->
+      <!-- Vehicle Safe Zone Orbit & Protective Bubble with Satellite Scanner Moon (NOMAD v4 Hyperspace) -->
       <div class="vehicle-safe-zone-bubble mode-heading-up" id="vehicle-safe-zone" title="Vehicle Safe Zone Bubble">
         <div class="safe-zone-pulse-ring"></div>
+        <div class="safe-zone-satellite-arm" id="safe-zone-satellite-arm">
+          <div class="safe-zone-satellite-moon" id="safe-zone-satellite-moon"></div>
+        </div>
       </div>
 
       <!-- Dedicated Independent Vehicle Overlay Marker (Tap: Toggle Perspective • Long-Press: Galaga) -->
@@ -2791,7 +2821,7 @@
         Customize kinetic bounce physics, geometric shape, color, and telemetry.
       </div>
 
-      <!-- Universal Bubble Tabs: 2-Row 3x2 Segmented Glass Grid -->
+      <!-- Universal Bubble Tabs: 2-Row Segmented Glass Grid -->
       <div class="bubble-tabs-grid" id="bubble-tabs-grid">
         <button class="bubble-tab-btn is-active" id="bubble-tab-speed" data-tab="speed" onclick="switchBubbleTab('speed')">
           <span class="bubble-tab-status is-active" id="bubble-tab-status-speed"></span>
@@ -2801,12 +2831,12 @@
         <button class="bubble-tab-btn" id="bubble-tab-compass" data-tab="compass" onclick="switchBubbleTab('compass')">
           <span class="bubble-tab-status" id="bubble-tab-status-compass"></span>
           <span class="bubble-tab-icon">🧭</span>
-          <span class="bubble-tab-label">Compass</span>
+          <span class="bubble-tab-label">CMPS</span>
         </button>
         <button class="bubble-tab-btn" id="bubble-tab-altitude" data-tab="altitude" onclick="switchBubbleTab('altitude')">
           <span class="bubble-tab-status" id="bubble-tab-status-altitude"></span>
           <span class="bubble-tab-icon">⛰️</span>
-          <span class="bubble-tab-label">Altitude</span>
+          <span class="bubble-tab-label">ALT</span>
         </button>
         <button class="bubble-tab-btn" id="bubble-tab-temp" data-tab="temp" onclick="switchBubbleTab('temp')">
           <span class="bubble-tab-status" id="bubble-tab-status-temp"></span>
@@ -2821,10 +2851,17 @@
         <button class="bubble-tab-btn" id="bubble-tab-coords" data-tab="coords" onclick="switchBubbleTab('coords')">
           <span class="bubble-tab-status" id="bubble-tab-status-coords"></span>
           <span class="bubble-tab-icon">📍</span>
-          <span class="bubble-tab-label">Coords</span>
+          <span class="bubble-tab-label">LALO</span>
+        </button>
+        <button class="bubble-tab-btn bubble-tab-vehicle-btn" id="bubble-tab-vehicle" data-tab="vehicle" onclick="switchBubbleTab('vehicle')" style="grid-column: span 2;">
+          <span class="bubble-tab-status is-active" id="bubble-tab-status-vehicle"></span>
+          <span class="bubble-tab-icon">🛸</span>
+          <span class="bubble-tab-label">Vehicle &amp; Moon</span>
         </button>
       </div>
 
+      <!-- Container for Telemetry-Bubble Specific Controls -->
+      <div id="bubble-specific-controls">
       <!-- Bubble Active / Visible Status -->
       <div class="config-section-label">Bubble Status</div>
       <div class="bubble-mode-toggle-group" id="bubble-active-group">
@@ -3052,8 +3089,84 @@
           <span>3.0x</span>
         </div>
       </div>
+      </div><!-- /bubble-specific-controls -->
 
-      <div style="margin-top: 18px; display: flex; gap: 8px;">
+      <!-- VEHICLE & SAFE-ZONE CONFIGURATION SECTION (Visible ONLY when Vehicle tab is active) -->
+      <div id="vehicle-options-section" style="display: none; margin-top: 14px;">
+        <!-- Vehicle Mode Switcher -->
+        <div class="config-section-label">Active Vehicle Marker</div>
+        <div class="bubble-mode-toggle-group" id="vehicle-marker-group">
+          <button type="button" class="bubble-mode-btn is-selected" id="vehicle-btn-chevron" onclick="setVehicleMarkerMode('cruise')">
+            <span style="display:inline-block; transform:rotate(-45deg); margin-right:4px;">▲</span> Cruise Chevron
+          </button>
+          <button type="button" class="bubble-mode-btn" id="vehicle-btn-galaga" onclick="setVehicleMarkerMode('galaga')">
+            👾 Galaga Fighter
+          </button>
+        </div>
+
+        <!-- Safe-Zone Protective Boundary Size -->
+        <div class="slider-config-container" style="margin-top: 14px;">
+          <div class="slider-header-row">
+            <span class="config-section-label" style="margin:0;">Safe-Zone Forcefield Diameter</span>
+            <span class="slider-val-badge" id="vehicle-safezone-val-badge">136px (Standard)</span>
+          </div>
+          <div class="bubble-size-preset-group" style="grid-template-columns: repeat(4, 1fr);">
+            <button type="button" class="bubble-size-btn" id="safezone-preset-55" onclick="setVehicleSafeZoneRadius(55)">Tight<br><span style="font-size:0.65rem; opacity:0.8;">110px</span></button>
+            <button type="button" class="bubble-size-btn is-selected" id="safezone-preset-68" onclick="setVehicleSafeZoneRadius(68)">Standard<br><span style="font-size:0.65rem; opacity:0.8;">136px</span></button>
+            <button type="button" class="bubble-size-btn" id="safezone-preset-90" onclick="setVehicleSafeZoneRadius(90)">Wide<br><span style="font-size:0.65rem; opacity:0.8;">180px</span></button>
+            <button type="button" class="bubble-size-btn" id="safezone-preset-110" onclick="setVehicleSafeZoneRadius(110)">Expansive<br><span style="font-size:0.65rem; opacity:0.8;">220px</span></button>
+          </div>
+          <div class="slider-track-wrap" style="margin-top: 10px;">
+            <input type="range" min="45" max="120" step="2" value="68" id="vehicle-safezone-slider" class="hud-range-slider" oninput="onVehicleSafeZoneSliderChange(this.value)">
+          </div>
+          <div class="slider-ticks-row">
+            <span>90px</span>
+            <span>136px</span>
+            <span>240px</span>
+          </div>
+        </div>
+
+        <!-- Satellite Moon / Scanner Active Toggle -->
+        <div class="config-section-label" style="margin-top: 14px;">Orbiting Satellite Moon ("Scanner")</div>
+        <div class="bubble-mode-toggle-group" id="vehicle-satellite-active-group">
+          <button type="button" class="bubble-mode-btn is-selected" id="satellite-status-active" onclick="setVehicleSatelliteActive(true)">👁️ Active (Orbiting)</button>
+          <button type="button" class="bubble-mode-btn" id="satellite-status-inactive" onclick="setVehicleSatelliteActive(false)">💤 Inactive (Off)</button>
+        </div>
+
+        <!-- Satellite Moon Color Palette -->
+        <div class="config-section-label" style="margin-top: 14px;">Satellite Moon Color</div>
+        <div class="bubble-color-row" id="vehicle-satellite-swatches">
+          <div class="bubble-color-swatch is-selected" data-color="#00d4ff" style="background: #00d4ff;" onclick="setVehicleSatelliteColor('#00d4ff')" title="Cyan"></div>
+          <div class="bubble-color-swatch" data-color="#ffb703" style="background: #ffb703;" onclick="setVehicleSatelliteColor('#ffb703')" title="Gold"></div>
+          <div class="bubble-color-swatch" data-color="#ff0055" style="background: #ff0055;" onclick="setVehicleSatelliteColor('#ff0055')" title="Hot Pink"></div>
+          <div class="bubble-color-swatch" data-color="#30d158" style="background: #30d158;" onclick="setVehicleSatelliteColor('#30d158')" title="Neon Green"></div>
+          <div class="bubble-color-swatch" data-color="#bf5af2" style="background: #bf5af2;" onclick="setVehicleSatelliteColor('#bf5af2')" title="Violet"></div>
+          <div class="bubble-color-swatch" data-color="#ffffff" style="background: #ffffff;" onclick="setVehicleSatelliteColor('#ffffff')" title="Ice White"></div>
+          <div class="bubble-color-swatch" data-color="#ff7700" style="background: #ff7700;" onclick="setVehicleSatelliteColor('#ff7700')" title="Sunset Orange"></div>
+        </div>
+
+        <!-- Satellite Moon Dot Dimension -->
+        <div class="config-section-label" style="margin-top: 14px;">Satellite Moon Size</div>
+        <div class="bubble-mode-toggle-group" id="vehicle-satellite-size-group">
+          <button type="button" class="bubble-mode-btn" id="satellite-size-6" onclick="setVehicleSatelliteSize(6)">Compact (6px)</button>
+          <button type="button" class="bubble-mode-btn is-selected" id="satellite-size-8" onclick="setVehicleSatelliteSize(8)">Standard (8px)</button>
+          <button type="button" class="bubble-mode-btn" id="satellite-size-12" onclick="setVehicleSatelliteSize(12)">Beacon (12px)</button>
+        </div>
+
+        <!-- Orbit Velocity & Speed Sync -->
+        <div class="config-section-label" style="margin-top: 14px;">Orbit Velocity &amp; GPS Speed Sync</div>
+        <div class="bubble-mode-toggle-group" id="vehicle-satellite-speed-group">
+          <button type="button" class="bubble-mode-btn" id="satellite-speed-1" onclick="setVehicleSatelliteSpeed(1)">Gentle (1x)</button>
+          <button type="button" class="bubble-mode-btn is-selected" id="satellite-speed-2" onclick="setVehicleSatelliteSpeed(2)">Cruising (2x)</button>
+          <button type="button" class="bubble-mode-btn" id="satellite-speed-3" onclick="setVehicleSatelliteSpeed(3)">Rapid (3x)</button>
+          <button type="button" class="bubble-mode-btn" id="satellite-speed-4" onclick="setVehicleSatelliteSpeed(4)">Warp (4x)</button>
+        </div>
+
+        <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.72rem; color: #94a3b8;">Reverses direction when data bubbles deflect!</span>
+          <button type="button" class="bubble-apply-all-btn" onclick="reverseVehicleSatelliteSpin()" style="white-space:nowrap; padding: 4px 8px;">🔄 Reverse Spin</button>
+        </div>
+      </div>
         <button class="modal-close-btn" style="flex: 1;" onclick="closeKineticBubbleModal()">Done</button>
       </div>
     </div>

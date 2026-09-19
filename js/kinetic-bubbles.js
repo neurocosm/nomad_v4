@@ -147,90 +147,144 @@
   };
 
   /**
-   * Generates mathematical SVG vector markup with notched typography for each geometric shape
+   * Generates mathematical SVG vector markup with notched typography for each geometric shape.
+   * Dynamically negotiates word length with an SVG knockout mask and matching aesthetic
+   * pill badge frame so the shape stroke NEVER penetrates the label words on any geometry.
    */
-  window.getBubbleShapeSVGMarkup = function(shape, hex, fill, channelLabel = 'SPEED', unitLabel = null) {
+  window.getBubbleShapeSVGMarkup = function(shape, hex, fill, channelLabel = 'SPEED', unitLabel = null, bubbleKey = 'speed', isLight = false) {
     const strokeW = 2.4;
     const strokeJoin = 'round';
     const strokeCap = 'round';
     if (!unitLabel) {
       unitLabel = (typeof window.isMph !== 'undefined' && !window.isMph) ? 'KM/H' : 'MPH';
     }
-    const labelFontSize = (shape === 'octagon') ? '8.4' : '8.8';
+
+    const bottomText = channelLabel || '';
+    const topText = unitLabel || '';
+    const bottomLen = bottomText.length;
+    const topLen = topText.length;
+
+    // Responsive typography sizing for concise cockpit acronyms
+    let bottomFontSize = '8.4';
+    let bottomLetterSpacing = '1.1';
+    if (bottomLen >= 6) {
+      bottomFontSize = '7.4';
+      bottomLetterSpacing = '0.8';
+    } else if (bottomLen <= 3) {
+      bottomFontSize = '8.8';
+      bottomLetterSpacing = '1.4';
+    }
+
+    const topFontSize = (topLen <= 2) ? '8.8' : (topLen <= 4 ? '8.0' : '7.2');
+    const topLetterSpacing = (topLen <= 2) ? '1.4' : '0.9';
+
+    // Calculate dynamic gap dimensions so stroke ends cleanly before and resumes cleanly after text
+    const bottomPillW = Math.max(22, bottomLen * 7.4 + 9);
+    const bottomPillH = 12.5;
+    const topPillW = Math.max(18, topLen * 7.4 + 9);
+    const topPillH = 12.5;
+
+    const maskId = `${bubbleKey || 'bubble'}-${shape || 'shape'}`;
+
+    // Pure Transparent Gap - The SVG mask cleanly knocks out the shape stroke with zero dark box artifact
+    const renderBadgesAndText = (topY, bottomY) => `
+      <defs>
+        <mask id="nomad-mask-${maskId}">
+          <rect x="-10" y="-10" width="120" height="120" fill="#ffffff" />
+          <rect x="${50 - topPillW / 2}" y="${topY - topPillH / 2}" width="${topPillW}" height="${topPillH}" rx="4" fill="#000000" />
+          <rect x="${50 - bottomPillW / 2}" y="${bottomY - bottomPillH / 2}" width="${bottomPillW}" height="${bottomPillH}" rx="4" fill="#000000" />
+        </mask>
+      </defs>
+
+      <!-- Top Notch Floating Typography -->
+      <text x="50" y="${topY}" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${topFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="${topLetterSpacing}" style="text-shadow: 0 1px 3px rgba(0,0,0,0.85);">${topText}</text>
+
+      <!-- Bottom Notch Floating Typography -->
+      <text x="50" y="${bottomY}" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${bottomFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="${bottomLetterSpacing}" style="text-shadow: 0 1px 3px rgba(0,0,0,0.85);">${bottomText}</text>
+    `;
 
     switch (shape) {
-      case 'triangle':
+      case 'triangle': {
+        const topY = 12;
+        const bottomY = 72;
         return `
           <polygon points="50,6 88.1,72 11.9,72" fill="${fill}" stroke="none"/>
-          <path d="M 56.6,17.5 L 88.1,72 L 68,72" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-          <path d="M 32,72 L 11.9,72 L 43.4,17.5" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-          <text x="50" y="10.5" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${unitLabel}</text>
-          <text x="50" y="72" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${channelLabel}</text>
+          <polygon points="50,6 88.1,72 11.9,72" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}" mask="url(#nomad-mask-${maskId})"/>
+          ${renderBadgesAndText(topY, bottomY)}
         `;
+      }
 
-      case 'square':
+      case 'square': {
+        const topY = 11;
+        const bottomY = 89;
         return `
           <rect x="11" y="11" width="78" height="78" rx="12" fill="${fill}" stroke="none"/>
-          <path d="M 69,11 L 77,11 A 12 12 0 0 1 89,23 L 89,77 A 12 12 0 0 1 77,89 L 69,89" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-          <path d="M 31,89 L 23,89 A 12 12 0 0 1 11,77 L 11,23 A 12 12 0 0 1 23,11 L 31,11" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-          <text x="50" y="11" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${unitLabel}</text>
-          <text x="50" y="89" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${channelLabel}</text>
+          <rect x="11" y="11" width="78" height="78" rx="12" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}" mask="url(#nomad-mask-${maskId})"/>
+          ${renderBadgesAndText(topY, bottomY)}
         `;
+      }
 
-      case 'squirkle':
+      case 'squirkle': {
+        const topY = 9;
+        const bottomY = 91;
         return `
           <rect x="9" y="9" width="82" height="82" rx="20" fill="${fill}" stroke="none"/>
-          <path d="M 68,9 L 71,9 A 20 20 0 0 1 91,29 L 91,71 A 20 20 0 0 1 71,91 L 68,91" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-          <path d="M 32,91 L 29,91 A 20 20 0 0 1 9,71 L 9,29 A 20 20 0 0 1 29,9 L 32,9" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-          <text x="50" y="9" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${unitLabel}</text>
-          <text x="50" y="91" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${channelLabel}</text>
+          <rect x="9" y="9" width="82" height="82" rx="20" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}" mask="url(#nomad-mask-${maskId})"/>
+          ${renderBadgesAndText(topY, bottomY)}
         `;
+      }
 
-      case 'hexagon':
+      case 'hexagon': {
+        const topY = 11.9;
+        const bottomY = 88.1;
         return `
           <polygon points="28,11.9 72,11.9 94,50 72,88.1 28,88.1 6,50" fill="${fill}" stroke="none"/>
-          <path d="M 68,11.9 L 72,11.9 L 94,50 L 72,88.1 L 68,88.1" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-          <path d="M 32,88.1 L 28,88.1 L 6,50 L 28,11.9 L 32,11.9" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-          <text x="50" y="11.9" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${unitLabel}</text>
-          <text x="50" y="88.1" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${channelLabel}</text>
+          <polygon points="28,11.9 72,11.9 94,50 72,88.1 28,88.1 6,50" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}" mask="url(#nomad-mask-${maskId})"/>
+          ${renderBadgesAndText(topY, bottomY)}
         `;
+      }
 
-      case 'octagon':
+      case 'octagon': {
+        const topY = 9.4;
+        const bottomY = 90.6;
         return `
           <polygon points="33.2,9.4 66.8,9.4 90.6,33.2 90.6,66.8 66.8,90.6 33.2,90.6 9.4,66.8 9.4,33.2" fill="${fill}" stroke="none"/>
-          <path d="M 66.8,9.4 L 90.6,33.2 L 90.6,66.8 L 66.8,90.6" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-          <path d="M 33.2,90.6 L 9.4,66.8 L 9.4,33.2 L 33.2,9.4" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-          <text x="50" y="9.4" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.1">${unitLabel}</text>
-          <text x="50" y="90.6" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.1">${channelLabel}</text>
+          <polygon points="33.2,9.4 66.8,9.4 90.6,33.2 90.6,66.8 66.8,90.6 33.2,90.6 9.4,66.8 9.4,33.2" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}" mask="url(#nomad-mask-${maskId})"/>
+          ${renderBadgesAndText(topY, bottomY)}
         `;
+      }
 
-      case 'pentagon':
+      case 'pentagon': {
+        const topY = 9.5;
+        const bottomY = 85.6;
         return `
           <polygon points="50,6 91.8,36.4 75.9,85.6 24.1,85.6 8.2,36.4" fill="${fill}" stroke="none"/>
-          <path d="M 63.7,16 L 91.8,36.4 L 75.9,85.6 L 68,85.6" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-          <path d="M 32,85.6 L 24.1,85.6 L 8.2,36.4 L 36.3,16" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-          <text x="50" y="10" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${unitLabel}</text>
-          <text x="50" y="85.6" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${channelLabel}</text>
+          <polygon points="50,6 91.8,36.4 75.9,85.6 24.1,85.6 8.2,36.4" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}" mask="url(#nomad-mask-${maskId})"/>
+          ${renderBadgesAndText(topY, bottomY)}
         `;
+      }
 
-      case 'egg':
+      case 'egg': {
+        const topY = 8;
+        const bottomY = 88;
+        const eggPath = 'M 50,7 C 74,7 94,14 94,34 C 94,62 84,84 70,88 L 30,88 C 16,84 6,62 6,34 C 6,14 26,7 50,7 Z';
         return `
-          <path d="M 50,7 C 74,7 94,14 94,34 C 94,62 84,84 70,88 L 30,88 C 16,84 6,62 6,34 C 6,14 26,7 50,7 Z" fill="${fill}" stroke="none"/>
-          <path d="M 68,8 C 76,8 94,14 94,34 C 94,62 84,84 70,88" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-          <path d="M 30,88 C 16,84 6,62 6,34 C 6,14 24,8 32,8" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-          <text x="50" y="8" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${unitLabel}</text>
-          <text x="50" y="88" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${channelLabel}</text>
+          <path d="${eggPath}" fill="${fill}" stroke="none"/>
+          <path d="${eggPath}" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}" mask="url(#nomad-mask-${maskId})"/>
+          ${renderBadgesAndText(topY, bottomY)}
         `;
+      }
 
       case 'circle':
-      default:
+      default: {
+        const topY = 10.8;
+        const bottomY = 89.2;
         return `
           <circle cx="50" cy="50" r="44" fill="${fill}" stroke="none"/>
-          <path d="M 70,10.8 A 44 44 0 0 1 70,89.2" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-          <path d="M 30,89.2 A 44 44 0 0 1 30,10.8" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}"/>
-          <text x="50" y="10.8" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${unitLabel}</text>
-          <text x="50" y="89.2" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${labelFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="1.2">${channelLabel}</text>
+          <circle cx="50" cy="50" r="44" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}" mask="url(#nomad-mask-${maskId})"/>
+          ${renderBadgesAndText(topY, bottomY)}
         `;
+      }
     }
   };
 
@@ -338,7 +392,7 @@
     let unitLabel = (window.isMph === false) ? 'KM/H' : 'MPH';
 
     if (bubbleKey === 'compass') {
-      channelLabel = 'COMPASS';
+      channelLabel = 'CMPS';
       const h = (typeof window.currentHeading === 'number' && !isNaN(window.currentHeading) && window.currentHeading !== 0)
         ? window.currentHeading
         : (window.map && typeof window.map.getBearing === 'function' ? ((window.map.getBearing() % 360 + 360) % 360) : 0);
@@ -347,7 +401,7 @@
         : (a => ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.round((a || 0) / 45) % 8]);
       unitLabel = getCard(h);
     } else if (bubbleKey === 'altitude') {
-      channelLabel = 'ALTITUDE';
+      channelLabel = 'ALT';
       unitLabel = (window.altitudeUnit === 'm') ? 'M' : 'FT';
     } else if (bubbleKey === 'temp') {
       channelLabel = 'TEMP';
@@ -366,12 +420,12 @@
         unitLabel = 'AIR';
       }
     } else if (bubbleKey === 'coords') {
-      channelLabel = 'COORDS';
+      channelLabel = 'LALO';
       unitLabel = 'GPS';
     }
 
     if (shapeFrame) {
-      shapeFrame.innerHTML = `<svg viewBox="0 0 100 100" class="kinetic-shape-svg" style="width:100%;height:100%;overflow:visible;display:block;filter:none;">${window.getBubbleShapeSVGMarkup(b.shape, hex, fill, channelLabel, unitLabel)}</svg>`;
+      shapeFrame.innerHTML = `<svg viewBox="0 0 100 100" class="kinetic-shape-svg" style="width:100%;height:100%;overflow:visible;display:block;filter:none;">${window.getBubbleShapeSVGMarkup(b.shape, hex, fill, channelLabel, unitLabel, bubbleKey, isLight)}</svg>`;
       shapeFrame.style.border = 'none';
       shapeFrame.style.background = 'transparent';
       shapeFrame.style.outline = 'none';
@@ -441,6 +495,11 @@
 
       // Inter-bubble elastic collision resolution (Pinball mode vs Ghost mode)
       resolveBubbleCollisions();
+
+      // Orbiting Satellite Moon / Scanner Dot continuous physics
+      if (typeof window.updateSatelliteMoonOrbit === 'function') {
+        window.updateSatelliteMoonOrbit();
+      }
 
       // Flush coordinates to DOM
       window.BUBBLE_KEYS.forEach(k => {
@@ -638,6 +697,11 @@
           const curSpeed = Math.sqrt(b.vx * b.vx + b.vy * b.vy) || 1;
           b.vx = (b.vx / curSpeed) * 1.4;
           b.vy = (b.vy / curSpeed) * 1.4;
+
+          // Trigger orbit spin reversal and pulse on satellite moon
+          if (typeof window.triggerSafeZoneDeflectionFlip === 'function') {
+            window.triggerSafeZoneDeflectionFlip(b.key);
+          }
         }
       }
     }
@@ -936,7 +1000,7 @@
    * Modal Tab Navigation
    */
   window.switchBubbleTab = function(tabId) {
-    if (!window.BUBBLE_KEYS.includes(tabId)) return;
+    if (tabId !== 'vehicle' && !window.BUBBLE_KEYS.includes(tabId)) return;
     window.currentSelectedBubbleTab = tabId;
 
     // 1. Update tab buttons active states and status indicators
@@ -946,6 +1010,30 @@
       const statusDot = document.getElementById(`bubble-tab-status-${k}`);
       if (statusDot) statusDot.classList.toggle('is-active', window.nomadBubbles[k].active !== false);
     });
+
+    const vehicleTabBtn = document.getElementById('bubble-tab-vehicle');
+    if (vehicleTabBtn) vehicleTabBtn.classList.toggle('is-active', tabId === 'vehicle');
+    const vehicleStatusDot = document.getElementById('bubble-tab-status-vehicle');
+    if (vehicleStatusDot) vehicleStatusDot.classList.toggle('is-active', window.nomadVehicleConfig && window.nomadVehicleConfig.satelliteActive !== false);
+
+    const bubbleControls = document.getElementById('bubble-specific-controls');
+    const vehicleSection = document.getElementById('vehicle-options-section');
+
+    if (tabId === 'vehicle') {
+      const titleEl = document.getElementById('bubble-modal-title');
+      if (titleEl) titleEl.innerText = 'Vehicle & Safe-Zone Config';
+
+      if (bubbleControls) bubbleControls.style.display = 'none';
+      if (vehicleSection) vehicleSection.style.display = 'block';
+
+      if (typeof window.syncVehicleModalUI === 'function') {
+        window.syncVehicleModalUI();
+      }
+      return;
+    }
+
+    if (bubbleControls) bubbleControls.style.display = 'block';
+    if (vehicleSection) vehicleSection.style.display = 'none';
 
     // 2. Update modal title
     const meta = window.BUBBLE_METADATA[tabId];

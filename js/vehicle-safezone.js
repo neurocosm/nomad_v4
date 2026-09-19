@@ -272,25 +272,318 @@
   };
 
   /**
+   * =========================================================================
+   * VEHICLE & SAFE-ZONE SATELLITE MOON CONFIGURATION (NOMAD V4 HYPERSPACE)
+   * =========================================================================
+   */
+  const DEFAULT_VEHICLE_CONFIG = {
+    safeZoneRadius: 68,        // 68px radius (136px diameter)
+    satelliteActive: true,     // Orbiting Scanner Dot Active
+    satelliteColor: '#00d4ff', // Default Holo Cyan
+    satelliteSize: 8,          // 8px standard
+    satelliteSpeedLevel: 2,    // 1: Gentle, 2: Cruising, 3: Rapid, 4: Warp
+    orbitAngle: 0,
+    orbitDirection: 1,         // 1 (CW) or -1 (CCW)
+    lastDeflectionTime: 0
+  };
+
+  function loadVehicleConfig() {
+    try {
+      const saved = localStorage.getItem('nomad_vehicle_safezone_config');
+      if (saved) {
+        return Object.assign({}, DEFAULT_VEHICLE_CONFIG, JSON.parse(saved));
+      }
+    } catch (e) {
+      console.warn('Failed to load vehicle config from localStorage', e);
+    }
+    return Object.assign({}, DEFAULT_VEHICLE_CONFIG);
+  }
+
+  window.nomadVehicleConfig = loadVehicleConfig();
+
+  window.saveVehicleConfig = function() {
+    try {
+      localStorage.setItem('nomad_vehicle_safezone_config', JSON.stringify({
+        safeZoneRadius: window.nomadVehicleConfig.safeZoneRadius,
+        satelliteActive: window.nomadVehicleConfig.satelliteActive,
+        satelliteColor: window.nomadVehicleConfig.satelliteColor,
+        satelliteSize: window.nomadVehicleConfig.satelliteSize,
+        satelliteSpeedLevel: window.nomadVehicleConfig.satelliteSpeedLevel
+      }));
+    } catch (e) {
+      console.warn('Failed to save vehicle config', e);
+    }
+  };
+
+  /**
+   * Applies vehicle safe zone and satellite moon properties directly to DOM
+   */
+  window.applyVehicleSafeZoneConfig = function() {
+    const cfg = window.nomadVehicleConfig;
+    if (!cfg) return;
+
+    const safeZone = document.getElementById('vehicle-safe-zone');
+    if (safeZone) {
+      const r = cfg.safeZoneRadius || 68;
+      safeZone.style.width = (r * 2) + 'px';
+      safeZone.style.height = (r * 2) + 'px';
+      safeZone.style.marginLeft = (-r) + 'px';
+      safeZone.style.marginTop = (-r) + 'px';
+    }
+
+    const arm = document.getElementById('safe-zone-satellite-arm');
+    if (arm) {
+      arm.style.display = cfg.satelliteActive ? 'block' : 'none';
+    }
+
+    const moon = document.getElementById('safe-zone-satellite-moon');
+    if (moon) {
+      const size = cfg.satelliteSize || 8;
+      const half = size / 2;
+      const col = cfg.satelliteColor || '#00d4ff';
+      moon.style.width = size + 'px';
+      moon.style.height = size + 'px';
+      moon.style.top = '-' + half + 'px';
+      moon.style.left = 'calc(50% - ' + half + 'px)';
+      moon.style.background = col;
+      moon.style.boxShadow = `0 0 10px ${col}, 0 0 4px #ffffff, 0 0 16px ${col}b3`;
+    }
+  };
+
+  /**
+   * Continuous orbital update for satellite moon / scanner dot
+   * Synchronizes orbit rate with live GPS vehicle speed and selected velocity level
+   */
+  window.updateSatelliteMoonOrbit = function() {
+    const cfg = window.nomadVehicleConfig;
+    if (!cfg || !cfg.satelliteActive) return;
+
+    const arm = document.getElementById('safe-zone-satellite-arm');
+    if (!arm) return;
+
+    // Get live vehicle speed in MPH
+    const currentMph = (typeof window.currentSpeedMph === 'number' && !isNaN(window.currentSpeedMph))
+      ? Math.max(0, window.currentSpeedMph)
+      : 0;
+
+    // Base orbit step per frame: level 1: 0.6°, 2: 1.2°, 3: 2.0°, 4: 3.2°
+    const baseRates = [0, 0.6, 1.2, 2.0, 3.2];
+    const baseRate = baseRates[cfg.satelliteSpeedLevel || 2] || 1.2;
+
+    // GPS speed bonus: scales smoothly up to +3.0°/frame at highway speed
+    const speedBonus = (currentMph / 30) * (cfg.satelliteSpeedLevel || 2) * 0.45;
+    const step = baseRate + speedBonus;
+
+    cfg.orbitAngle = ((cfg.orbitAngle || 0) + (cfg.orbitDirection || 1) * step) % 360;
+    arm.style.transform = `rotate(${cfg.orbitAngle}deg)`;
+  };
+
+  /**
+   * Reverses orbit direction when a kinetic bubble deflects off the safe-zone forcefield
+   */
+  window.triggerSafeZoneDeflectionFlip = function(bubbleKey) {
+    const cfg = window.nomadVehicleConfig;
+    if (!cfg || !cfg.satelliteActive) return;
+
+    const now = Date.now();
+    if (now - (cfg.lastDeflectionTime || 0) < 350) return;
+    cfg.lastDeflectionTime = now;
+
+    // Reverse orbital direction
+    cfg.orbitDirection = (cfg.orbitDirection || 1) * -1;
+
+    // Momentary kinetic pop pulse on the satellite moon
+    const moon = document.getElementById('safe-zone-satellite-moon');
+    if (moon) {
+      moon.style.transform = 'scale(2.0)';
+      moon.style.filter = 'brightness(1.6)';
+      setTimeout(() => {
+        if (moon) {
+          moon.style.transform = 'scale(1)';
+          moon.style.filter = 'none';
+        }
+      }, 160);
+    }
+  };
+
+  /**
+   * Switches active vehicle marker (Cruise Chevron vs Galaga Fighter)
+   */
+  window.setVehicleMarkerMode = function(mode) {
+    if (mode === 'galaga' && !window.isGalagaMode) {
+      window.toggleGalagaMode();
+    } else if (mode === 'cruise' && window.isGalagaMode) {
+      window.toggleGalagaMode();
+    }
+    window.syncVehicleModalUI();
+  };
+
+  /**
+   * Sets Safe-Zone protective boundary radius (in px)
+   */
+  window.setVehicleSafeZoneRadius = function(radius) {
+    radius = Math.max(45, Math.min(120, parseInt(radius, 10) || 68));
+    window.nomadVehicleConfig.safeZoneRadius = radius;
+    window.applyVehicleSafeZoneConfig();
+    window.saveVehicleConfig();
+    window.syncVehicleModalUI();
+  };
+
+  window.onVehicleSafeZoneSliderChange = function(val) {
+    window.setVehicleSafeZoneRadius(val);
+  };
+
+  /**
+   * Sets Satellite Moon Active / Inactive
+   */
+  window.setVehicleSatelliteActive = function(active) {
+    window.nomadVehicleConfig.satelliteActive = !!active;
+    window.applyVehicleSafeZoneConfig();
+    window.saveVehicleConfig();
+    window.syncVehicleModalUI();
+  };
+
+  /**
+   * Sets Satellite Moon Color
+   */
+  window.setVehicleSatelliteColor = function(hex) {
+    window.nomadVehicleConfig.satelliteColor = hex;
+    window.applyVehicleSafeZoneConfig();
+    window.saveVehicleConfig();
+    window.syncVehicleModalUI();
+  };
+
+  /**
+   * Sets Satellite Moon Size (in px)
+   */
+  window.setVehicleSatelliteSize = function(size) {
+    size = parseInt(size, 10) || 8;
+    window.nomadVehicleConfig.satelliteSize = size;
+    window.applyVehicleSafeZoneConfig();
+    window.saveVehicleConfig();
+    window.syncVehicleModalUI();
+  };
+
+  /**
+   * Sets Satellite Orbit Velocity Level (1-4)
+   */
+  window.setVehicleSatelliteSpeed = function(level) {
+    level = parseInt(level, 10) || 2;
+    window.nomadVehicleConfig.satelliteSpeedLevel = level;
+    window.saveVehicleConfig();
+    window.syncVehicleModalUI();
+  };
+
+  /**
+   * Manually reverses orbit direction
+   */
+  window.reverseVehicleSatelliteSpin = function() {
+    window.triggerSafeZoneDeflectionFlip('manual');
+  };
+
+  /**
+   * Synchronizes the Vehicle & Safe-Zone section UI in the modal
+   */
+  window.syncVehicleModalUI = function() {
+    const cfg = window.nomadVehicleConfig;
+    if (!cfg) return;
+
+    // 1. Vehicle Marker Mode buttons
+    const btnChevron = document.getElementById('vehicle-btn-chevron');
+    const btnGalaga = document.getElementById('vehicle-btn-galaga');
+    if (btnChevron && btnGalaga) {
+      btnChevron.classList.toggle('is-selected', !window.isGalagaMode);
+      btnGalaga.classList.toggle('is-selected', !!window.isGalagaMode);
+    }
+
+    // 2. Safe-Zone Radius & Slider
+    const r = cfg.safeZoneRadius || 68;
+    const diameter = r * 2;
+    const badge = document.getElementById('vehicle-safezone-val-badge');
+    if (badge) {
+      let desc = 'Standard';
+      if (diameter <= 115) desc = 'Tight';
+      else if (diameter >= 210) desc = 'Expansive';
+      else if (diameter >= 170) desc = 'Wide';
+      badge.innerText = `${diameter}px (${desc})`;
+    }
+
+    const slider = document.getElementById('vehicle-safezone-slider');
+    if (slider) slider.value = r;
+
+    [55, 68, 90, 110].forEach(val => {
+      const presetBtn = document.getElementById(`safezone-preset-${val}`);
+      if (presetBtn) {
+        presetBtn.classList.toggle('is-selected', Math.abs(r - val) < 3);
+      }
+    });
+
+    // 3. Satellite Active Toggle
+    const btnActive = document.getElementById('satellite-status-active');
+    const btnInactive = document.getElementById('satellite-status-inactive');
+    if (btnActive && btnInactive) {
+      btnActive.classList.toggle('is-selected', !!cfg.satelliteActive);
+      btnInactive.classList.toggle('is-selected', !cfg.satelliteActive);
+    }
+
+    // 4. Tab status dot
+    const statusDot = document.getElementById('bubble-tab-status-vehicle');
+    if (statusDot) {
+      statusDot.classList.toggle('is-active', !!cfg.satelliteActive);
+    }
+
+    // 5. Satellite Color Swatches (Exact same swatch style as data bubbles)
+    const swatches = document.querySelectorAll('#vehicle-satellite-swatches .bubble-color-swatch');
+    swatches.forEach(s => {
+      const col = s.getAttribute('data-color');
+      s.classList.toggle('is-selected', col && col.toLowerCase() === (cfg.satelliteColor || '').toLowerCase());
+    });
+
+    // 6. Satellite Size Buttons
+    [6, 8, 12].forEach(sz => {
+      const btn = document.getElementById(`satellite-size-${sz}`);
+      if (btn) {
+        btn.classList.toggle('is-selected', (cfg.satelliteSize || 8) === sz);
+      }
+    });
+
+    // 7. Satellite Speed Buttons
+    [1, 2, 3, 4].forEach(lvl => {
+      const btn = document.getElementById(`satellite-speed-${lvl}`);
+      if (btn) {
+        btn.classList.toggle('is-selected', (cfg.satelliteSpeedLevel || 2) === lvl);
+      }
+    });
+  };
+
+  /**
    * Exposes Safe Zone protective boundary coordinates and radius for Hyperspace kinetic collision
    */
   window.getNomadVehicleSafeZone = function() {
     const el = document.getElementById('vehicle-safe-zone');
+    const r = (window.nomadVehicleConfig && window.nomadVehicleConfig.safeZoneRadius) || 68;
     if (!el) {
       const isNorth = (window.cameraPerspectiveMode === 'north-up');
       return {
         x: window.innerWidth / 2,
         y: isNorth ? (window.innerHeight / 2) : (window.innerHeight * 0.62),
-        radius: 68
+        radius: r
       };
     }
     const rect = el.getBoundingClientRect();
     return {
       x: rect.left + rect.width / 2,
       y: rect.top + rect.height / 2,
-      radius: (rect.width / 2) || 68,
+      radius: r,
       element: el
     };
   };
+
+  // Initialize on load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', window.applyVehicleSafeZoneConfig);
+  } else {
+    window.applyVehicleSafeZoneConfig();
+  }
 
 })();
