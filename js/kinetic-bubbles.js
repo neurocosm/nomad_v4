@@ -65,7 +65,7 @@
       displayFormat: 'ticker', tickerSpeed: 2.5, currentTickerIndex: 0
     },
     coords: {
-      key: 'coords', active: true, shape: 'square', color: '#ffffff', opacity: 18, size: 95,
+      key: 'coords', active: true, shape: 'rectangle', color: '#ffffff', opacity: 18, size: 90,
       mode: 'kinetic', wallBehavior: 'bounce', safeZoneBehavior: 'bounce',
       spinMode: 'keel', spinRate: 2, currentRotation: 0, angularVelocity: 0, keelTime: 5.5,
       speedLevel: 3, x: 230, y: 490, vx: -0.65, vy: -0.90, isDragging: false, isHovered: false
@@ -110,6 +110,11 @@
         if (window.nomadBubbles.compass) {
           if (!window.nomadBubbles.compass.headingSource) window.nomadBubbles.compass.headingSource = 'magnetometer';
           if (!window.nomadBubbles.compass.needleMode) window.nomadBubbles.compass.needleMode = 'north';
+        }
+        if (window.nomadBubbles.coords) {
+          if (!window.nomadBubbles.coords.shape || window.nomadBubbles.coords.shape === 'square') {
+            window.nomadBubbles.coords.shape = 'rectangle';
+          }
         }
       } else {
         // Fallback for legacy single-bubble storage
@@ -211,23 +216,35 @@
     const maskId = `${bubbleKey || 'bubble'}-${shape || 'shape'}`;
 
     // Pure Transparent Gap - The SVG mask cleanly knocks out the shape stroke with zero dark box artifact
-    const renderBadgesAndText = (topY, bottomY) => `
+    const renderBadgesAndText = (topY, bottomY, cx = 50, maskW = 120, maskH = 120) => `
       <defs>
         <mask id="nomad-mask-${maskId}">
-          <rect x="-10" y="-10" width="120" height="120" fill="#ffffff" />
-          ${hasTopText ? `<rect x="${50 - topPillW / 2}" y="${topY - topPillH / 2}" width="${topPillW}" height="${topPillH}" rx="4" fill="#000000" />` : ''}
-          ${hasBottomText ? `<rect x="${50 - bottomPillW / 2}" y="${bottomY - bottomPillH / 2}" width="${bottomPillW}" height="${bottomPillH}" rx="4" fill="#000000" />` : ''}
+          <rect x="-10" y="-10" width="${maskW}" height="${maskH}" fill="#ffffff" />
+          ${hasTopText ? `<rect x="${cx - topPillW / 2}" y="${topY - topPillH / 2}" width="${topPillW}" height="${topPillH}" rx="4" fill="#000000" />` : ''}
+          ${hasBottomText ? `<rect x="${cx - bottomPillW / 2}" y="${bottomY - bottomPillH / 2}" width="${bottomPillW}" height="${bottomPillH}" rx="4" fill="#000000" />` : ''}
         </mask>
       </defs>
 
       <!-- Top Notch Floating Typography -->
-      ${hasTopText ? `<text x="50" y="${topY}" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${topFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="${topLetterSpacing}" style="text-shadow: none;">${topText}</text>` : ''}
+      ${hasTopText ? `<text x="${cx}" y="${topY}" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${topFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="${topLetterSpacing}" style="text-shadow: none;">${topText}</text>` : ''}
 
       <!-- Bottom Notch Floating Typography -->
-      ${hasBottomText ? `<text x="50" y="${bottomY}" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${bottomFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="${bottomLetterSpacing}" style="text-shadow: none;">${bottomText}</text>` : ''}
+      ${hasBottomText ? `<text x="${cx}" y="${bottomY}" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${bottomFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="${bottomLetterSpacing}" style="text-shadow: none;">${bottomText}</text>` : ''}
     `;
 
     switch (shape) {
+      case 'rectangle': {
+        const topY = 7;
+        const bottomY = 61;
+        const cx = 62;
+        return `
+          <rect x="6" y="6" width="112" height="56" rx="14" fill="${fill}" stroke="none"/>
+          <rect x="6" y="6" width="112" height="56" rx="14" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}" mask="url(#nomad-mask-${maskId})"/>
+          <!-- Subtle Center Pivot Fulcrum Point Indicator -->
+          <circle cx="62" cy="34" r="1.5" fill="${hex}" opacity="0.35"/>
+          ${renderBadgesAndText(topY, bottomY, cx, 144, 90)}
+        `;
+      }
       case 'triangle': {
         const topY = 12;
         const bottomY = 72;
@@ -335,6 +352,7 @@
       case 'egg': shapeFactor = 0.72; break;
       case 'squirkle': shapeFactor = 0.75; break;
       case 'square': shapeFactor = 0.76; break;
+      case 'rectangle': shapeFactor = 0.96; break;
       case 'circle':
       default: shapeFactor = 0.74; break;
     }
@@ -380,8 +398,11 @@
 
     // 1. Dimensions
     const size = b.size || 90;
-    el.style.width = `${size}px`;
-    el.style.height = `${size}px`;
+    const isRect = (b.shape === 'rectangle');
+    const bw = isRect ? Math.round(size * 1.38) : size;
+    const bh = isRect ? Math.round(size * 0.76) : size;
+    el.style.width = `${bw}px`;
+    el.style.height = `${bh}px`;
 
     // Outer container is 100% transparent with zero rectangular bounding box artifacts
     el.style.background = 'transparent';
