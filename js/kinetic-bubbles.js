@@ -25,7 +25,7 @@
     altitude: { key: 'altitude', title: 'Altitude', unitDefault: 'FT', channel: 'ALTITUDE' },
     temp: { key: 'temp', title: 'Temperature', unitDefault: '°F', channel: 'TEMP' },
     atmo: { key: 'atmo', title: 'Atmosphere', unitDefault: 'TRIAD', channel: 'ATMO' },
-    coords: { key: 'coords', title: 'Coordinates', unitDefault: 'LAT/LON', channel: 'COORDS' }
+    coords: { key: 'coords', title: 'Lat/Lon Coordinates', unitDefault: 'GPS', channel: 'LAT/LON' }
   };
 
   // 6-Bubble State Objects
@@ -112,8 +112,10 @@
           if (!window.nomadBubbles.compass.needleMode) window.nomadBubbles.compass.needleMode = 'north';
         }
         if (window.nomadBubbles.coords) {
-          if (!window.nomadBubbles.coords.shape || window.nomadBubbles.coords.shape === 'square') {
+          if (!window.nomadBubbles.coords.shape || window.nomadBubbles.coords.shape === 'square' || !window.nomadBubbles.coords.shapeMigratedToRect) {
             window.nomadBubbles.coords.shape = 'rectangle';
+            window.nomadBubbles.coords.shapeMigratedToRect = true;
+            window.saveBubbleConfig();
           }
         }
       } else {
@@ -238,8 +240,8 @@
         const bottomY = 61;
         const cx = 62;
         return `
-          <rect x="6" y="6" width="112" height="56" rx="14" fill="${fill}" stroke="none"/>
-          <rect x="6" y="6" width="112" height="56" rx="14" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}" mask="url(#nomad-mask-${maskId})"/>
+          <rect x="6" y="6" width="112" height="56" rx="8" ry="8" fill="${fill}" stroke="none"/>
+          <rect x="6" y="6" width="112" height="56" rx="8" ry="8" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}" mask="url(#nomad-mask-${maskId})"/>
           <!-- Subtle Center Pivot Fulcrum Point Indicator -->
           <circle cx="62" cy="34" r="1.5" fill="${hex}" opacity="0.35"/>
           ${renderBadgesAndText(topY, bottomY, cx, 144, 90)}
@@ -259,8 +261,8 @@
         const topY = 11;
         const bottomY = 89;
         return `
-          <rect x="11" y="11" width="78" height="78" rx="12" fill="${fill}" stroke="none"/>
-          <rect x="11" y="11" width="78" height="78" rx="12" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="${strokeJoin}" stroke-linecap="${strokeCap}" mask="url(#nomad-mask-${maskId})"/>
+          <rect x="11" y="11" width="78" height="78" rx="0" ry="0" fill="${fill}" stroke="none"/>
+          <rect x="11" y="11" width="78" height="78" rx="0" ry="0" fill="none" stroke="${hex}" stroke-width="${strokeW}" stroke-linejoin="miter" stroke-linecap="square" mask="url(#nomad-mask-${maskId})"/>
           ${renderBadgesAndText(topY, bottomY)}
         `;
       }
@@ -462,12 +464,14 @@
       channelLabel = 'ATMO';
       unitLabel = ''; // For the ATMOS bubble, the data metric is already clearly labelled under the numeric reading, so top notch is omitted.
     } else if (bubbleKey === 'coords') {
-      channelLabel = 'LALO';
+      channelLabel = 'LAT/LON';
       unitLabel = 'GPS';
     }
 
     if (shapeFrame) {
-      shapeFrame.innerHTML = `<svg viewBox="0 0 100 100" class="kinetic-shape-svg" style="width:100%;height:100%;overflow:visible;display:block;filter:none;">${window.getBubbleShapeSVGMarkup(b.shape, hex, fill, channelLabel, unitLabel, bubbleKey, isLight)}</svg>`;
+      const isRect = (b.shape === 'rectangle');
+      const vb = isRect ? '0 0 124 68' : '0 0 100 100';
+      shapeFrame.innerHTML = `<svg viewBox="${vb}" class="kinetic-shape-svg" style="width:100%;height:100%;overflow:visible;display:block;filter:none;">${window.getBubbleShapeSVGMarkup(b.shape, hex, fill, channelLabel, unitLabel, bubbleKey, isLight)}</svg>`;
       shapeFrame.style.border = 'none';
       shapeFrame.style.background = 'transparent';
       shapeFrame.style.outline = 'none';
@@ -596,16 +600,18 @@
     if (b.spinMode === 'keel') {
       b.keelTime = (b.keelTime || 0) + (0.048 * rateMultiplier);
 
-      const motionTilt = Math.max(-10.0, Math.min(10.0, -b.vx * 3.6 * rateMultiplier));
-      const cruisingSway = (Math.sin(b.keelTime) * 4.2 + Math.cos(b.keelTime * 0.65) * 1.8) * rateMultiplier;
+      const isRectangle = (b.shape === 'rectangle');
+      const swayAmplitude = isRectangle ? 6.5 : 4.2;
+      const motionTilt = Math.max(-10.0, Math.min(10.0, -b.vx * (isRectangle ? 4.2 : 3.6) * rateMultiplier));
+      const cruisingSway = (Math.sin(b.keelTime) * swayAmplitude + Math.cos(b.keelTime * 0.68) * (isRectangle ? 2.4 : 1.8)) * rateMultiplier;
       const targetAngle = motionTilt + cruisingSway;
 
       const currentAngle = b.currentRotation || 0;
       const displacement = currentAngle - targetAngle;
       const absAngle = Math.abs(currentAngle);
 
-      let springK = 0.08 * rateMultiplier;
-      let damping = 0.94;
+      let springK = (isRectangle ? 0.095 : 0.08) * rateMultiplier;
+      let damping = isRectangle ? 0.945 : 0.94;
 
       if (absAngle > 40) {
         const excess = absAngle - 40;
@@ -664,6 +670,9 @@
     if (!el) return;
 
     const size = b.size || 90;
+    const isRect = (b.shape === 'rectangle');
+    const bw = isRect ? Math.round(size * 1.38) : size;
+    const bh = isRect ? Math.round(size * 0.76) : size;
     const vw = window.innerWidth;
     const vh = window.innerHeight;
 
@@ -679,38 +688,42 @@
     if (b.wallBehavior === 'wrap') {
       // Continuous Toroidal Screen Wrap: As soon as the leading edge/half penetrates a wall,
       // it immediately re-emerges on the opposite side with zero dead time.
-      const leadMargin = size * 0.45;
-      const emergeMargin = size * 0.55;
+      const leadMarginX = bw * 0.45;
+      const emergeMarginX = bw * 0.55;
+      const leadMarginY = bh * 0.45;
+      const emergeMarginY = bh * 0.55;
 
-      if (b.vx > 0 && b.x > (vw - leadMargin)) {
-        b.x = -emergeMargin;
-      } else if (b.vx < 0 && b.x < -leadMargin) {
-        b.x = vw - emergeMargin;
+      if (b.vx > 0 && b.x > (vw - leadMarginX)) {
+        b.x = -emergeMarginX;
+      } else if (b.vx < 0 && b.x < -leadMarginX) {
+        b.x = vw - emergeMarginX;
       }
 
-      if (b.vy > 0 && b.y > (vh - leadMargin)) {
-        b.y = -emergeMargin;
-      } else if (b.vy < 0 && b.y < -leadMargin) {
-        b.y = vh - emergeMargin;
+      if (b.vy > 0 && b.y > (vh - leadMarginY)) {
+        b.y = -emergeMarginY;
+      } else if (b.vy < 0 && b.y < -leadMarginY) {
+        b.y = vh - emergeMarginY;
       }
     } else {
       // Full screen edge-to-edge and corner-to-corner bounce (glides underneath top buttons and bottom location bar)
       const topLimit = 0;
-      const bottomLimit = Math.max(0, vh - size);
+      const bottomLimit = Math.max(0, vh - bh);
       const leftLimit = 0;
-      const rightLimit = Math.max(0, vw - size);
+      const rightLimit = Math.max(0, vw - bw);
 
       if (b.x <= leftLimit) {
         b.x = leftLimit;
         b.vx = Math.abs(b.vx);
         if (b.spinMode === 'keel') {
-          b.angularVelocity = Math.min(15, (b.angularVelocity || 0) + 11 * rateMultiplier);
+          const rectBoost = isRect ? 1.4 : 1.0;
+          b.angularVelocity = Math.min(16, (b.angularVelocity || 0) + 11 * rateMultiplier * rectBoost);
         }
       } else if (b.x >= rightLimit) {
         b.x = rightLimit;
         b.vx = -Math.abs(b.vx);
         if (b.spinMode === 'keel') {
-          b.angularVelocity = Math.max(-15, (b.angularVelocity || 0) - 11 * rateMultiplier);
+          const rectBoost = isRect ? 1.4 : 1.0;
+          b.angularVelocity = Math.max(-16, (b.angularVelocity || 0) - 11 * rateMultiplier * rectBoost);
         }
       }
 
@@ -718,14 +731,14 @@
         b.y = topLimit;
         b.vy = Math.abs(b.vy);
         if (b.spinMode === 'keel') {
-          const impulse = Math.max(-8, Math.min(8, b.vx * 4.5)) * rateMultiplier;
+          const impulse = Math.max(-8, Math.min(8, b.vx * 4.5)) * rateMultiplier * (isRect ? 1.3 : 1.0);
           b.angularVelocity += impulse;
         }
       } else if (b.y >= bottomLimit) {
         b.y = bottomLimit;
         b.vy = -Math.abs(b.vy);
         if (b.spinMode === 'keel') {
-          const impulse = Math.max(-8, Math.min(8, -b.vx * 4.5)) * rateMultiplier;
+          const impulse = Math.max(-8, Math.min(8, -b.vx * 4.5)) * rateMultiplier * (isRect ? 1.3 : 1.0);
           b.angularVelocity += impulse;
         }
       }
@@ -735,14 +748,15 @@
     if (b.safeZoneBehavior === 'bounce' && typeof window.getNomadVehicleSafeZone === 'function') {
       const safeZone = window.getNomadVehicleSafeZone();
       if (safeZone) {
-        const bubbleCenterX = b.x + size / 2;
-        const bubbleCenterY = b.y + size / 2;
+        const bubbleCenterX = b.x + bw / 2;
+        const bubbleCenterY = b.y + bh / 2;
 
         const dx = bubbleCenterX - safeZone.x;
         const dy = bubbleCenterY - safeZone.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
-        const minSafeDist = (size / 2) + safeZone.radius;
+        const effRadius = Math.max(bw, bh) / 2;
+        const minSafeDist = effRadius + safeZone.radius;
 
         if (dist < minSafeDist && dist > 0.001) {
           const nx = dx / dist;
@@ -790,17 +804,23 @@
       const b1 = window.nomadBubbles[keys[i]];
       if (!b1 || b1.active === false) continue;
       const size1 = b1.size || 90;
-      const r1 = size1 / 2;
-      const c1x = b1.x + r1;
-      const c1y = b1.y + r1;
+      const isRect1 = (b1.shape === 'rectangle');
+      const bw1 = isRect1 ? Math.round(size1 * 1.38) : size1;
+      const bh1 = isRect1 ? Math.round(size1 * 0.76) : size1;
+      const r1 = Math.max(bw1, bh1) / 2;
+      const c1x = b1.x + bw1 / 2;
+      const c1y = b1.y + bh1 / 2;
 
       for (let j = i + 1; j < len; j++) {
         const b2 = window.nomadBubbles[keys[j]];
         if (!b2 || b2.active === false) continue;
         const size2 = b2.size || 90;
-        const r2 = size2 / 2;
-        const c2x = b2.x + r2;
-        const c2y = b2.y + r2;
+        const isRect2 = (b2.shape === 'rectangle');
+        const bw2 = isRect2 ? Math.round(size2 * 1.38) : size2;
+        const bh2 = isRect2 ? Math.round(size2 * 0.76) : size2;
+        const r2 = Math.max(bw2, bh2) / 2;
+        const c2x = b2.x + bw2 / 2;
+        const c2y = b2.y + bh2 / 2;
 
         const dx = c2x - c1x;
         const dy = c2y - c1y;
@@ -1194,7 +1214,7 @@
     window.setBubbleMotionModeUI(b.mode || 'kinetic');
     window.setBubbleSafeZoneBehaviorUI(b.safeZoneBehavior || 'bounce');
     window.setBubbleWallBehaviorUI(b.wallBehavior || 'bounce');
-    window.setBubbleShapeUI(b.shape || 'circle');
+    window.setBubbleShapeUI(b.shape || (tabId === 'coords' ? 'rectangle' : 'circle'));
     window.setBubbleColorUI(b.color || '#00d4ff');
     window.setBubbleSizeUI(b.size || 90);
 
@@ -1989,9 +2009,10 @@
     const b = window.nomadBubbles && window.nomadBubbles.coords;
     if (b) {
       const s = b.size || 90;
-      const fs = window.calculateDynamicBubbleFontSize(latEl.innerText, s, b.shape || 'square', {
-        maxScale: 0.13,
-        minPx: 8.5
+      const isRect = (b.shape === 'rectangle');
+      const fs = window.calculateDynamicBubbleFontSize(latEl.innerText, s, b.shape || 'rectangle', {
+        maxScale: isRect ? 0.165 : 0.13,
+        minPx: isRect ? 9.2 : 8.5
       });
       latEl.style.fontSize = fs;
       lonEl.style.fontSize = fs;

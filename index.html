@@ -2683,7 +2683,7 @@
       </div>
 
       <!-- 6. GPS Coordinates Vault Bubble (Encased in Seesaw Rectangle) -->
-      <div class="kinetic-bubble has-shape-rectangle" id="coords-bubble" style="width: 124px; height: 68px; left: 236px; top: 220px; color: #ffffff; display: none;" title="Drag to flick • Long-press to configure">
+      <div class="kinetic-bubble has-shape-rectangle" id="coords-bubble" style="width: 124px; height: 68px; left: 236px; top: 220px; color: #ffffff; display: flex;" title="Drag to flick • Long-press to configure">
         <div class="kinetic-bubble-shape-wrap kinetic-shape-rectangle" id="coords-bubble-shape-frame"></div>
         <div class="kinetic-pin-indicator" id="coords-bubble-pin" style="display: none; z-index: 3;">📌</div>
         <div class="kinetic-bubble-inner" id="coords-bubble-content" style="padding: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">
@@ -2953,9 +2953,9 @@
           <span class="bubble-tab-label">Atmo</span>
         </button>
         <button class="bubble-tab-btn" id="bubble-tab-coords" data-tab="coords" onclick="switchBubbleTab('coords')">
-          <span class="bubble-tab-status" id="bubble-tab-status-coords"></span>
+          <span class="bubble-tab-status is-active" id="bubble-tab-status-coords"></span>
           <span class="bubble-tab-icon">📍</span>
-          <span class="bubble-tab-label">LALO</span>
+          <span class="bubble-tab-label">Lat/Lon</span>
         </button>
         <button class="bubble-tab-btn" id="bubble-tab-shields" data-tab="shields" onclick="switchBubbleTab('shields')">
           <span class="bubble-tab-status" id="bubble-tab-status-shields"></span>
@@ -3008,9 +3008,12 @@
         </div>
       </div>
 
-      <!-- Coords Information Tip: Visible ONLY when Coords tab is active -->
-      <div id="coords-options-section" style="display: none; margin-top: 14px; padding: 9px 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); font-size: 0.74rem; color: #94a3b8; line-height: 1.45;">
-        📍 GPS Coordinates are truncated to 3 decimal places in the floating bubble for clear legibility. Full-precision coordinates are preserved in the background telemetry vault for records and sharing.
+      <!-- Coords Information Tip: Visible ONLY when Lat/Lon tab is active -->
+      <div id="coords-options-section" style="display: none; margin-top: 14px; padding: 10px 14px; border-radius: 12px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); font-size: 0.74rem; color: #94a3b8; line-height: 1.45;">
+        <div style="font-weight: 700; color: #ffffff; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+          <span>📍 Lat/Lon Coordinates (Seesaw Rectangle)</span>
+        </div>
+        Encased in the specialized horizontal Seesaw Rectangle geometry designed to cradle two-line GPS coordinates with buoyant pendulum wobble physics.
       </div>
 
       <!-- Dedicated Compass Sensor & Needle Controls: Visible ONLY when Compass tab is active -->
@@ -3138,11 +3141,11 @@
           Squirkle
         </button>
         <button class="bubble-shape-btn" data-shape="rectangle" onclick="setBubbleShape('rectangle')">
-          <svg width="20" height="20" viewBox="0 0 100 100" class="shape-btn-icon"><rect x="6" y="24" width="88" height="52" rx="10" ry="10"/></svg>
+          <svg width="20" height="20" viewBox="0 0 100 100" class="shape-btn-icon"><rect x="6" y="24" width="88" height="52" rx="6" ry="6"/></svg>
           Rectangle
         </button>
         <button class="bubble-shape-btn" data-shape="square" onclick="setBubbleShape('square')">
-          <svg width="20" height="20" viewBox="0 0 100 100" class="shape-btn-icon"><rect x="8" y="8" width="84" height="84" rx="12" ry="12"/></svg>
+          <svg width="20" height="20" viewBox="0 0 100 100" class="shape-btn-icon"><rect x="8" y="8" width="84" height="84" rx="0" ry="0" stroke-linejoin="miter"/></svg>
           Square
         </button>
         <button class="bubble-shape-btn" data-shape="triangle" onclick="setBubbleShape('triangle')">
