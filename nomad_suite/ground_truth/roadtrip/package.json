@@ -1,7 +1,7 @@
 {
   "name": "nomad-roadtrip",
   "version": "1.0.0",
-  "description": "NOMAD: Hyperspace Heads-Up GPS Navigation, Telemetry Dashboard, and Visualizer Arcade",
+  "description": "NOMAD: RoadTrip Heads-Up GPS Navigation, Telemetry Dashboard, and Visualizer Arcade",
   "type": "module",
   "scripts": {
     "dev": "node server.js",

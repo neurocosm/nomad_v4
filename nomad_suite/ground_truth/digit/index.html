@@ -1,0 +1,2474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Nomad DIGIT</title>
+  <meta name="description" content="Nomad DIGIT - Kinetic Telemetry, Navigation Avionics & Text HUD for Mobilization by BostonyFX (@neurocosm)" />
+  <meta name="application-name" content="Nomad DIGIT" />
+  <meta name="apple-mobile-web-app-title" content="Nomad DIGIT" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#050811" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/pwa-192x192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="/pwa-512x512.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #050811;
+      --bg-card: #0b1325;
+      --bg-card-hover: #101c36;
+      --border-cyan: rgba(0, 243, 255, 0.32);
+      --border-cyan-bright: rgba(0, 243, 255, 0.75);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #475569;
+      --accent-cyan: #00f3ff;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --radius-block: 12px;
+    }
+
+    /* ========================================================
+       THEME 2: RELAXED 256-GRAY (MONOCHROME TITANIUM SLATE)
+       ======================================================== */
+    body.theme-gray,
+    body.mode-relaxed {
+      --bg-main: #080a0d;
+      --bg-card: #0f1217;
+      --bg-card-hover: #151921;
+      --border-cyan: rgba(148, 163, 184, 0.22);
+      --border-cyan-bright: rgba(175, 186, 199, 0.45);
+      --text-main: #9ea7b4; /* Calm matte titanium silver — ZERO harsh white */
+      --text-muted: #6b7480; /* Soft mid slate */
+      --text-dim: #444c56; /* Subtle shadow line */
+      --accent-cyan: #8b96a4; /* Muted steel/pewter slate */
+      --accent-green: #83918b; /* Calmed sage-slate */
+      --accent-amber: #948c82; /* Warm graphite */
+    }
+
+    body.theme-gray .loc-city-state,
+    body.mode-relaxed .loc-city-state {
+      color: #88919d !important;
+    }
+
+    body.theme-gray .loc-county-zip,
+    body.mode-relaxed .loc-county-zip {
+      color: #636b77 !important;
+    }
+
+    body.theme-gray .phil-quote-text,
+    body.mode-relaxed .phil-quote-text {
+      color: #98a1ad !important;
+    }
+
+    body.theme-gray .app-title,
+    body.mode-relaxed .app-title {
+      color: #9ea7b4;
+    }
+
+    body.theme-gray .app-title .dot,
+    body.mode-relaxed .app-title .dot {
+      background: #76808e;
+      box-shadow: none;
+    }
+
+    body.theme-gray .btn-ctrl.active,
+    body.mode-relaxed .btn-ctrl.active {
+      border-color: rgba(158, 167, 180, 0.5);
+      color: #9ea7b4;
+    }
+
+    body.theme-gray .toast-pill,
+    body.mode-relaxed .toast-pill {
+      background: #323943;
+      color: #a4abb5;
+    }
+
+    body.theme-gray .block-badge,
+    body.mode-relaxed .block-badge {
+      border: 1px solid rgba(148, 163, 184, 0.28) !important;
+      color: #88929e !important;
+      background: transparent !important;
+    }
+
+    body.theme-gray .block-badge.locked,
+    body.mode-relaxed .block-badge.locked {
+      border-color: rgba(148, 163, 184, 0.40) !important;
+      color: #9ea7b4 !important;
+    }
+
+    body.theme-gray .block-badge.stopped,
+    body.mode-relaxed .block-badge.stopped {
+      border-color: rgba(148, 163, 184, 0.20) !important;
+      color: #6b7480 !important;
+    }
+
+    body.theme-gray .version-tag,
+    body.mode-relaxed .version-tag {
+      border-color: rgba(148, 163, 184, 0.22) !important;
+      background: rgba(18, 22, 28, 0.6) !important;
+      color: #6b7480 !important;
+    }
+
+    body.theme-gray #clock-day,
+    body.mode-relaxed #clock-day {
+      color: #88929e !important;
+    }
+
+    body.theme-gray .footer-bar,
+    body.mode-relaxed .footer-bar {
+      color: #444c56 !important;
+    }
+
+    body.theme-gray .footer-bar .footer-brand,
+    body.theme-gray .footer-bar a,
+    body.mode-relaxed .footer-bar .footer-brand,
+    body.mode-relaxed .footer-bar a {
+      color: #727b87 !important;
+      font-weight: 500;
+    }
+
+    /* ========================================================
+       THEME 3: APOLLO HERITAGE (RETRO NAVAL R-W-B)
+       Solid Obsidian Backdrop, Matte Bone Chalk, Steel Cadet Blue,
+       and Subdued Apollo Crimson Accents.
+       ======================================================== */
+    body.theme-apollo {
+      --bg-main: #080a0d;
+      --bg-card: #0d1219;
+      --bg-card-hover: #131922;
+      --border-cyan: rgba(95, 126, 155, 0.28);
+      --border-cyan-bright: rgba(95, 126, 155, 0.55);
+      --text-main: #b4bcc8; /* Matte Apollo Bone / Chalk White */
+      --text-muted: #6e7e93;
+      --text-dim: #444f5e;
+      --accent-cyan: #5f7e9b; /* Steel Cadet Blue */
+      --accent-green: #6f9185; /* Lunar Command Green */
+      --accent-amber: #b25555; /* Subdued Apollo Crimson */
+    }
+
+    body.theme-apollo .loc-city-state {
+      color: #8496ab !important;
+    }
+
+    body.theme-apollo .loc-county-zip {
+      color: #5d6b7b !important;
+    }
+
+    body.theme-apollo .phil-quote-text {
+      color: #a0aab8 !important;
+    }
+
+    body.theme-apollo .app-title {
+      color: #5f7e9b;
+    }
+
+    body.theme-apollo .app-title .dot {
+      background: #b25555;
+      box-shadow: 0 0 6px rgba(178, 85, 85, 0.5);
+    }
+
+    body.theme-apollo .btn-ctrl.active {
+      border-color: rgba(95, 126, 155, 0.6);
+      color: #b4bcc8;
+    }
+
+    body.theme-apollo .toast-pill {
+      background: #222c3a;
+      color: #b4bcc8;
+    }
+
+    body.theme-apollo .block-badge {
+      border: 1px solid rgba(95, 126, 155, 0.35) !important;
+      color: #7b96b2 !important;
+      background: transparent !important;
+    }
+
+    body.theme-apollo .block-badge.locked {
+      border-color: rgba(178, 85, 85, 0.55) !important;
+      color: #c46a6a !important;
+    }
+
+    body.theme-apollo .block-badge.stopped {
+      border-color: rgba(95, 126, 155, 0.22) !important;
+      color: #5a6878 !important;
+    }
+
+    body.theme-apollo .version-tag {
+      border-color: rgba(95, 126, 155, 0.25) !important;
+      background: rgba(13, 18, 25, 0.6) !important;
+      color: #6e7e93 !important;
+    }
+
+    body.theme-apollo #clock-day {
+      color: #5f7e9b !important;
+    }
+
+    body.theme-apollo .footer-bar {
+      color: #444f5e !important;
+    }
+
+    body.theme-apollo .footer-bar .footer-brand,
+    body.theme-apollo .footer-bar a {
+      color: #7b96b2 !important;
+      font-weight: 500;
+    }
+
+    /* ========================================================
+       THEME 4: ARIZONA DUSK (DESERT SUNSET / MOJAVE TWILIGHT)
+       Solid Obsidian Backdrop, Sun-Bleached Sand, Washed Agave,
+       and Canyon Terracotta / Dusk Copper Accents.
+       ======================================================== */
+    body.theme-arizona {
+      --bg-main: #080a0d;
+      --bg-card: #141012;
+      --bg-card-hover: #1c1719;
+      --border-cyan: rgba(184, 109, 78, 0.28);
+      --border-cyan-bright: rgba(184, 109, 78, 0.55);
+      --text-main: #c4b8a5; /* Sun-bleached Dune Sand */
+      --text-muted: #827267;
+      --text-dim: #4a403b;
+      --accent-cyan: #689793; /* Washed Agave Turquoise */
+      --accent-green: #7d8c76; /* Desert Cactus Sage */
+      --accent-amber: #b86d4e; /* Canyon Terracotta / Dusk Copper */
+    }
+
+    body.theme-arizona .loc-city-state {
+      color: #9c8d82 !important;
+    }
+
+    body.theme-arizona .loc-county-zip {
+      color: #6e6157 !important;
+    }
+
+    body.theme-arizona .phil-quote-text {
+      color: #b8ab99 !important;
+    }
+
+    body.theme-arizona .app-title {
+      color: #b86d4e;
+    }
+
+    body.theme-arizona .app-title .dot {
+      background: #689793;
+      box-shadow: 0 0 6px rgba(104, 151, 147, 0.5);
+    }
+
+    body.theme-arizona .btn-ctrl.active {
+      border-color: rgba(184, 109, 78, 0.6);
+      color: #c4b8a5;
+    }
+
+    body.theme-arizona .toast-pill {
+      background: #332624;
+      color: #c4b8a5;
+    }
+
+    body.theme-arizona .block-badge {
+      border: 1px solid rgba(184, 109, 78, 0.35) !important;
+      color: #b87758 !important;
+      background: transparent !important;
+    }
+
+    body.theme-arizona .block-badge.locked {
+      border-color: rgba(104, 151, 147, 0.55) !important;
+      color: #7faaa6 !important;
+    }
+
+    body.theme-arizona .block-badge.stopped {
+      border-color: rgba(130, 114, 103, 0.25) !important;
+      color: #6e6157 !important;
+    }
+
+    body.theme-arizona .version-tag {
+      border-color: rgba(184, 109, 78, 0.25) !important;
+      background: rgba(20, 16, 18, 0.6) !important;
+      color: #827267 !important;
+    }
+
+    body.theme-arizona #clock-day {
+      color: #b86d4e !important;
+    }
+
+    body.theme-arizona .footer-bar {
+      color: #4a403b !important;
+    }
+
+    body.theme-arizona .footer-bar .footer-brand,
+    body.theme-arizona .footer-bar a {
+      color: #b87758 !important;
+      font-weight: 500;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: env(safe-area-inset-top, 6px) 6px env(safe-area-inset-bottom, 6px);
+    }
+
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-feature-settings: 'tnum' on, 'zero' on;
+    }
+
+    /* Top Utility Header */
+    .top-header {
+      width: 100%;
+      max-width: 480px;
+      height: 28px;
+      flex-shrink: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 4px;
+    }
+
+    .app-title {
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+      padding: 3px 6px;
+      margin-left: -6px;
+      border-radius: 6px;
+      transition: background-color 0.15s, opacity 0.15s, transform 0.1s;
+    }
+
+    .app-title:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .app-title:active {
+      transform: scale(0.96);
+    }
+
+    .app-title .dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent-cyan);
+      border-radius: 50%;
+    }
+
+    .version-tag {
+      font-size: 0.60rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      padding: 2px 8px;
+      border: 1px solid rgba(0, 243, 255, 0.2);
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.6);
+      user-select: none;
+      line-height: 1.4;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .version-tag:hover {
+      border-color: rgba(0, 243, 255, 0.4);
+      color: var(--text-main);
+    }
+
+    /* Orange Ring & Alert when Update Available */
+    .version-tag.has-update {
+      color: #ffb74d;
+      border: 1.5px solid #ff9800;
+      background: rgba(255, 152, 0, 0.14);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      animation: pulseOrangeRing 2s infinite ease-in-out;
+    }
+
+    .version-tag.has-update:hover {
+      background: rgba(255, 152, 0, 0.25);
+      border-color: #ffa726;
+      color: #ffffff;
+    }
+
+    .version-tag.has-update .update-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ff9800;
+      animation: blinkUpdateDot 1s infinite alternate;
+    }
+
+    @keyframes pulseOrangeRing {
+      0%, 100% {
+        border-color: #ff9800;
+        background: rgba(255, 152, 0, 0.14);
+      }
+      50% {
+        border-color: #ffb74d;
+        background: rgba(255, 152, 0, 0.28);
+      }
+    }
+
+    @keyframes blinkUpdateDot {
+      from { opacity: 0.3; transform: scale(0.85); }
+      to { opacity: 1; transform: scale(1.15); }
+    }
+
+    .top-controls {
+      display: flex;
+      gap: 5px;
+    }
+
+    .btn-ctrl {
+      background: var(--bg-card);
+      color: var(--text-muted);
+      border: 1px solid var(--border-cyan);
+      border-radius: 12px;
+      padding: 2px 9px;
+      font-size: 0.64rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      cursor: pointer;
+      line-height: 1.4;
+      transition: all 0.15s;
+    }
+
+    .btn-ctrl:hover {
+      color: var(--text-main);
+      border-color: var(--border-cyan-bright);
+    }
+
+    .btn-ctrl.active {
+      background: rgba(0, 243, 255, 0.16);
+      color: var(--accent-cyan);
+      border-color: var(--accent-cyan);
+    }
+
+    .btn-ctrl.pressing {
+      transform: scale(0.91);
+      border-color: #ef4444 !important;
+      background: rgba(239, 68, 68, 0.28) !important;
+      color: #fca5a5 !important;
+      animation: pulse-purge 0.35s infinite alternate;
+    }
+
+    @keyframes pulse-purge {
+      from { transform: scale(0.92); opacity: 0.9; }
+      to { transform: scale(0.88); opacity: 1; }
+    }
+
+    /* Vertical 5-Block Stack for Pixel 11 PRO / Mobile Viewport (100dvh non-scrollable) */
+    .blocks-stack {
+      width: 100%;
+      max-width: 480px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 4px;
+      margin: 2px 0;
+      min-height: 0;
+    }
+
+    /* Individual Rounded Horizontal Rectangular Block */
+    .rounded-block {
+      flex: 1;
+      min-height: 0;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-cyan);
+      border-radius: var(--radius-block);
+      padding: 6px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: border-color 0.15s, background-color 0.15s, transform 0.1s;
+      overflow: hidden;
+    }
+
+    .rounded-block:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-cyan-bright);
+    }
+
+    .rounded-block:active {
+      transform: scale(0.992);
+    }
+
+    .block-meta-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.62rem;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      line-height: 1;
+    }
+
+    .block-badge {
+      padding: 1px 7px;
+      border-radius: 6px;
+      font-size: 0.6rem;
+      font-weight: 450;
+      background: transparent;
+      border: 1px solid rgba(0, 243, 255, 0.45);
+      color: var(--accent-cyan);
+      line-height: 1.3;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .block-badge.stopped {
+      background: transparent;
+      border-color: rgba(148, 163, 184, 0.35);
+      color: var(--text-muted);
+    }
+
+    .block-badge.locked {
+      background: transparent;
+      border-color: rgba(16, 185, 129, 0.55);
+      color: var(--accent-green);
+    }
+
+    /* Subdivided Columns within a Block for Maximum Readability */
+    .metric-split-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      align-items: center;
+      margin: 2px 0;
+    }
+
+    .metric-col {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .metric-col:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: -4px;
+      top: 15%;
+      height: 70%;
+      width: 1px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .col-title {
+      font-size: 0.58rem;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+      margin-bottom: 1px;
+    }
+
+    .col-hero {
+      font-size: clamp(1.27rem, 3.52vh, 1.71rem);
+      font-weight: 800;
+      line-height: 1.05;
+      color: var(--text-main);
+      white-space: nowrap;
+    }
+
+    .col-hero .sub-unit {
+      font-size: 0.79rem;
+      color: var(--accent-cyan);
+      font-weight: 700;
+      margin-left: 2px;
+    }
+
+    .col-subtext {
+      font-size: 0.62rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    /* Block Meta Bottom Row */
+    .block-meta-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.62rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 4px;
+      line-height: 1;
+    }
+
+    /* Block 01 Location Content (Top Justified & Dynamic Sizing) */
+    .block-location-content {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start; /* Justify TOP */
+      padding-top: 1px;
+      gap: 2px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .loc-street-name {
+      font-size: clamp(1.28rem, 3.25vh, 1.65rem);
+      font-weight: 800;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.12;
+      letter-spacing: -0.015em;
+      margin: 0;
+      padding: 0;
+      transition: font-size 0.15s ease;
+    }
+
+    /* City & State (Secondary hierarchy: distinct, +10% enlarged, clearly subordinate to street name) */
+    .loc-city-state {
+      font-size: clamp(0.95rem, 2.36vh, 1.10rem);
+      color: #e2e8f0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
+      font-weight: 650;
+      letter-spacing: -0.005em;
+      margin: 0;
+      padding: 0;
+      transition: font-size 0.15s ease;
+    }
+
+    /* County & Zip (Tertiary metadata: +10% enlarged, subtle slate styling) */
+    .loc-county-zip {
+      font-size: clamp(0.81rem, 2.04vh, 0.95rem);
+      color: #94a3b8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
+      font-weight: 550;
+      letter-spacing: 0.01em;
+      margin: 0;
+      padding: 0;
+      transition: font-size 0.15s ease;
+    }
+
+    .date-dot {
+      display: inline-block;
+      opacity: 0.45;
+      font-weight: 400;
+      margin: 0 2px;
+      line-height: 1;
+    }
+
+    /* Philosophy Quote Styling & Dynamic Viewport */
+    .phil-quote-viewport {
+      width: 100%;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+      position: relative;
+      margin: 2px 0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .phil-quote-text {
+      display: block;
+      width: 100%;
+      white-space: normal;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      text-wrap: balance;
+      font-size: clamp(0.92rem, 2.3vh, 1.25rem);
+      font-weight: 600;
+      line-height: 1.24;
+      color: #f8fafc;
+      font-style: italic;
+      will-change: transform;
+      transform: translateY(0);
+      text-align: left;
+      transition: font-size 0.12s ease-out, line-height 0.12s ease-out;
+    }
+
+    .phil-quote-viewport.has-overflow {
+      align-items: flex-start;
+      mask-image: linear-gradient(to bottom, transparent 0px, black 6px, black calc(100% - 6px), transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0px, black 6px, black calc(100% - 6px), transparent 100%);
+    }
+
+    .phil-author {
+      font-size: 0.66rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent-cyan);
+      font-weight: 450;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 65%;
+    }
+
+    /* Toast Notification */
+    .toast-pill {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent-green);
+      color: #022c22;
+      padding: 5px 14px;
+      border-radius: 16px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      display: none;
+      z-index: 100;
+    }
+
+    .footer-bar {
+      height: 16px;
+      flex-shrink: 0;
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 450;
+      text-align: center;
+      line-height: 16px;
+    }
+
+    .footer-bar .footer-brand {
+      font-weight: 450;
+      color: var(--accent-cyan);
+    }
+
+    .footer-bar a {
+      color: var(--accent-cyan);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    try {
+      var savedTheme = localStorage.getItem('nomad_color_theme') || localStorage.getItem('nomad_color_mode');
+      if (savedTheme === 'gray' || savedTheme === 'relaxed') {
+        document.body.classList.add('theme-gray', 'mode-relaxed');
+      } else if (savedTheme === 'apollo') {
+        document.body.classList.add('theme-apollo');
+      } else if (savedTheme === 'arizona') {
+        document.body.classList.add('theme-arizona');
+      }
+    } catch (e) {}
+  </script>
+
+  <!-- Non-rendered DOM Telemetry Vault for external scripts -->
+  <div class="hidden-telemetry-vault" style="display:none;" aria-hidden="true">
+    <span id="currentLatitude">42.360100</span>
+    <span id="currentLongitude">-71.058900</span>
+    <span id="currentAltitudeMeters">14.5</span>
+    <span id="currentAltitudeFeet">47.6</span>
+    <span id="currentHeadingDegrees">18.0</span>
+    <span id="currentHeadingCardinal">NNE</span>
+    <span id="rawSpeedMps">0.00</span>
+    <span id="clampedSpeedMph">0.0</span>
+    <span id="clampedSpeedKmh">0.0</span>
+    <span id="gpsAccuracyMeters">4.0</span>
+    <span id="gpsTimestamp">0</span>
+  </div>
+
+  <!-- Top Controls -->
+  <div class="top-header">
+    <div id="btn-brand-mode" class="app-title nomad-brand" title="Tap: Toggle Theme (Vivid / 256-Gray / Apollo / Arizona)">
+      <span class="dot"></span>
+      <span>NOMAD: DIGIT</span>
+    </div>
+    <div class="version-tag" id="hud-version" title="System Version • Tap to check updates">v1.10022026.2157</div>
+    <div class="top-controls">
+      <button id="btn-install-pwa" class="btn-ctrl" style="display: none; border-color: var(--accent-cyan); color: var(--accent-cyan);" title="Install Nomad DIGIT to your device">INSTALL</button>
+      <button id="btn-audio" class="btn-ctrl active" title="Tap: Audio On/Off • Hold 1s: Deep Flush App Cache">AUDIO: ON</button>
+    </div>
+  </div>
+
+  <!-- 5 Rounded Horizontal Rectangular Blocks (Orientation per User Sketch) -->
+  <div class="blocks-stack">
+
+    <!-- BLOCK 1: Location & Coordinates -->
+    <div id="block-location" class="rounded-block" title="Tap to copy coordinates">
+      <div class="block-meta-top">
+        <span>01 // LOCATION &amp; COORDS</span>
+        <span id="corridor-axis-badge" class="block-badge stopped">SEEKING...</span>
+      </div>
+      <div id="block-location-content" class="block-location-content">
+        <div id="street-name" class="loc-street-name">
+          Resolving Location...
+        </div>
+        <div id="city-state" class="loc-city-state">
+          Triangulating Position...
+        </div>
+        <div id="county-zip" class="loc-county-zip">
+          GNSS &amp; Wi-Fi Network
+        </div>
+      </div>
+      <div class="block-meta-bottom">
+        <span id="coords-lat-lon" class="font-mono" style="color: var(--accent-cyan); font-weight: 450;">
+          ACQUIRING POSITION...
+        </span>
+        <span style="color: var(--accent-cyan); font-weight: 450;">TAP: COPY COORDS</span>
+      </div>
+    </div>
+
+    <!-- BLOCK 2: Motion, Bearing & Elevation -->
+    <div id="block-motion" class="rounded-block" title="Tap to toggle MPH / KM/H">
+      <div class="block-meta-top">
+        <span>02 // MOTION &amp; AVIONICS</span>
+        <span id="speed-status-badge" class="block-badge stopped">STOPPED</span>
+      </div>
+      <div class="metric-split-row">
+        <!-- Speed -->
+        <div class="metric-col">
+          <span class="col-title">SPEED</span>
+          <div class="col-hero font-mono">
+            <span id="speed-val">0.0</span><span id="speed-unit-val" class="sub-unit">MPH</span>
+          </div>
+          <span class="col-subtext">&lt;1.8 CLAMP</span>
+        </div>
+        <!-- Direction / Compass -->
+        <div class="metric-col">
+          <span class="col-title">BEARING</span>
+          <div class="col-hero font-mono">
+            <span id="heading-card-val">NNE</span><span id="heading-deg-val" class="sub-unit">018°</span>
+          </div>
+          <span id="sensor-type-val" class="col-subtext">GNSS COURSE</span>
+        </div>
+        <!-- Altimeter / Elevation -->
+        <div class="metric-col">
+          <span class="col-title">ELEVATION</span>
+          <div class="col-hero font-mono">
+            <span id="alt-ft-val">48</span><span class="sub-unit">FT</span>
+          </div>
+          <span id="alt-m-val" class="col-subtext">14.5 M (MSL)</span>
+        </div>
+      </div>
+      <div class="block-meta-bottom">
+        <span id="vertical-speed-val">RATE: 0.0 m/s</span>
+        <span>TAP: TOGGLE UNITS</span>
+      </div>
+    </div>
+
+    <!-- BLOCK 3: Weather & Atmosphere -->
+    <div id="block-weather" class="rounded-block" title="Tap to toggle °F / °C & inHg / hPa">
+      <div class="block-meta-top">
+        <span>03 // WEATHER &amp; ATMOSPHERE</span>
+        <span id="weather-condition-badge" class="block-badge">CLEAR SKY</span>
+      </div>
+      <div class="metric-split-row">
+        <!-- Temperature -->
+        <div class="metric-col">
+          <span class="col-title">TEMP</span>
+          <div class="col-hero font-mono">
+            <span id="temp-val">72.4</span><span id="temp-unit-val" class="sub-unit">°F</span>
+          </div>
+          <span class="col-subtext">OPEN-METEO</span>
+        </div>
+        <!-- Humidity & UV -->
+        <div class="metric-col">
+          <span class="col-title">ATMOSPHERE</span>
+          <div class="col-hero font-mono">
+            <span id="humidity-val">46</span><span class="sub-unit">%RH</span>
+          </div>
+          <span id="uv-val" class="col-subtext">UV 3.2 MOD</span>
+        </div>
+        <!-- Barometric Pressure -->
+        <div class="metric-col">
+          <span class="col-title">BAROMETER</span>
+          <div class="col-hero font-mono">
+            <span id="baro-val">29.92</span><span id="baro-unit-val" class="sub-unit">inHg</span>
+          </div>
+          <span id="baro-trend-val" class="col-subtext">1013.2 hPa • STEADY</span>
+        </div>
+      </div>
+      <div class="block-meta-bottom">
+        <span>ATMOSPHERIC TELEMETRY</span>
+        <span>TAP: TOGGLE °F / °C</span>
+      </div>
+    </div>
+
+    <!-- BLOCK 4: Chronometry -->
+    <div id="block-time" class="rounded-block" title="Synchronized Local Chronometry">
+      <div class="block-meta-top">
+        <span>04 // CHRONOMETRY &amp; TIMEGRID</span>
+        <span id="timezone-badge" class="block-badge locked">LOCAL TIME</span>
+      </div>
+      <div class="metric-split-row" style="grid-template-columns: 1.35fr 1.15fr;">
+        <!-- Time AM/PM -->
+        <div class="metric-col">
+          <span class="col-title">TIME</span>
+          <div class="col-hero font-mono" style="font-size: clamp(1.4rem, 3.8vh, 1.95rem); letter-spacing: -0.02em;">
+            <span id="clock-time">12:00:00</span>
+            <span id="clock-ampm" class="sub-unit" style="font-size: 0.85rem;">PM</span>
+          </div>
+          <span id="clock-millis" class="col-subtext">UTC SYNCED</span>
+        </div>
+        <!-- Day & Date (MM DD YYYY) -->
+        <div class="metric-col" style="text-align: right; align-items: flex-end;">
+          <span class="col-title">DAY &amp; DATE</span>
+          <div id="clock-day" style="font-size: clamp(0.97rem, 2.52vh, 1.21rem); font-weight: 800; color: var(--accent-cyan); text-transform: uppercase; white-space: nowrap; line-height: 1.15;">
+            TUESDAY
+          </div>
+          <span id="clock-date" class="font-mono" style="font-size: clamp(0.97rem, 2.52vh, 1.21rem); color: var(--text-main); font-weight: 700; white-space: nowrap; line-height: 1.15; margin-top: 2px;">
+            10<span class="date-dot">·</span>02<span class="date-dot">·</span>2026
+          </span>
+        </div>
+      </div>
+      <div class="block-meta-bottom" id="timegrid-bottom-meta" title="Tap to toggle: DAMON (Countdown) / NOMAD (Elapsed) / UNIX Epoch" style="cursor: pointer;">
+        <span id="annual-time-label">DAMON TIME (COUNTDOWN)</span>
+        <span id="epoch-seconds" class="font-mono" title="DAMON Time: Seconds remaining until New Year (Counts backwards to zero)">7765000</span>
+      </div>
+    </div>
+
+    <!-- BLOCK 5: Philosophical Insight / API -->
+    <div id="block-philosophy" class="rounded-block" title="Tap to refresh quote">
+      <div class="block-meta-top">
+        <span>05 // COGNITION &amp; PERSPECTIVE</span>
+        <span id="phil-status-badge" class="block-badge">DAILY QUOTE</span>
+      </div>
+      <div class="phil-quote-viewport" id="phil-quote-viewport">
+        <div id="phil-quote" class="phil-quote-text">
+          Syncing Daily API Insight...
+        </div>
+      </div>
+      <div class="block-meta-bottom">
+        <span id="phil-author" class="phil-author">— ...</span>
+        <span style="color: var(--accent-cyan); font-weight: 450;">TAP: REFRESH</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer Credits -->
+  <footer class="footer-bar nomad-footer">
+    NOMAD: DIGIT • Telemetry HUD • Crafted by <span class="footer-brand">BostonyFX</span>
+  </footer>
+
+  <div id="toast-pill" class="toast-pill">COPIED TO CLIPBOARD</div>
+
+  <script src="/version.js"></script>
+  <script>
+    // State lookup table for US states
+    const US_STATES = {
+      "Alabama": "AL", "Alaska": "AK", "Arizona": "AZ", "Arkansas": "AR", "California": "CA",
+      "Colorado": "CO", "Connecticut": "CT", "Delaware": "DE", "Florida": "FL", "Georgia": "GA",
+      "Hawaii": "HI", "Idaho": "ID", "Illinois": "IL", "Indiana": "IN", "Iowa": "IA",
+      "Kansas": "KS", "Kentucky": "KY", "Louisiana": "LA", "Maine": "ME", "Maryland": "MD",
+      "Massachusetts": "MA", "Michigan": "MI", "Minnesota": "MN", "Mississippi": "MS", "Missouri": "MO",
+      "Montana": "MT", "Nebraska": "NE", "Nevada": "NV", "New Hampshire": "NH", "New Jersey": "NJ",
+      "New Mexico": "NM", "New York": "NY", "North Carolina": "NC", "North Dakota": "ND", "Ohio": "OH",
+      "Oklahoma": "OK", "Oregon": "OR", "Pennsylvania": "PA", "Rhode Island": "RI", "South Carolina": "SC",
+      "South Dakota": "SD", "Tennessee": "TN", "Texas": "TX", "Utah": "UT", "Vermont": "VT",
+      "Virginia": "VA", "Washington": "WA", "West Virginia": "WV", "Wisconsin": "WI", "Wyoming": "WY"
+    };
+
+    function abbreviateStreetName(streetName) {
+      if (!streetName) return '';
+      return streetName
+        .replace(/\b(?:Route|State Route|State Hwy|SR)\s+(\d{1,3}[A-Z]?)\b/gi, '$1')
+        .replace(/\bStreet\b/gi, 'St.')
+        .replace(/\bAvenue\b/gi, 'Ave.')
+        .replace(/\bBoulevard\b/gi, 'Blvd.')
+        .replace(/\bDrive\b/gi, 'Dr.')
+        .replace(/\bRoad\b/gi, 'Rd.')
+        .replace(/\bLane\b/gi, 'Ln.')
+        .replace(/\bCourt\b/gi, 'Ct.')
+        .replace(/\bPlace\b/gi, 'Pl.')
+        .replace(/\bTerrace\b/gi, 'Ter.')
+        .replace(/\bCircle\b/gi, 'Cir.')
+        .replace(/\bParkway\b/gi, 'Pkwy.')
+        .replace(/\bHighway\b/gi, 'Hwy.')
+        .replace(/\bTurnpike\b/gi, 'Tpk.')
+        .replace(/\bNorth\b/gi, 'N.')
+        .replace(/\bSouth\b/gi, 'S.')
+        .replace(/\bEast\b/gi, 'E.')
+        .replace(/\bWest\b/gi, 'W.')
+        .replace(/\bNortheast\b/gi, 'NE')
+        .replace(/\bNorthwest\b/gi, 'NW')
+        .replace(/\bSoutheast\b/gi, 'SE')
+        .replace(/\bSouthwest\b/gi, 'SW');
+    }
+
+    function getInitialTheme() {
+      try {
+        const stored = localStorage.getItem('nomad_color_theme') || localStorage.getItem('nomad_color_mode');
+        if (stored === 'relaxed') return 'gray';
+        if (['vivid', 'gray', 'apollo', 'arizona'].includes(stored)) return stored;
+      } catch (e) {}
+      return 'vivid';
+    }
+
+    // Remove any legacy calibration from local storage
+    try {
+      localStorage.removeItem('nomad_calibrated_location');
+    } catch (e) {}
+
+    const state = {
+      speedUnit: 'MPH',
+      tempUnit: 'F',
+      baroUnit: 'inHg',
+      rawSpeedMps: 0,
+      clampedSpeedMph: 0,
+      clampedSpeedKmh: 0,
+      speedStatus: 'STOPPED',
+      latitude: 0,
+      longitude: 0,
+      altitudeM: 14.5,
+      altitudeFt: 47.6,
+      verticalSpeedMps: 0,
+      headingDeg: 18.0,
+      headingCard: 'NNE',
+      headingSource: 'STANDBY',
+      corridorAxis: 'Open',
+      isCorridorLocked: false,
+      accuracyM: 0,
+      hasRealGpsLock: false,
+      locationSource: 'SEARCHING', // 'GPS' | 'WIFI_IP' | 'SEARCHING'
+      lastGeocodedLat: null,
+      lastGeocodedLon: null,
+      lastGeocodedTime: 0,
+      soundEnabled: true,
+      colorTheme: getInitialTheme(),
+      weather: {
+        tempF: 72.0,
+        tempC: 22.0,
+        condition: 'Scanning...',
+        humidity: 50,
+        pressureInHg: 29.92,
+        pressureHpa: 1013.2,
+        trend: 'Steady',
+        uv: 3.0,
+      },
+      location: {
+        road: 'Resolving Location...',
+        cityState: 'Scanning Wi-Fi / GNSS Network',
+        county: '',
+        zip: '',
+        googleMapsUrl: ''
+      },
+      philosophy: {
+        quote: 'Syncing Daily API Insight...',
+        author: ''
+      }
+    };
+
+    // Daily Quote Engine (All Categories • Once per Day via API • Zero Hardcoded Fallbacks)
+    function getTodayDateKey() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    let quoteAnimation = null;
+
+    function applyQuoteOverflowScroll(quoteEl, viewportEl) {
+      if (quoteAnimation) {
+        quoteAnimation.cancel();
+        quoteAnimation = null;
+      }
+      quoteEl.style.transform = 'translateY(0)';
+      viewportEl.classList.remove('has-overflow');
+
+      // Allow DOM to settle multi-line word wrap before measuring vertical bounds
+      requestAnimationFrame(() => {
+        const textHeight = quoteEl.scrollHeight;
+        const viewportHeight = viewportEl.clientHeight;
+        const overflow = textHeight - viewportHeight;
+
+        // ONLY IF the paragraph breaches the vertical area of Block 05!
+        if (overflow > 4) {
+          viewportEl.classList.add('has-overflow');
+
+          // Reading cadence for multi-line paragraphs:
+          // 1. Initial pause at top: 3.2s so user can read first lines
+          // 2. Comfortable vertical drift reading speed: ~18 pixels per second
+          // 3. Pause at bottom: 2.6s so user finishes the conclusion
+          // 4. Smooth return glide back to top: ~1.2s
+          const initialPauseMs = 3200;
+          const endPauseMs = 2600;
+          const returnMs = 1200;
+          const scrollSpeedPxPerSec = 18;
+          const scrollDurationMs = Math.round((overflow / scrollSpeedPxPerSec) * 1000);
+          const totalDurationMs = initialPauseMs + scrollDurationMs + endPauseMs + returnMs;
+
+          const p1 = initialPauseMs / totalDurationMs;
+          const p2 = (initialPauseMs + scrollDurationMs) / totalDurationMs;
+          const p3 = (initialPauseMs + scrollDurationMs + endPauseMs) / totalDurationMs;
+
+          const keyframes = [
+            { transform: 'translateY(0px)', offset: 0 },
+            { transform: 'translateY(0px)', offset: p1, easing: 'ease-in-out' },
+            { transform: `translateY(-${overflow + 4}px)`, offset: p2 },
+            { transform: `translateY(-${overflow + 4}px)`, offset: p3, easing: 'ease-in-out' },
+            { transform: 'translateY(0px)', offset: 1.0 }
+          ];
+
+          quoteAnimation = quoteEl.animate(keyframes, {
+            duration: totalDurationMs,
+            iterations: Infinity
+          });
+        }
+      });
+    }
+
+    function renderPhilosophy() {
+      const quoteEl = document.getElementById('phil-quote');
+      const authorEl = document.getElementById('phil-author');
+      const viewportEl = document.getElementById('phil-quote-viewport');
+      if (!quoteEl || !viewportEl) return;
+
+      const rawQuote = (state.philosophy.quote || '').trim();
+      const rawAuthor = (state.philosophy.author || 'Insight').trim();
+
+      quoteEl.textContent = `“${rawQuote}”`;
+      if (authorEl) authorEl.textContent = `— ${rawAuthor.toUpperCase()}`;
+
+      // 1. Analyze quote geometry & typographic density
+      const charLen = rawQuote.length;
+
+      // 2. Initial strategic sizing & typographic weight based on character mass
+      let targetRem;
+      let targetLineHeight;
+      let targetWeight;
+
+      if (charLen <= 55) {
+        // Ultra-short punchy aphorisms (e.g. Rumi passage) -> Bold Cockpit Headline
+        targetRem = 1.45;
+        targetLineHeight = 1.18;
+        targetWeight = '700';
+      } else if (charLen <= 95) {
+        // Short quotes -> Prominent 2-3 line presence
+        targetRem = 1.22;
+        targetLineHeight = 1.22;
+        targetWeight = '650';
+      } else if (charLen <= 160) {
+        // Medium quotes -> Balanced 3-line presentation
+        targetRem = 1.05;
+        targetLineHeight = 1.24;
+        targetWeight = '600';
+      } else if (charLen <= 240) {
+        // Extended passages -> 4 lines, comfortable density
+        targetRem = 0.88;
+        targetLineHeight = 1.22;
+        targetWeight = '550';
+      } else {
+        // Very long passages (> 240 chars)
+        targetRem = 0.76;
+        targetLineHeight = 1.20;
+        targetWeight = '500';
+      }
+
+      quoteEl.style.fontSize = `${targetRem}rem`;
+      quoteEl.style.lineHeight = String(targetLineHeight);
+      quoteEl.style.fontWeight = targetWeight;
+
+      // 3. Dynamic Physical Geometry-Fit Pass (Rapid convergence to optimal block fill)
+      requestAnimationFrame(() => {
+        const availH = viewportEl.clientHeight;
+        const availW = viewportEl.clientWidth;
+
+        if (availH > 30 && availW > 100) {
+          let currentPx = parseFloat(window.getComputedStyle(quoteEl).fontSize) || 16;
+          let scrollH = quoteEl.scrollHeight;
+
+          // Target ideal text fill: 80% to 92% of available viewport height
+          const idealMaxH = availH - 4;
+          const idealMinH = availH * 0.72;
+
+          // Case A: Text spills outside viewport bounds -> Scale down to fit neatly
+          if (scrollH > idealMaxH && currentPx > 11.5) {
+            const fitScale = idealMaxH / scrollH;
+            const fittedPx = Math.max(11.5, currentPx * fitScale * 0.97);
+            quoteEl.style.fontSize = `${fittedPx.toFixed(1)}px`;
+          }
+          // Case B: Text underfills available block space (< 72% height) -> Scale up to command space
+          else if (scrollH < idealMinH && currentPx < 32) {
+            // For short quotes under 90 chars, expand generously to fill the cockpit block
+            const maxAllowedPx = charLen <= 55 ? 30 : (charLen <= 95 ? 24 : 20);
+            const expandRatio = Math.min(1.65, (availH * 0.88) / Math.max(1, scrollH));
+            const expandedPx = Math.min(maxAllowedPx, currentPx * expandRatio);
+            if (expandedPx > currentPx + 0.5) {
+              quoteEl.style.fontSize = `${expandedPx.toFixed(1)}px`;
+            }
+          }
+        }
+
+        // 4. If an exceptionally long text still breaches boundary at minimum font size, apply smooth drift
+        applyQuoteOverflowScroll(quoteEl, viewportEl);
+      });
+    }
+
+    async function loadDailyQuote(forceRefresh = false) {
+      const badge = document.getElementById('phil-status-badge');
+      const todayKey = getTodayDateKey();
+
+      if (!forceRefresh) {
+        try {
+          const cachedDate = localStorage.getItem('nomad_daily_quote_date');
+          const cachedPayload = localStorage.getItem('nomad_daily_quote_payload');
+          if (cachedDate === todayKey && cachedPayload) {
+            const data = JSON.parse(cachedPayload);
+            if (data && data.quote) {
+              state.philosophy = data;
+              if (badge) badge.textContent = 'DAILY QUOTE';
+              renderPhilosophy();
+              return;
+            }
+          }
+        } catch (e) {}
+      }
+
+      if (badge) badge.textContent = 'QUERYING API...';
+
+      let fetched = null;
+
+      // 1. Primary: DummyJSON Quotes (1400+ quotes across all categories, open CORS, 99.99% uptime)
+      try {
+        const ctrl = new AbortController();
+        const tid = setTimeout(() => ctrl.abort(), 3500);
+        const res = await fetch('https://dummyjson.com/quotes/random', { signal: ctrl.signal });
+        clearTimeout(tid);
+        if (res.ok) {
+          const d = await res.json();
+          if (d && d.quote) {
+            fetched = {
+              quote: d.quote.trim(),
+              author: d.author ? d.author.trim() : 'Unknown'
+            };
+          }
+        }
+      } catch (e) {}
+
+      // 2. Secondary fallback: FavQs Quote of the Day
+      if (!fetched) {
+        try {
+          const ctrl = new AbortController();
+          const tid = setTimeout(() => ctrl.abort(), 3500);
+          const res = await fetch('https://favqs.com/api/qotd', { signal: ctrl.signal });
+          clearTimeout(tid);
+          if (res.ok) {
+            const d = await res.json();
+            if (d && d.quote && d.quote.body) {
+              fetched = {
+                quote: d.quote.body.trim(),
+                author: d.quote.author ? d.quote.author.trim() : 'Unknown'
+              };
+            }
+          }
+        } catch (e) {}
+      }
+
+      // 3. Tertiary fallback: Stoic Quote API
+      if (!fetched) {
+        try {
+          const ctrl = new AbortController();
+          const tid = setTimeout(() => ctrl.abort(), 3500);
+          const res = await fetch('https://stoic.tekloon.net/stoic-quote', { signal: ctrl.signal });
+          clearTimeout(tid);
+          if (res.ok) {
+            const d = await res.json();
+            if (d && d.data && d.data.quote) {
+              fetched = {
+                quote: d.data.quote.trim(),
+                author: d.data.author ? d.data.author.trim() : 'Philosopher'
+              };
+            }
+          }
+        } catch (e) {}
+      }
+
+      if (fetched) {
+        state.philosophy = fetched;
+        try {
+          localStorage.setItem('nomad_daily_quote_date', todayKey);
+          localStorage.setItem('nomad_daily_quote_payload', JSON.stringify(fetched));
+        } catch (e) {}
+        if (badge) badge.textContent = 'DAILY QUOTE';
+        renderPhilosophy();
+        if (forceRefresh) showToast('NEW QUOTE LOADED');
+      } else {
+        if (badge) badge.textContent = 'RETRY...';
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      renderPhilosophy();
+    });
+
+    // Audio Engine
+    let audioCtx = null;
+    function playTone(freq = 1200) {
+      if (!state.soundEnabled) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.05);
+      } catch (e) {}
+    }
+
+    function showToast(text) {
+      const toast = document.getElementById('toast-pill');
+      if (!toast) return;
+      toast.textContent = text;
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 1800);
+    }
+
+    function getCardinal(deg) {
+      const dir = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+      return dir[Math.round(((deg % 360 + 360) % 360) / 22.5) % 16];
+    }
+
+    // AASHTO Highway Corridor Grid Axis Engine with ±15° Directional Hysteresis
+    let prevHighwayDirection = '';
+    function getHighwayCorridorAxis(routeNumber, highwayType = '') {
+      if (!routeNumber) return 'any';
+      const clean = String(routeNumber).toUpperCase().trim();
+      const isInterstate = highwayType === 'interstate' || /^I[-\s]?\d+/i.test(clean) || clean.includes('INTERSTATE');
+      const isUS = highwayType === 'us' || /^US[-\s]?\d+/i.test(clean);
+      const isState = highwayType === 'state' || /^(?:RT|ROUTE|SR|MA)[-\s]?\d+/i.test(clean);
+
+      const numMatch = clean.match(/\d+/);
+      const num = numMatch ? parseInt(numMatch[0], 10) : null;
+
+      if (num !== null) {
+        if (num === 128) return 'north-south';
+        if ([3, 24, 140, 12, 8, 7, 28, 38].includes(num)) return 'north-south';
+        if ([2, 9, 20, 30, 119].includes(num)) return 'east-west';
+
+        // Interstate Highway Grid (AASHTO standard: Odd = N/S, Even = E/W)
+        if (isInterstate || (!isUS && !isState && [95, 93, 90, 84, 80, 91, 87, 495, 290, 195, 295, 395].includes(num))) {
+          const baseNum = num >= 100 ? (num % 100) : num;
+          return (baseNum % 2 === 1) ? 'north-south' : 'east-west';
+        }
+        if (isUS || isState) {
+          return (num % 2 === 1) ? 'north-south' : 'east-west';
+        }
+      }
+      return 'any';
+    }
+
+    function calculateConstrainedDirection(heading, routeNumber = '') {
+      if (heading === null || isNaN(heading)) return '';
+      const norm = (heading % 360 + 360) % 360;
+      const axis = getHighwayCorridorAxis(routeNumber);
+
+      if (axis === 'north-south') {
+        if (prevHighwayDirection === 'North') {
+          prevHighwayDirection = (norm > 105 && norm < 255) ? 'South' : 'North';
+        } else if (prevHighwayDirection === 'South') {
+          prevHighwayDirection = (norm < 75 || norm > 285) ? 'North' : 'South';
+        } else {
+          prevHighwayDirection = (norm >= 90 && norm <= 270) ? 'South' : 'North';
+        }
+        return prevHighwayDirection;
+      } else if (axis === 'east-west') {
+        if (prevHighwayDirection === 'East') {
+          prevHighwayDirection = (norm > 195 && norm < 345) ? 'West' : 'East';
+        } else if (prevHighwayDirection === 'West') {
+          prevHighwayDirection = (norm > 15 && norm < 165) ? 'East' : 'West';
+        } else {
+          prevHighwayDirection = (norm >= 0 && norm < 180) ? 'East' : 'West';
+        }
+        return prevHighwayDirection;
+      }
+
+      // Default 4-Quadrant
+      if (norm >= 315 || norm < 45) return 'North';
+      if (norm >= 45 && norm < 135) return 'East';
+      if (norm >= 135 && norm < 225) return 'South';
+      return 'West';
+    }
+
+    // Chronometry Engine & Annual Nomad/Damon Time
+    let annualTimeMode = localStorage.getItem('nomad_annual_time_mode') || 'damon';
+
+    function updateClock() {
+      const now = new Date();
+      let hours = now.getHours();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      const strHours = String(hours).padStart(2, '0');
+      const strMinutes = String(now.getMinutes()).padStart(2, '0');
+      const strSeconds = String(now.getSeconds()).padStart(2, '0');
+
+      document.getElementById('clock-time').textContent = `${strHours}:${strMinutes}:${strSeconds}`;
+      document.getElementById('clock-ampm').textContent = ampm;
+
+      const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+      document.getElementById('clock-day').textContent = days[now.getDay()];
+
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      const yyyy = now.getFullYear();
+      document.getElementById('clock-date').innerHTML = `${mm}<span class="date-dot">·</span>${dd}<span class="date-dot">·</span>${yyyy}`;
+
+      const labelEl = document.getElementById('annual-time-label');
+      const valEl = document.getElementById('epoch-seconds');
+      const startOfYear = new Date(yyyy, 0, 1, 0, 0, 0, 0);
+      const endOfYear = new Date(yyyy + 1, 0, 1, 0, 0, 0, 0);
+
+      if (annualTimeMode === 'damon') {
+        const remainingSec = Math.max(0, Math.floor((endOfYear.getTime() - now.getTime()) / 1000));
+        if (labelEl) labelEl.textContent = 'DAMON TIME (COUNTDOWN)';
+        if (valEl) {
+          valEl.textContent = remainingSec;
+          valEl.title = `DAMON Time: ${remainingSec} seconds remaining until New Year ${yyyy + 1} (Counts backwards to zero)`;
+        }
+      } else if (annualTimeMode === 'nomad') {
+        const elapsedSec = Math.max(0, Math.floor((now.getTime() - startOfYear.getTime()) / 1000));
+        if (labelEl) labelEl.textContent = 'NOMAD TIME (ELAPSED)';
+        if (valEl) {
+          valEl.textContent = elapsedSec;
+          valEl.title = `NOMAD Time: ${elapsedSec} seconds elapsed in ${yyyy} since Jan 1`;
+        }
+      } else {
+        const epochSec = Math.floor(now.getTime() / 1000);
+        if (labelEl) labelEl.textContent = 'UNIX EPOCH TIMESTAMP';
+        if (valEl) {
+          valEl.textContent = epochSec;
+          valEl.title = 'Unix Epoch Time: Total seconds elapsed since Jan 1, 1970 00:00:00 UTC';
+        }
+      }
+    }
+
+    document.getElementById('timegrid-bottom-meta')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      playTone(1050);
+      if (annualTimeMode === 'damon') {
+        annualTimeMode = 'nomad';
+        showToast('NOMAD TIME: ANNUAL ELAPSED SECONDS');
+      } else if (annualTimeMode === 'nomad') {
+        annualTimeMode = 'epoch';
+        showToast('UNIX EPOCH: SECONDS SINCE 1970');
+      } else {
+        annualTimeMode = 'damon';
+        showToast('DAMON TIME: NEW YEAR COUNTDOWN SECONDS');
+      }
+      try { localStorage.setItem('nomad_annual_time_mode', annualTimeMode); } catch (err) {}
+      updateClock();
+    });
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function updateDOM() {
+      // Block 1: Location & Coordinates (Top Justified with Dynamic Sizing)
+      const streetEl = document.getElementById('street-name');
+      const cityStateEl = document.getElementById('city-state');
+      const countyZipEl = document.getElementById('county-zip');
+      const roadName = state.location.road || 'Resolving Location...';
+      streetEl.textContent = roadName;
+
+      // Dynamic sizing for street name based on length & container width
+      const roadLen = roadName.length;
+      if (roadLen <= 15) {
+        streetEl.style.fontSize = 'clamp(1.28rem, 3.25vh, 1.65rem)';
+      } else if (roadLen <= 24) {
+        streetEl.style.fontSize = 'clamp(1.15rem, 2.8vh, 1.42rem)';
+      } else if (roadLen <= 34) {
+        streetEl.style.fontSize = 'clamp(1.00rem, 2.3vh, 1.20rem)';
+      } else {
+        streetEl.style.fontSize = 'clamp(0.88rem, 2.05vh, 1.05rem)';
+      }
+
+      // Check width overflow for street name
+      requestAnimationFrame(() => {
+        if (streetEl.scrollWidth > streetEl.clientWidth && streetEl.clientWidth > 0) {
+          const currentPx = parseFloat(window.getComputedStyle(streetEl).fontSize);
+          const fitRatio = streetEl.clientWidth / streetEl.scrollWidth;
+          streetEl.style.fontSize = `${Math.max(14, currentPx * fitRatio * 0.96)}px`;
+        }
+      });
+
+      // Line 2: City & State (+10% enlarged, clear secondary scale with overflow safety)
+      const cityStateText = state.location.cityState || 'Triangulating GNSS & Wi-Fi';
+      cityStateEl.textContent = cityStateText;
+      const cityStateLen = cityStateText.length;
+      if (cityStateLen <= 16) {
+        cityStateEl.style.fontSize = 'clamp(0.97rem, 2.42vh, 1.12rem)';
+      } else if (cityStateLen <= 26) {
+        cityStateEl.style.fontSize = 'clamp(0.88rem, 2.20vh, 1.04rem)';
+      } else {
+        cityStateEl.style.fontSize = 'clamp(0.82rem, 2.04vh, 0.95rem)';
+      }
+
+      requestAnimationFrame(() => {
+        if (cityStateEl.scrollWidth > cityStateEl.clientWidth && cityStateEl.clientWidth > 0) {
+          const currentPx = parseFloat(window.getComputedStyle(cityStateEl).fontSize);
+          const fitRatio = cityStateEl.clientWidth / cityStateEl.scrollWidth;
+          cityStateEl.style.fontSize = `${Math.max(12, currentPx * fitRatio * 0.96)}px`;
+        }
+      });
+
+      // Line 3: County & Zip on their own line (+10% enlarged, clean slate metadata scale)
+      const countyZipParts = [state.location.county, state.location.zip].filter(Boolean);
+      const countyZipText = countyZipParts.join(' • ') || (state.location.cityState ? '' : 'Scanning Position');
+      countyZipEl.textContent = countyZipText;
+      countyZipEl.style.display = countyZipText ? 'block' : 'none';
+      const czLen = countyZipText.length;
+      if (czLen <= 24) {
+        countyZipEl.style.fontSize = 'clamp(0.84rem, 2.04vh, 0.97rem)';
+      } else if (czLen <= 36) {
+        countyZipEl.style.fontSize = 'clamp(0.79rem, 1.93vh, 0.90rem)';
+      } else {
+        countyZipEl.style.fontSize = 'clamp(0.75rem, 1.82vh, 0.86rem)';
+      }
+
+      requestAnimationFrame(() => {
+        if (countyZipEl.scrollWidth > countyZipEl.clientWidth && countyZipEl.clientWidth > 0) {
+          const currentPx = parseFloat(window.getComputedStyle(countyZipEl).fontSize);
+          const fitRatio = countyZipEl.clientWidth / countyZipEl.scrollWidth;
+          countyZipEl.style.fontSize = `${Math.max(11, currentPx * fitRatio * 0.96)}px`;
+        }
+      });
+      
+      if (state.latitude !== 0 || state.longitude !== 0) {
+        const latStr = `${Math.abs(state.latitude).toFixed(6)}° ${state.latitude >= 0 ? 'N' : 'S'}`;
+        const lonStr = `${Math.abs(state.longitude).toFixed(6)}° ${state.longitude >= 0 ? 'E' : 'W'}`;
+        document.getElementById('coords-lat-lon').textContent = `${latStr}, ${lonStr}`;
+      } else {
+        document.getElementById('coords-lat-lon').textContent = 'ACQUIRING POSITION...';
+      }
+      
+      const badgeLoc = document.getElementById('corridor-axis-badge');
+      if (state.locationSource === 'GPS') {
+        if (state.accuracyM <= 1.8) {
+          badgeLoc.textContent = `GNSS L1/L5 ±${state.accuracyM.toFixed(1)}M`;
+        } else if (state.accuracyM <= 5.0) {
+          badgeLoc.textContent = `GNSS ±${state.accuracyM.toFixed(1)}M`;
+        } else if (state.accuracyM <= 15.0) {
+          badgeLoc.textContent = `A-GPS ±${state.accuracyM.toFixed(1)}M`;
+        } else {
+          badgeLoc.textContent = `CELL/NET ±${state.accuracyM.toFixed(1)}M`;
+        }
+        badgeLoc.className = 'block-badge ' + (state.accuracyM <= 10 ? 'locked' : '');
+      } else if (state.locationSource === 'WIFI_IP') {
+        badgeLoc.textContent = `NET-GEO ±${Math.round(state.accuracyM / 1000)}KM`;
+        badgeLoc.className = 'block-badge stopped';
+      } else {
+        badgeLoc.textContent = 'SEEKING...';
+        badgeLoc.className = 'block-badge stopped';
+      }
+
+      // Block 2: Motion, Speed & Bearing & Elevation
+      const speedVal = state.speedUnit === 'MPH' ? state.clampedSpeedMph : state.clampedSpeedKmh;
+      document.getElementById('speed-val').textContent = speedVal.toFixed(1);
+      document.getElementById('speed-unit-val').textContent = state.speedUnit;
+      
+      const badge = document.getElementById('speed-status-badge');
+      badge.textContent = state.speedStatus;
+      badge.className = 'block-badge ' + (state.speedStatus === 'STOPPED' ? 'stopped' : 'locked');
+
+      document.getElementById('heading-card-val').textContent = state.headingCard;
+      document.getElementById('heading-deg-val').textContent = Math.round(state.headingDeg).toString().padStart(3, '0') + '°';
+      document.getElementById('sensor-type-val').textContent = state.headingSource;
+
+      document.getElementById('alt-ft-val').textContent = Math.round(state.altitudeFt);
+      document.getElementById('alt-m-val').textContent = `${state.altitudeM.toFixed(1)} M (MSL)`;
+      document.getElementById('vertical-speed-val').textContent = `RATE: ${state.verticalSpeedMps >= 0 ? '+' : ''}${state.verticalSpeedMps.toFixed(1)} m/s`;
+
+      // Block 3: Weather & Atmosphere
+      const tempVal = state.tempUnit === 'F' ? state.weather.tempF : state.weather.tempC;
+      document.getElementById('temp-val').textContent = tempVal.toFixed(1);
+      document.getElementById('temp-unit-val').textContent = `°${state.tempUnit}`;
+      document.getElementById('weather-condition-badge').textContent = state.weather.condition.toUpperCase();
+      document.getElementById('humidity-val').textContent = state.weather.humidity;
+      document.getElementById('uv-val').textContent = `UV ${state.weather.uv} (${state.weather.uv > 5 ? 'HIGH' : 'MOD'})`;
+
+      const baroVal = state.baroUnit === 'inHg' ? state.weather.pressureInHg.toFixed(2) : state.weather.pressureHpa.toFixed(1);
+      document.getElementById('baro-val').textContent = baroVal;
+      document.getElementById('baro-unit-val').textContent = state.baroUnit;
+      document.getElementById('baro-trend-val').textContent = `${state.weather.pressureHpa.toFixed(1)} hPa • ${state.weather.trend.toUpperCase()}`;
+
+      // Vault Synchronizer
+      document.getElementById('currentLatitude').textContent = state.latitude.toFixed(6);
+      document.getElementById('currentLongitude').textContent = state.longitude.toFixed(6);
+      document.getElementById('currentAltitudeMeters').textContent = state.altitudeM.toFixed(1);
+      document.getElementById('currentAltitudeFeet').textContent = state.altitudeFt.toFixed(1);
+      document.getElementById('currentHeadingDegrees').textContent = state.headingDeg.toFixed(1);
+      document.getElementById('currentHeadingCardinal').textContent = state.headingCard;
+      document.getElementById('rawSpeedMps').textContent = state.rawSpeedMps.toFixed(2);
+      document.getElementById('clampedSpeedMph').textContent = state.clampedSpeedMph.toFixed(1);
+      document.getElementById('clampedSpeedKmh').textContent = state.clampedSpeedKmh.toFixed(1);
+      document.getElementById('gpsAccuracyMeters').textContent = state.accuracyM.toFixed(1);
+      document.getElementById('gpsTimestamp').textContent = Date.now();
+    }
+
+    // High Precision Telemetry Ingestion Engine
+    let lastAlt = 14.5;
+    let lastPositionTime = Date.now();
+    let lastValidPos = null;
+
+    function ingestTelemetry(lat, lon, altM, speedMps, headingDeg, accuracyM, isIp = false) {
+      if (state.hasRealGpsLock && isIp) return;
+
+      const now = Date.now();
+      const dt = Math.max(0.1, (now - lastPositionTime) / 1000);
+      lastPositionTime = now;
+
+      if (!isIp) {
+        state.hasRealGpsLock = true;
+        state.locationSource = 'GPS';
+      } else {
+        state.locationSource = 'WIFI_IP';
+      }
+
+      const effectiveAlt = (altM !== null && altM !== undefined && !isNaN(altM)) ? altM : lastAlt;
+      const vertSpeed = (effectiveAlt - lastAlt) / dt;
+      lastAlt = effectiveAlt;
+
+      // Speed Calculation & Stationary Noise Filter
+      let measuredSpeedMps = 0;
+      if (speedMps !== null && speedMps !== undefined && !isNaN(speedMps) && speedMps >= 0) {
+        measuredSpeedMps = speedMps;
+      } else if (lastValidPos && !isIp) {
+        const dMeters = distanceMeters(lat, lon, lastValidPos.lat, lastValidPos.lon);
+        // Only calculate synthetic speed if displacement clearly exceeds the GPS accuracy radius
+        const minNoiseRadius = Math.max(7.0, (accuracyM || 5) * 0.75);
+        if (dMeters > minNoiseRadius && dt >= 1.0) {
+          measuredSpeedMps = Math.min(70, dMeters / dt);
+        } else {
+          measuredSpeedMps = 0;
+        }
+      }
+
+      // Hard Stationary Zero-Clamp Deadband (< 1.8 MPH / 0.804 m/s)
+      let clampedMps = measuredSpeedMps;
+      const rawMph = clampedMps * 2.23694;
+      if (rawMph < 1.8) {
+        clampedMps = 0;
+      } else if (accuracyM && accuracyM > 20 && rawMph < 2.5) {
+        clampedMps = 0;
+      }
+
+      const finalMph = clampedMps * 2.23694;
+      const finalKmh = clampedMps * 3.6;
+
+      // Bearing Resolution & Sensor Fusion
+      let resolvedHeading = state.headingDeg;
+      let headingSource = state.headingSource;
+
+      if (clampedMps > 1.1) {
+        // Vehicle in motion: Prioritize GNSS track
+        if (headingDeg !== null && headingDeg !== undefined && !isNaN(headingDeg) && headingDeg >= 0) {
+          resolvedHeading = headingDeg;
+          headingSource = 'GNSS COURSE';
+        } else if (lastValidPos && distanceMeters(lat, lon, lastValidPos.lat, lastValidPos.lon) > 8.0) {
+          resolvedHeading = calculateBearingDegrees(lastValidPos.lat, lastValidPos.lon, lat, lon);
+          headingSource = 'GNSS AZIMUTH';
+        }
+      } else {
+        // Vehicle stationary: Preserve previous course or let magnetometer guide
+        if (window.hardwareCompassHeading !== undefined && window.hardwareCompassHeading !== null) {
+          resolvedHeading = window.hardwareCompassHeading;
+          headingSource = 'MAGNETOMETER';
+        } else {
+          headingSource = 'STATIONARY LOCK';
+        }
+      }
+
+      const constrainedAxis = calculateConstrainedDirection(resolvedHeading, state.location.road);
+
+      state.latitude = lat;
+      state.longitude = lon;
+      state.altitudeM = effectiveAlt;
+      state.altitudeFt = effectiveAlt * 3.28084;
+      state.verticalSpeedMps = vertSpeed;
+      state.rawSpeedMps = measuredSpeedMps;
+      state.clampedSpeedMph = finalMph;
+      state.clampedSpeedKmh = finalKmh;
+      state.speedStatus = clampedMps === 0 ? 'STOPPED' : finalMph < 25 ? 'SLOW' : finalMph < 55 ? 'CRUISING' : 'HIGHWAY';
+      state.headingDeg = resolvedHeading;
+      state.headingCard = getCardinal(resolvedHeading);
+      state.headingSource = headingSource;
+      state.corridorAxis = constrainedAxis;
+      state.isCorridorLocked = true;
+      state.accuracyM = accuracyM ?? (isIp ? 5000 : 4.0);
+      state.location.googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat.toFixed(6)},${lon.toFixed(6)}`;
+
+      if (!isIp) {
+        lastValidPos = { lat, lon, time: now };
+      }
+
+      updateDOM();
+      reverseGeocodeLocation(lat, lon, false);
+
+      if (distanceMeters(lat, lon, lastWeatherLat, lastWeatherLon) > 4000) {
+        lastWeatherLat = lat;
+        lastWeatherLon = lon;
+        fetchWeather(lat, lon);
+      }
+    }
+
+    function calculateBearingDegrees(lat1, lon1, lat2, lon2) {
+      const p1 = lat1 * Math.PI / 180;
+      const p2 = lat2 * Math.PI / 180;
+      const dl = (lon2 - lon1) * Math.PI / 180;
+      const y = Math.sin(dl) * Math.cos(p2);
+      const x = Math.cos(p1) * Math.sin(p2) - Math.sin(p1) * Math.cos(p2) * Math.cos(dl);
+      const theta = Math.atan2(y, x);
+      return (theta * 180 / Math.PI + 360) % 360;
+    }
+
+    function distanceMeters(lat1, lon1, lat2, lon2) {
+      if (lat1 === null || lon1 === null || lat2 === null || lon2 === null) return 999999;
+      const R = 6371e3;
+      const p1 = lat1 * Math.PI / 180;
+      const p2 = lat2 * Math.PI / 180;
+      const dp = (lat2 - lat1) * Math.PI / 180;
+      const dl = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dp / 2) * Math.sin(dp / 2) +
+                Math.cos(p1) * Math.cos(p2) *
+                Math.sin(dl / 2) * Math.sin(dl / 2);
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    let isGeocoding = false;
+    let lastWeatherLat = null;
+    let lastWeatherLon = null;
+
+    async function reverseGeocodeLocation(lat, lon, force = false) {
+      const now = Date.now();
+      const dist = distanceMeters(lat, lon, state.lastGeocodedLat, state.lastGeocodedLon);
+
+      if (!force && (dist < 40 || now - state.lastGeocodedTime < 10000)) {
+        return;
+      }
+      if (isGeocoding) return;
+      isGeocoding = true;
+      state.lastGeocodedTime = now;
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat.toFixed(6)}&lon=${lon.toFixed(6)}&zoom=18&addressdetails=1&extra_tags=1`, {
+          signal: controller.signal,
+          headers: { 'Accept-Language': 'en' }
+        });
+        clearTimeout(timeoutId);
+
+        if (res.ok) {
+          const data = await res.json();
+          const addr = data.address || {};
+          let houseNumber = (addr.house_number || addr.street_number || addr.housenumber || addr.building_number || addr.conscriptionnumber || '').trim();
+          
+          // Check extratags if provided
+          if (!houseNumber && data.extratags && data.extratags['addr:housenumber']) {
+            houseNumber = data.extratags['addr:housenumber'].trim();
+          }
+
+          // Check display_name leading house number e.g. "10, Glen Circle, ..."
+          if (!houseNumber && data.display_name) {
+            const dnMatch = data.display_name.match(/^(\d+[\w-]*)\s*,\s*/);
+            if (dnMatch && dnMatch[1]) {
+              houseNumber = dnMatch[1].trim();
+            }
+          }
+
+          // Check data.name if numeric
+          if (!houseNumber && data.name && /^\d+[\w-]*$/.test(data.name.trim())) {
+            houseNumber = data.name.trim();
+          }
+
+          let road = addr.road || addr.highway || addr.motorway || addr.trunk || addr.primary || addr.secondary || addr.street || addr.pedestrian || (data.name && data.name !== addr.city && !/^\d+$/.test(data.name) ? data.name : null) || 'Corridor En Route';
+          road = abbreviateStreetName(road);
+
+          // Corridor directional alignment
+          const corridor = calculateConstrainedDirection(state.headingDeg, road);
+          if (corridor && (/^I-\d+/i.test(road) || /^(?:US|ROUTE)\s*\d+/i.test(road))) {
+            if (!road.toLowerCase().includes(corridor.toLowerCase())) {
+              road = `${road} ${corridor}`;
+            }
+          }
+
+          // Format house number with street name e.g. "10 Glen Cir."
+          if (houseNumber && !road.toLowerCase().startsWith(houseNumber.toLowerCase())) {
+            road = `${houseNumber} ${road}`;
+          }
+
+          let city = addr.city || addr.town || addr.village || addr.municipality || addr.suburb || addr.hamlet || '';
+          let stateRaw = addr.state || addr.region || '';
+          let stateCode = US_STATES[stateRaw] || stateRaw;
+          let county = addr.county || '';
+          let postcode = addr.postcode || '';
+
+          state.location.road = road;
+          state.location.cityState = [city, stateCode].filter(Boolean).join(', ');
+          state.location.county = county;
+          state.location.zip = postcode;
+          state.lastGeocodedLat = lat;
+          state.lastGeocodedLon = lon;
+          updateDOM();
+          isGeocoding = false;
+          return;
+        }
+      } catch (err) {}
+
+      try {
+        const bRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat.toFixed(6)}&longitude=${lon.toFixed(6)}&localityLanguage=en`);
+        if (bRes.ok) {
+          const bData = await bRes.json();
+          let road = bData.localityInfo?.informative?.[0]?.name || bData.locality || 'Navigational Corridor';
+          road = abbreviateStreetName(road);
+          let city = bData.city || bData.locality || '';
+          let stateCode = bData.principalSubdivision || '';
+          let postcode = bData.postcode || '';
+
+          state.location.road = road;
+          state.location.cityState = [city, stateCode].filter(Boolean).join(', ');
+          state.location.zip = postcode;
+          state.lastGeocodedLat = lat;
+          state.lastGeocodedLon = lon;
+          updateDOM();
+        }
+      } catch (e) {}
+
+      isGeocoding = false;
+    }
+
+    // IP Geolocation Fallback (Fast 1.5s parallel runner)
+    async function fetchWifiIpLocation() {
+      if (state.hasRealGpsLock) return;
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3500);
+        const res = await fetch('https://get.geojs.io/v1/ip/geo.json', { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.latitude && data.longitude) {
+            if (state.hasRealGpsLock) return;
+
+            const lat = parseFloat(data.latitude);
+            const lon = parseFloat(data.longitude);
+            const city = data.city || '';
+            const region = data.region || '';
+            const stateCode = US_STATES[region] || region;
+            const country = data.country || '';
+            const accuracy = parseFloat(data.accuracy || 20) * 1000;
+
+            ingestTelemetry(lat, lon, 14.5, 0, null, accuracy, true);
+            state.location.cityState = [city, stateCode].filter(Boolean).join(', ');
+            state.location.county = country;
+            updateDOM();
+            fetchWeather(lat, lon);
+            reverseGeocodeLocation(lat, lon, true);
+            return;
+          }
+        }
+      } catch (e) {}
+
+      try {
+        const res2 = await fetch('https://api.bigdatacloud.net/data/reverse-geocode-client');
+        if (res2.ok) {
+          const d2 = await res2.json();
+          if (d2 && d2.latitude && d2.longitude) {
+            if (state.hasRealGpsLock) return;
+            const lat = parseFloat(d2.latitude);
+            const lon = parseFloat(d2.longitude);
+            ingestTelemetry(lat, lon, 14.5, 0, null, 15000, true);
+            const stateCode = US_STATES[d2.principalSubdivision] || d2.principalSubdivision || '';
+            state.location.cityState = [d2.city || d2.locality, stateCode].filter(Boolean).join(', ');
+            updateDOM();
+            fetchWeather(lat, lon);
+            reverseGeocodeLocation(lat, lon, true);
+          }
+        }
+      } catch (e) {}
+    }
+
+    // Tracking Engine & Watchers
+    let watchPositionId = null;
+    let ipFallbackTimer = null;
+
+    // High Precision Multi-Stage Tracking Engine
+    function startTracking() {
+      // 1. IP Fallback Timer in parallel (fires if GPS takes > 1.5s)
+      if (ipFallbackTimer) clearTimeout(ipFallbackTimer);
+      ipFallbackTimer = setTimeout(() => {
+        if (!state.hasRealGpsLock) {
+          fetchWifiIpLocation();
+        }
+      }, 1500);
+
+      if (!('geolocation' in navigator)) {
+        fetchWifiIpLocation();
+        return;
+      }
+
+      // 2. Instantaneous Single-Shot Lock
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          if (ipFallbackTimer) clearTimeout(ipFallbackTimer);
+          ingestTelemetry(pos.coords.latitude, pos.coords.longitude, pos.coords.altitude, pos.coords.speed, pos.coords.heading, pos.coords.accuracy, false);
+          reverseGeocodeLocation(pos.coords.latitude, pos.coords.longitude, true);
+          lastWeatherLat = pos.coords.latitude;
+          lastWeatherLon = pos.coords.longitude;
+          fetchWeather(pos.coords.latitude, pos.coords.longitude);
+        },
+        err => {
+          console.warn('Initial single-shot GNSS warning:', err.message);
+          fetchWifiIpLocation();
+        },
+        { enableHighAccuracy: true, timeout: 6000, maximumAge: 10000 }
+      );
+
+      // 3. Continuous Tracking with Graceful Fallback Escalation
+      try {
+        if (watchPositionId !== null) {
+          navigator.geolocation.clearWatch(watchPositionId);
+        }
+
+        watchPositionId = navigator.geolocation.watchPosition(
+          pos => {
+            if (ipFallbackTimer) clearTimeout(ipFallbackTimer);
+            ingestTelemetry(pos.coords.latitude, pos.coords.longitude, pos.coords.altitude, pos.coords.speed, pos.coords.heading, pos.coords.accuracy, false);
+          },
+          error => {
+            console.warn('GPS High-Accuracy notice:', error.message);
+            // If high accuracy times out (desktop or deep indoors), gracefully degrade to standard accuracy
+            if (error.code === 2 || error.code === 3) {
+              if (watchPositionId !== null) {
+                navigator.geolocation.clearWatch(watchPositionId);
+              }
+              watchPositionId = navigator.geolocation.watchPosition(
+                lowPos => {
+                  if (ipFallbackTimer) clearTimeout(ipFallbackTimer);
+                  ingestTelemetry(lowPos.coords.latitude, lowPos.coords.longitude, lowPos.coords.altitude, lowPos.coords.speed, lowPos.coords.heading, lowPos.coords.accuracy, false);
+                },
+                lowErr => {
+                  console.warn('GPS Standard Accuracy fallback notice:', lowErr.message);
+                  if (!state.hasRealGpsLock) {
+                    fetchWifiIpLocation();
+                  }
+                },
+                { enableHighAccuracy: false, maximumAge: 5000, timeout: 20000 }
+              );
+            } else if (error.code === 1) {
+              if (!state.hasRealGpsLock) {
+                fetchWifiIpLocation();
+              }
+            }
+          },
+          { enableHighAccuracy: true, maximumAge: 1500, timeout: 10000 }
+        );
+      } catch (e) {
+        fetchWifiIpLocation();
+      }
+    }
+
+    // Hardware Magnetometer / Gyroscope Fusion with 3D Tilt Compensation
+    window.hardwareCompassHeading = null;
+    function handleOrientationEvent(e) {
+      if (!e) return;
+      let trueMag = null;
+
+      if (e.webkitCompassHeading !== undefined && e.webkitCompassHeading !== null) {
+        // iOS Safari True Compass Heading directly in degrees
+        trueMag = (Number(e.webkitCompassHeading) % 360 + 360) % 360;
+      } else if (e.alpha !== null && !isNaN(e.alpha)) {
+        // W3C Android / standard orientation with tilt compensation
+        if (typeof e.beta === 'number' && typeof e.gamma === 'number' && (Math.abs(e.beta) > 6 || Math.abs(e.gamma) > 6)) {
+          const degToRad = Math.PI / 180;
+          const _x = e.beta * degToRad; // pitch
+          const _y = e.gamma * degToRad; // roll
+          const _z = e.alpha * degToRad; // yaw
+          const cX = Math.cos(_x), cY = Math.cos(_y), cZ = Math.cos(_z);
+          const sX = Math.sin(_x), sY = Math.sin(_y), sZ = Math.sin(_z);
+          const Vx = -cZ * sY - sZ * sX * cY;
+          const Vy = -sZ * sY + cZ * sX * cY;
+          let comp = Math.atan2(Vx, Vy) * (180 / Math.PI);
+          if (comp < 0) comp += 360;
+          const screenAngle = (window.screen?.orientation?.angle) ?? (window.orientation || 0);
+          trueMag = (comp + screenAngle + 360) % 360;
+        } else {
+          const screenAngle = (window.screen?.orientation?.angle) ?? (window.orientation || 0);
+          trueMag = ((360 - e.alpha) + screenAngle + 360) % 360;
+        }
+      }
+
+      if (trueMag !== null && !isNaN(trueMag)) {
+        window.hardwareCompassHeading = trueMag;
+        // When vehicle is stopped, compass is driven directly by hardware magnetometer
+        if (state.clampedSpeedMph <= 2.2) {
+          state.headingDeg = trueMag;
+          state.headingCard = getCardinal(trueMag);
+          state.headingSource = 'MAGNETOMETER';
+          state.corridorAxis = calculateConstrainedDirection(trueMag, state.location.road);
+          updateDOM();
+        }
+      }
+    }
+
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientationabsolute', handleOrientationEvent, { passive: true });
+      window.addEventListener('deviceorientation', handleOrientationEvent, { passive: true });
+    }
+
+    function requestOrientationPermission() {
+      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission().then(res => {
+          if (res === 'granted') {
+            window.addEventListener('deviceorientation', handleOrientationEvent, { passive: true });
+            window.addEventListener('deviceorientationabsolute', handleOrientationEvent, { passive: true });
+          }
+        }).catch(() => {});
+      }
+    }
+    window.addEventListener('touchstart', requestOrientationPermission, { once: true, passive: true });
+    window.addEventListener('click', requestOrientationPermission, { once: true, passive: true });
+
+    // Weather API (Open-Meteo)
+    async function fetchWeather(lat, lon) {
+      try {
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}&current=temperature_2m,relative_humidity_2m,surface_pressure,weather_code,uv_index`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const cur = data.current || {};
+        const c = cur.temperature_2m ?? 22.0;
+        const f = (c * 9) / 5 + 32;
+        const hpa = cur.surface_pressure ?? 1013.2;
+        const inHg = hpa * 0.02953;
+
+        state.weather.tempC = Math.round(c * 10) / 10;
+        state.weather.tempF = Math.round(f * 10) / 10;
+        state.weather.humidity = Math.round(cur.relative_humidity_2m ?? 46);
+        state.weather.pressureHpa = Math.round(hpa * 10) / 10;
+        state.weather.pressureInHg = Math.round(inHg * 100) / 100;
+        state.weather.uv = cur.uv_index ?? 3.2;
+        state.weather.condition = cur.weather_code === 0 ? 'Clear Sky' : cur.weather_code < 3 ? 'Partly Cloudy' : cur.weather_code < 70 ? 'Showers' : 'Atmospheric';
+        updateDOM();
+      } catch (e) {}
+    }
+    fetchWeather(state.latitude, state.longitude);
+
+    // Tap Interactions for Blocks
+    document.getElementById('block-location').addEventListener('click', () => {
+      playTone(1300);
+      if (state.latitude !== 0 || state.longitude !== 0) {
+        const coordsText = `${state.latitude.toFixed(6)}, ${state.longitude.toFixed(6)}`;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(state.location.googleMapsUrl || coordsText);
+        }
+        showToast('COORDINATES COPIED');
+      } else {
+        showToast('ACQUIRING POSITION...');
+      }
+    });
+
+    document.getElementById('block-motion').addEventListener('click', () => {
+      playTone(1000);
+      state.speedUnit = state.speedUnit === 'MPH' ? 'KM/H' : 'MPH';
+      updateDOM();
+    });
+
+    document.getElementById('block-weather').addEventListener('click', () => {
+      playTone(1100);
+      state.tempUnit = state.tempUnit === 'F' ? 'C' : 'F';
+      state.baroUnit = state.baroUnit === 'inHg' ? 'hPa' : 'inHg';
+      updateDOM();
+    });
+
+    document.getElementById('block-time').addEventListener('click', () => {
+      playTone(1200);
+      showToast('LOCAL TIME SYNCED');
+    });
+
+    document.getElementById('block-philosophy').addEventListener('click', () => {
+      playTone(1500);
+      loadDailyQuote(true);
+    });
+
+    // ==========================================
+    // 4-THEME AVIONICS COLOR CONTROLLER
+    // ==========================================
+    const NOMAD_THEMES = [
+      { id: 'vivid', name: 'ORIGINAL VIVID HUD', className: '', freq: 1200, bgThemeColor: '#050811' },
+      { id: 'gray', name: 'RELAXED 256-GRAY', className: 'theme-gray mode-relaxed', freq: 750, bgThemeColor: '#080a0d' },
+      { id: 'apollo', name: 'APOLLO (R-W-B)', className: 'theme-apollo', freq: 900, bgThemeColor: '#080a0d' },
+      { id: 'arizona', name: 'ARIZONA DUSK', className: 'theme-arizona', freq: 1050, bgThemeColor: '#080a0d' }
+    ];
+
+    function applyTheme(themeId) {
+      state.colorTheme = themeId;
+      document.body.classList.remove('theme-gray', 'mode-relaxed', 'theme-apollo', 'theme-arizona');
+
+      const themeObj = NOMAD_THEMES.find(t => t.id === themeId) || NOMAD_THEMES[0];
+      if (themeObj.className) {
+        themeObj.className.split(' ').forEach(cls => {
+          if (cls) document.body.classList.add(cls);
+        });
+      }
+
+      const themeMeta = document.querySelector('meta[name="theme-color"]');
+      if (themeMeta) {
+        themeMeta.setAttribute('content', themeObj.bgThemeColor);
+      }
+
+      try {
+        localStorage.setItem('nomad_color_theme', themeId);
+        localStorage.setItem('nomad_color_mode', themeId);
+      } catch (e) {}
+    }
+
+    const brandBtn = document.getElementById('btn-brand-mode');
+    if (brandBtn) {
+      brandBtn.addEventListener('click', () => {
+        const currentIndex = NOMAD_THEMES.findIndex(t => t.id === state.colorTheme);
+        const nextIndex = (currentIndex + 1) % NOMAD_THEMES.length;
+        const nextTheme = NOMAD_THEMES[nextIndex];
+
+        playTone(nextTheme.freq);
+        applyTheme(nextTheme.id);
+        showToast(`THEME: ${nextTheme.name}`);
+      });
+    }
+
+    // Apply active theme on initial load
+    applyTheme(state.colorTheme);
+
+    // ==========================================
+    // AUDIO ON/OFF & LONG-PRESS DEEP CACHE FLUSH
+    // ==========================================
+    const audioBtn = document.getElementById('btn-audio');
+    let audioPressTimer = null;
+    let isLongPressTriggered = false;
+
+    async function triggerDeepAppFlush() {
+      isLongPressTriggered = true;
+      if (audioBtn) audioBtn.classList.remove('pressing');
+
+      // Haptic feedback & avionics purge chime
+      try {
+        if ('vibrate' in navigator) navigator.vibrate([100, 50, 150]);
+      } catch (e) {}
+
+      playTone(1800);
+      setTimeout(() => playTone(2400), 120);
+      showToast('SYSTEM PURGE: FLUSHING CACHE & REFETCHING SOURCE...');
+
+      // 1. Post FORCE_PURGE to Service Worker & unregister all workers
+      if ('serviceWorker' in navigator) {
+        try {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (const reg of registrations) {
+            if (reg.active) {
+              reg.active.postMessage({ type: 'FORCE_PURGE' });
+            }
+            await reg.unregister();
+          }
+        } catch (e) {}
+      }
+
+      // 2. Wipe every CacheStorage instance
+      if ('caches' in window) {
+        try {
+          const cacheKeys = await caches.keys();
+          await Promise.all(cacheKeys.map(k => caches.delete(k)));
+        } catch (e) {}
+      }
+
+      // 3. Clear session and temporary storage
+      try {
+        sessionStorage.clear();
+        localStorage.removeItem('nomad_cached_version');
+        localStorage.removeItem('nomad_last_update_check');
+      } catch (e) {}
+
+      // 4. Force hard reload from server with timestamp cache-buster
+      setTimeout(() => {
+        const dest = new URL(window.location.origin + window.location.pathname);
+        dest.searchParams.set('flush', Date.now().toString());
+        window.location.replace(dest.toString());
+      }, 500);
+    }
+
+    function startAudioPress() {
+      isLongPressTriggered = false;
+      audioBtn.classList.add('pressing');
+      clearTimeout(audioPressTimer);
+      audioPressTimer = setTimeout(() => {
+        triggerDeepAppFlush();
+      }, 800); // 800ms threshold for deep purge
+    }
+
+    function cancelAudioPress() {
+      clearTimeout(audioPressTimer);
+      audioBtn.classList.remove('pressing');
+    }
+
+    function handleAudioClick(e) {
+      if (isLongPressTriggered) {
+        e.preventDefault();
+        e.stopPropagation();
+        isLongPressTriggered = false;
+        return;
+      }
+      state.soundEnabled = !state.soundEnabled;
+      audioBtn.textContent = state.soundEnabled ? 'AUDIO: ON' : 'AUDIO: OFF';
+      audioBtn.className = 'btn-ctrl ' + (state.soundEnabled ? 'active' : '');
+      if (state.soundEnabled) playTone(1200);
+    }
+
+    if (audioBtn) {
+      audioBtn.addEventListener('pointerdown', startAudioPress);
+      audioBtn.addEventListener('pointerup', cancelAudioPress);
+      audioBtn.addEventListener('pointercancel', cancelAudioPress);
+      audioBtn.addEventListener('pointerleave', cancelAudioPress);
+      audioBtn.addEventListener('click', handleAudioClick);
+    }
+
+    // Screen Wake Lock
+    let wakeLock = null;
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLock = await navigator.wakeLock.request('screen');
+        }
+      } catch (err) {}
+    }
+    requestWakeLock();
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') requestWakeLock();
+    });
+
+    // ==========================================
+    // NOMAD: DIGIT — Versioning & PWA Call-Home Engine
+    // ==========================================
+    const NOMAD_CURRENT_VERSION = 'v1.10022026.2157';
+    let serviceWorkerRegistration = null;
+    let isUpdateAvailable = false;
+
+    // In-App PWA Install Flow
+    let deferredInstallPrompt = null;
+    const installBtn = document.getElementById('btn-install-pwa');
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      if (installBtn && !isStandalone) {
+        installBtn.style.display = 'inline-flex';
+      }
+    });
+
+    if (installBtn) {
+      installBtn.addEventListener('click', async () => {
+        playTone(1200);
+        if (!deferredInstallPrompt) {
+          showToast('PWA: Tap Chrome ⋮ menu -> Install App');
+          return;
+        }
+        deferredInstallPrompt.prompt();
+        const { outcome } = await deferredInstallPrompt.userChoice;
+        if (outcome === 'accepted') {
+          installBtn.style.display = 'none';
+          showToast('NOMAD DIGIT INSTALLED');
+        }
+        deferredInstallPrompt = null;
+      });
+    }
+
+    window.addEventListener('appinstalled', () => {
+      if (installBtn) installBtn.style.display = 'none';
+      showToast('NOMAD DIGIT INSTALLED');
+    });
+
+    const versionTagEl = document.getElementById('hud-version');
+
+    function setUpdateAvailableState(remoteVersion) {
+      if (isUpdateAvailable) return;
+      isUpdateAvailable = true;
+      if (versionTagEl) {
+        versionTagEl.classList.add('has-update');
+        versionTagEl.innerHTML = '<span class="update-dot"></span> UPDATE AVAILABLE';
+        versionTagEl.setAttribute('title', `New version ${remoteVersion || ''} available. Tap to refresh system.`);
+      }
+    }
+
+    async function checkRemoteVersion(showFeedbackOnUpToDate = false) {
+      if (isUpdateAvailable) return;
+
+      try {
+        let res = await fetch(`/version.json?t=${Date.now()}`, {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+        }).catch(() => null);
+
+        if (!res || !res.ok) {
+          res = await fetch(`/public/version.json?t=${Date.now()}`, {
+            cache: 'no-store',
+            headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+          }).catch(() => null);
+        }
+
+        if (res && res.ok) {
+          const data = await res.json();
+          if (data && data.version && data.version !== NOMAD_CURRENT_VERSION) {
+            setUpdateAvailableState(data.version);
+            return;
+          }
+        }
+      } catch (err) {}
+
+      if (serviceWorkerRegistration) {
+        try {
+          await serviceWorkerRegistration.update();
+        } catch (e) {}
+      }
+
+      if (showFeedbackOnUpToDate && !isUpdateAvailable) {
+        showToast(`SYSTEM UP TO DATE (${NOMAD_CURRENT_VERSION})`);
+      }
+    }
+
+    function applySystemUpdate() {
+      playTone(1600);
+      showToast('APPLYING UPDATE...');
+
+      if (serviceWorkerRegistration && serviceWorkerRegistration.waiting) {
+        serviceWorkerRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+
+      if ('caches' in window) {
+        caches.keys().then((names) => {
+          Promise.all(names.map((name) => caches.delete(name))).finally(() => {
+            setTimeout(() => {
+              window.location.reload();
+            }, 350);
+          });
+        });
+      } else {
+        setTimeout(() => {
+          window.location.reload();
+        }, 350);
+      }
+    }
+
+    if (versionTagEl) {
+      versionTagEl.addEventListener('click', () => {
+        if (isUpdateAvailable) {
+          applySystemUpdate();
+        } else {
+          playTone(1200);
+          showToast('CHECKING FOR UPDATES...');
+          checkRemoteVersion(true);
+        }
+      });
+    }
+
+    // PWA Service Worker Registration & Lifecycle
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((reg) => {
+            serviceWorkerRegistration = reg;
+
+            if (reg.waiting) {
+              setUpdateAvailableState();
+            }
+
+            reg.addEventListener('updatefound', () => {
+              const newWorker = reg.installing;
+              if (newWorker) {
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    setUpdateAvailableState();
+                  }
+                });
+              }
+            });
+          })
+          .catch(() => {});
+
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!refreshing) {
+            refreshing = true;
+            window.location.reload();
+          }
+        });
+      });
+    }
+
+    // Call Home Triggers:
+    // 1. Initial check after boot
+    setTimeout(() => checkRemoteVersion(false), 2000);
+    // 2. Periodic poll every 60 seconds
+    setInterval(() => checkRemoteVersion(false), 60000);
+    // 3. On window focus / return to app
+    window.addEventListener('focus', () => checkRemoteVersion(false));
+    // 4. On network reconnection
+    window.addEventListener('online', () => checkRemoteVersion(false));
+
+    // Developer simulation helper
+    window.simulateUpdate = () => {
+      setUpdateAvailableState('v1.TEST.UPDATE');
+      showToast('UPDATE DETECTED (SIMULATED)');
+    };
+
+    // Boot
+    startTracking();
+    updateDOM();
+    loadDailyQuote(false);
+  </script>
+</body>
+</html>

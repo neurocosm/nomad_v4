@@ -21,7 +21,7 @@ const PORT = 3000;
 
 // API health endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', app: 'NOMAD: RoadTrip' });
+  res.json({ status: 'ok', app: 'NOMAD: Hyperspace' });
 });
 
 // Atmospheric & Weather Telemetry Proxy Endpoint
@@ -92,5 +92,5 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`NOMAD: RoadTrip server running on http://0.0.0.0:${PORT}`);
+  console.log(`NOMAD: Hyperspace server running on http://0.0.0.0:${PORT}`);
 });

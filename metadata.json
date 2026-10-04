@@ -1,6 +1,6 @@
 {
-  "name": "NOMAD: RoadTrip",
-  "description": "NOMAD Version 4 Hyperspace: Real-time Heads-Up GPS Navigation, Telemetry Dashboard, and Kinetic Visualizers",
+  "name": "NOMAD: Hyperspace",
+  "description": "NOMAD Version 4 - Hyperspace: Real-time Heads-Up GPS Navigation, Telemetry Dashboard, and Kinetic Visualizers",
   "requestFramePermissions": [
     "geolocation"
   ],

@@ -13,7 +13,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>NOMAD: Hyperspace - User Guide &amp; Features</title>
+  <title>NOMAD: RoadTrip - Features &amp; Guide</title>
 
   <!-- Version Single Source of Truth -->
   <script src="version.js"></script>
@@ -384,8 +384,8 @@
     <!-- Header -->
     <div class="header">
       <div class="header-title-group">
-        <div class="header-title">NOMAD: Hyperspace</div>
-        <div class="header-tagline">Version 4 &bull; Kinetic Telemetry &amp; Navigation HUD</div>
+        <div class="header-title">NOMAD: RoadTrip</div>
+        <div class="header-tagline">Telemetry &amp; Navigation HUD</div>
       </div>
       <div class="header-nav-btns">
         <a href="geek-stats.html" class="btn-terminal-header" onclick="window.location.replace('geek-stats.html'); return false;">&gt;_ VT220</a>
@@ -407,134 +407,60 @@
       <a href="gps-setup.html" class="btn-gps-guide" onclick="window.location.replace('gps-setup.html'); return false;">GPS GUIDE &rarr;</a>
     </div>
 
-    <!-- 1. HYPERSPACE KINETIC DATA BUBBLES & GEOMETRY ENGINE -->
+    <!-- 1. CORE TELEMETRY & MEGA-HUD DISPLAY MODES -->
     <div class="feature-card highlight">
       <div class="card-heading">
-        <span class="badge-icon badge-core">💫</span>
-        Hyperspace Kinetic Data Bubbles &amp; Geometries
+        <span class="badge-icon badge-core">📡</span>
+        Mega-HUD Telemetry &amp; Navigation
       </div>
 
       <div class="feature-row">
         <div class="feature-name">
-          <span>Autonomous Floating Kinetic Physics</span>
-          <span class="feature-action-pill">Newtonian Bounce</span>
+          <span>High-Visibility Address Stack</span>
+          <span class="feature-action-pill">Auto-Shrink</span>
         </div>
         <div class="feature-desc">
-          Telemetry previously locked to fixed corner gauges now floats freely in kinetic data bubbles across the entire vector map canvas. Bubbles feature autonomous velocity momentum, perimeter screen-wall deflection, and direct pointer flicking with continuous inertia.
+          Context-aware reverse-geocoding displays full street numbers, standard abbreviations, town, state code, and county zip. Dynamic font sizing prevents long street names from clipping.
         </div>
       </div>
 
       <div class="feature-row">
         <div class="feature-name">
-          <span>Curated Geometric Defaults &amp; True Shapes</span>
-          <span class="feature-action-pill">Curated Tuning</span>
-        </div>
-        <div class="feature-desc">
-          Every telemetry channel features an architecturally curated optimal default geometry tailored specifically to its metric:
-          <ul style="margin: 6px 0 6px 18px; font-size: 0.85rem; line-height: 1.5; color: #b0b8c4;">
-            <li><strong>Speed</strong>: Egg / Oval for fluid horizontal velocity dynamics.</li>
-            <li><strong>Weather &amp; Temp</strong>: Squirkle (smooth continuous superellipse).</li>
-            <li><strong>Compass (CMPS)</strong>: Pentagon pointing toward the course vector.</li>
-            <li><strong>Atmospheric Barometer (ATMO)</strong>: Hexagon for atmospheric data stacking.</li>
-            <li><strong>Lat/Lon Coordinates</strong>: Specialized <strong>Seesaw Rectangle</strong> with center fulcrum pivot and buoyant pendulum wobble physics, perfectly cradling two-line GPS coordinates.</li>
-            <li><strong>Route Shields</strong>: Tactical Interstate &amp; State Highway shield badge.</li>
-          </ul>
-          <span style="font-size: 0.84rem; color: #8ea0b4;">
-            Fully customizable in the bubble editor: <strong>Circle, Egg/Oval, Triangle, True Square (razor-sharp right-angle corners), Squirkle, Rectangle, Pentagon, Hexagon, and Octagon</strong>.
-          </span>
-        </div>
-      </div>
-
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Catch-on-Hover / Touch ("Catch the Bubble")</span>
-          <span class="feature-action-pill">Hover / Touch Stop</span>
-        </div>
-        <div class="feature-desc">
-          Simply hover your mouse cursor over any floating bubble or rest your finger on it to immediately freeze its motion in place with a cyan glow resonance. Eliminates the frustration of having to chase floating data across the display.
-        </div>
-      </div>
-
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Dual Motion Modes (Kinetic vs. Stationary Pinned)</span>
-          <span class="feature-action-pill">Long-Press (600ms)</span>
-        </div>
-        <div class="feature-desc">
-          Long-press any bubble to access its Hyperspace Configurator. Toggle between <strong>🚀 Kinetic Bounce</strong> (free-floating physics) and <strong>📌 Stationary Pinned</strong> (drag and drop anywhere on the vector map to lock your custom cockpit layout with a 📌 indicator).
-        </div>
-      </div>
-
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Vehicle Safe Zone Forcefield</span>
-          <span class="feature-action-pill">Holographic Shield</span>
-        </div>
-        <div class="feature-desc">
-          Dedicated protective forcefield around the central vehicle marker (Chevron or Galaga Fighter) guarantees floating telemetry never obscures vital navigation. Configurable per bubble: <strong>Bounce Off</strong> (elastic collision deflection) or <strong>Pass Underneath</strong> (smoothly glides underneath the vehicle icon).
-        </div>
-      </div>
-
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Crystal Transparent Glass &amp; Dynamic Lighting</span>
-          <span class="feature-action-pill">0% – 80% Alpha</span>
-        </div>
-        <div class="feature-desc">
-          True alpha-channel crystalline glass with contour-conforming drop-shadows and zero square-corner clipping artifacts. Automatically adapts sheer glass tints to Natural Dark Navigation (semi-transparent deep obsidian) and Natural Light Navigation (frosted crystal off-white).
-        </div>
-      </div>
-
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Dynamic Outer Shape Rotation Modes</span>
-          <span class="feature-action-pill">Speed / Compass Spin</span>
-        </div>
-        <div class="feature-desc">
-          The outer geometric shape frame rotates dynamically while telemetry readings and unit badges stay locked strictly upright. Choose between <strong>Speed Spin (GPS)</strong> scaling with travel velocity, <strong>Compass Orientation (Gyro)</strong> aligning with vehicle heading, or <strong>Static</strong>.
-        </div>
-      </div>
-    </div>
-
-    <!-- 2. EDGE-TO-EDGE VECTOR COCKPIT & MINIMAL CONTROLS -->
-    <div class="feature-card">
-      <div class="card-heading">
-        <span class="badge-icon badge-core">🗺️</span>
-        Edge-to-Edge Vector Cockpit &amp; Minimal Controls
-      </div>
-
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Bottom-Docked Location Channel Space Block</span>
-          <span class="feature-action-pill">Tap to Share GPS</span>
-        </div>
-        <div class="feature-desc">
-          Sleek, low-profile glass plaque docked along the bottom edge, displaying Street/Highway Name, City/State, and County/ZIP with subtle cyan dot divider. Tap anywhere on the plaque to copy a direct Google Maps GPS link to your clipboard with instant toast confirmation.
-        </div>
-      </div>
-
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Deep Corner Glassy Controls</span>
-          <span class="feature-action-pill">36px Minimal Pods</span>
-        </div>
-        <div class="feature-desc">
-          <ul style="margin: 6px 0 6px 18px; font-size: 0.85rem; line-height: 1.5; color: #b0b8c4;">
-            <li><strong>Top-Left (Map Theme)</strong>: Circular glassy pod toggles Natural Dark Navigation and Natural Light Navigation with instant WebGL palette switching.</li>
-            <li><strong>Top-Center (Fullscreen)</strong>: Native borderless immersive fullscreen with automatic screen wake-lock prevention.</li>
-            <li><strong>Top-Right (Craft Mode Toggle)</strong>: Glassy toggle with dynamic "other option" icon switching between the standard Cruise Chevron and retro Galaga Fighter.</li>
-            <li><strong>Center Vehicle Chevron (Perspective Switch)</strong>: Tapping the center vehicle marker directly switches between <strong>3D Take-Off Drive (58° road perspective tilt)</strong>, <strong>Top-Down Track-Up</strong>, and <strong>Top-Down North-Up</strong>.</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Highway Corridor Grid Axis Engine</span>
+          <span>Corridor-Aware Universal Geocoding Engine</span>
           <span class="feature-action-pill">Auto-Hysteresis</span>
         </div>
         <div class="feature-desc">
-          Intelligent corridor logic constrains directional headings along highway corridors (Odd Interstates North/South, Even Interstates East/West) with ±15° directional hysteresis deadband preventing jitter along circumferential highway curves.
+          Spatial highway filter activates strictly at <strong>&gt;40 MPH</strong> or freeway lock, querying at zoom 15 with OpenStreetMap taxonomy metadata to eliminate median dropouts and unmapped road gaps. Preserves route titles across brief gaps with a 15-second smoothing memory buffer. Transitions to residential addresses at &le;40 MPH (zoom 17).
+        </div>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-name">
+          <span>Google Maps Link Sharing</span>
+          <span class="feature-action-pill">Single Tap</span>
+        </div>
+        <div class="feature-desc">
+          Tap the top Location Card to copy a direct Google Maps GPS coordinate link to your clipboard with an instant confirmation badge.
+        </div>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-name">
+          <span>Tactical Corner Badges, 5-Tier Scaling &amp; Transparency</span>
+          <span class="feature-action-pill">Tap / Hold Telem (500ms)</span>
+        </div>
+        <div class="feature-desc">
+          Tap the top-left squircle pod to cycle between <strong>Heading &amp; Bearing</strong> (e.g., 0° NORTH or 338° NW), <strong>GPS Altitude</strong> in feet (FT ALT), and real-time <strong>GPS Accuracy Margin</strong> (±ft FT GPS). Long-press (500ms) to open the <strong>Corner Badges &amp; HUD</strong> configurator: adjust between <strong>5 proportional size tiers</strong> (Small, Small-Med, Medium, Med-Large, Large Quad) and fine-tune <strong>Transparency</strong> with smooth real-time background &amp; border alpha sliders.
+        </div>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-name">
+          <span>Chronometer Squircle Compass &amp; 3D POV Pitch</span>
+          <span class="feature-action-pill">Tap / Hold Compass</span>
+        </div>
+        <div class="feature-desc">
+          Precision squircle compass with borderless dial face, dynamic light/dark theme contrast, dual-taper needle, and 30° tactile tick marks. Tap to toggle <strong>Heading-Up</strong> vs. <strong>North-Up</strong> navigation. Long-press (500ms) to toggle between <strong>3D 58° Take-Off Pitch</strong> and flat 2D bird's-eye view.
         </div>
       </div>
 
@@ -559,39 +485,75 @@
       </div>
     </div>
 
-    <!-- 3. SENSORY CONSOLES & WEATHER ENGINE -->
+    <!-- 2. SPEED SIGN, MAP PALETTES & WEATHER CONFIG -->
     <div class="feature-card">
       <div class="card-heading">
         <span class="badge-icon badge-weather">⚡</span>
-        Sensory Consoles &amp; Weather Engine
+        Dash Customization &amp; Weather Engine
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-name">
+          <span>High-Contrast Speed Sign</span>
+          <span class="feature-action-pill">Tap Speed</span>
+        </div>
+        <div class="feature-desc">
+          Authentic highway regulatory sign styling. Tap to instantly toggle between <strong>MPH</strong> and <strong>KM/H</strong>.
+        </div>
       </div>
 
       <div class="feature-row">
         <div class="feature-name">
           <span>Cinematic Maps &amp; Kinetic Sensory Consoles</span>
-          <span class="feature-action-pill">Die Button 🎲</span>
+          <span class="feature-action-pill">Chevron &amp; Die Icons</span>
         </div>
         <div class="feature-desc">
-          Seamless split navigation separates live cartography from kinetic sensory fidget consoles:
+          Dual-mode split navigation separates live cartography from kinetic sensory fidget consoles:
           <ul style="margin: 6px 0 6px 18px; font-size: 0.85rem; line-height: 1.5; color: #b0b8c4;">
-            <li><strong>Amber Cosmic Starfield</strong>: Interactive space-flight console with velocity warp vectors, rotating celestial rings, and temperature-reactive nebular blooms.</li>
-            <li><strong>Underwater Ocean Deep</strong>: Relaxing marine simulation featuring caustic sunlight beams, reactive swimming aquatic life, rising bubbles, and hydrodynamic shockwaves.</li>
-            <li><strong>Synthomatic Sensory Console</strong>: 1:1 square retro-futuristic PCB with central SYNTH-DSP 8800 chip, quartz crystal clock, 45° gold traces, and regenerative braking energy pulse surges.</li>
-            <li><strong>Stampede Canyon Charge (Ark Stampede)</strong>: Scenic kinetic prairie sanctuary with pairs of diverse fauna racing beneath a starlit night sky toward the illuminated Ark beacon.</li>
+            <li><strong>Map Mode (Vehicle Chevron)</strong>: Tap the GPS vehicle chevron marker in the center of the map to cycle between <em>Natural Dark Navigation</em> and <em>Natural Light Navigation</em>. Continuing forward steps directly into the sensory consoles.</li>
+            <li><strong>Fidget Mode (Far Lower-Right Die Button 🎲)</strong>: When enjoying a sensory console, tap the rolling Die button in the bottom-right corner to cycle continuously between all kinetic fidget consoles without leaving fidget mode.</li>
+            <li><strong>Instant Return to Map (Far Lower-Left Map Button 🗺️)</strong>: Tap the folded map icon in the bottom-left corner to immediately escape back to your active live map navigation theme without having to cycle through remaining consoles.</li>
           </ul>
-          <div style="margin-top: 6px; font-size: 0.84rem; color: #8ea0b4;">
-            <strong>Auto-Cycle Screensaver</strong>: Long-press the Die button for 700ms to activate the automated 60-second console countdown cycle (6 &rarr; 5 &rarr; 4 &rarr; 3 &rarr; 2 &rarr; 1).
+          <div style="margin-top: 8px; font-size: 0.82rem; color: #8ea0b4;">
+            <strong>Available Kinetic Consoles:</strong>
+            <ul style="margin: 4px 0 4px 18px; line-height: 1.45;">
+              <li><strong>Amber Cosmic Starfield</strong>: Interactive kinetic space-flight console with velocity warp vectors, rotating celestial rings, and temperature-reactive nebular blooms.</li>
+              <li><strong>Underwater Ocean Deep</strong>: Relaxing marine simulation featuring caustic sunlight beams, reactive swimming aquatic life, rising bubbles, and hydrodynamic shockwaves.</li>
+              <li><strong>Synthomatic Sensory Console</strong>: Retro-futuristic kinetic synesthesia console featuring multi-axis internal sensor feedback across a 3-bar stepped equalizer, emerald green &amp; gold PCB circuit traces, and dynamic orbital scanner bezel.</li>
+              <li><strong>Stampede Canyon Charge (Ark Stampede)</strong>: Scenic kinetic canyon and prairie sanctuary celebration featuring pairs of diverse fauna racing in high spirits—Towering Giraffes, Slithering Desert Snakes, American Bison, Wild Mustangs, Pronghorn Antelopes, Majestic Elk, Bighorn Rams, and soaring Eagles beneath a starlit night sky and crescent moon, racing toward the illuminated Ark beacon.</li>
+            </ul>
           </div>
+          Your active theme preference is remembered across sessions.
         </div>
       </div>
 
       <div class="feature-row">
         <div class="feature-name">
-          <span>Live Weather, UV &amp; Barometric Telemetry</span>
-          <span class="feature-action-pill">Open-Meteo GPS</span>
+          <span>Live Weather &amp; UV Telemetry</span>
+          <span class="feature-action-pill">Tap Temp</span>
         </div>
         <div class="feature-desc">
-          Real-time meteorological conditions including dynamic weather icons, relative humidity percentage, barometric pressure, and color-graded UV index warnings. Tap temperature to toggle between <strong>°F</strong> and <strong>°C</strong>. Long-press to configure custom update polling (Time intervals 10m–60m or Distance triggers 15mi–50mi).
+          Real-time conditions from Open-Meteo including dynamic weather icons, relative humidity percentage, and color-graded UV index warnings. Tap temperature to toggle between <strong>°F</strong> and <strong>°C</strong>.
+        </div>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-name">
+          <span>Weather Refresh Configuration</span>
+          <span class="feature-action-pill">Hold Temp (500ms)</span>
+        </div>
+        <div class="feature-desc">
+          Long-press temperature to set your custom update polling: Time intervals (10m, 20m, 30m, 60m) or Distance triggers (15mi, 30mi, 50mi, or Off).
+        </div>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-name">
+          <span>Fullscreen &amp; Screen Wake Lock</span>
+          <span class="feature-action-pill">Tap Top Icon</span>
+        </div>
+        <div class="feature-desc">
+          Locks your phone display awake during long road trips and triggers native borderless immersive fullscreen navigation.
         </div>
       </div>
     </div>
@@ -698,29 +660,28 @@
       </a>
     </div>
 
-    <!-- 5. VEHICLE CRAFT & ARCADE VAULT -->
+    <!-- 5. SECRET CHEATS & EASTER EGGS -->
     <div class="feature-card vault">
       <div class="card-heading">
         <span class="badge-icon badge-secret">👾</span>
-        Vehicle Craft &amp; Arcade Vault
+        Secret Cheats &amp; Arcade Vault
       </div>
 
-      <!-- Mode 1: Cruise Chevron -->
-      <div class="secret-box" style="border-color: #00d4ff; background: rgba(0, 212, 255, 0.08);">
-        <div class="secret-title" style="color: #00d4ff;">🚀 Cruise Chevron &amp; 3D Perspective Tilt</div>
+      <!-- Secret 1: Dixie Horn -->
+      <div class="secret-box">
+        <div class="secret-title">🎺 General Lee "Dixie" Air Horn &amp; Scaled 01</div>
         <div class="secret-desc">
-          <strong>Alignment:</strong> Automatically tilts into the road plane in 3D Perspective Mode (pitch: 58°, tilt: 42°), resetting cleanly to flat overhead in 2D North-Up and Track-Up modes.<br />
-          <strong>Perspective Switch:</strong> Tap the center Chevron directly to cycle between <strong>3D Take-Off Drive</strong>, <strong>Top-Down Track-Up</strong>, and <strong>Top-Down North-Up</strong>.
+          <strong>Trigger:</strong> Press and hold the <strong>Vehicle Arrow</strong> for 500ms in normal cruise mode.<br />
+          <strong>Effect:</strong> Synthesizes the authentic 12-note <em>Dixie</em> phrase via dual harmonic oscillators while the car swells to <strong>2× size with a pulsing orange glow</strong> and the telemetry badge flashes the scaled <strong>"01"</strong> livery insignia.
         </div>
       </div>
 
-      <!-- Mode 2: Galaga Fighter -->
+      <!-- Secret 2: Galaga Mode -->
       <div class="secret-box">
-        <div class="secret-title">👾 8-Bit Galaga Fighter &amp; Triple Laser Salvos</div>
+        <div class="secret-title">👾 8-Bit Galaga Mode &amp; Triple Blaster Lasers</div>
         <div class="secret-desc">
-          <strong>Activation:</strong> Tap the glassy top-right vehicle toggle button (featuring a dynamic alternate vehicle icon).<br />
-          <strong>Dual Themes:</strong> Neon magenta/cyan retro arcade craft in Dark mode, dynamically transforming into the matte charcoal <strong>F-117 Stealth Fighter</strong> interceptor in Light mode.<br />
-          <strong>Blaster Action:</strong> Tap the Galaga Fighter to fire <strong>three dual-laser salvos (pew-pew ... pew-pew ... pew-pew!)</strong> with recoil pulse animations.
+          <strong>Trigger:</strong> Press and hold the <strong>SPEED Sign</strong> for 600ms.<br />
+          <strong>Effect:</strong> Morphs the dashboard into an OutRun neon arcade cockpit (magenta/cyan glow), turns the speed sign into an arcade cabinet, and swaps your car for an 8-bit Galaga Fighter craft. Long-press the Galaga ship to fire <strong>three dual-laser salvos (pew-pew ... pew-pew ... pew-pew!)</strong> with 2× recoil pulsing.
         </div>
       </div>
     </div>
