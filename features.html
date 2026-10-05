@@ -1,6 +1,7 @@
 <!--
  ====================================================================
  NOMAD HUD & Telemetry Navigation System
+ Universal User Guide & Avionics Field Manual
  
  Proprietary & Created by BostonyFX
  Instagram: https://instagram.com/neurocosm
@@ -13,12 +14,34 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>NOMAD: Hyperspace - User Guide &amp; Features</title>
+  <title>NOMAD: Universal User Guide &amp; Avionics Manual</title>
+  <meta name="description" content="NOMAD Universal User Guide - Complete documentation and field manuals for Hyperspace, RoadTrip, DIGIT, and Shared Sensory Avionics by BostonyFX (@neurocosm)" />
+  <meta name="theme-color" content="#050811" />
 
-  <!-- Version Single Source of Truth -->
+  <!-- Fonts & Single Source of Truth Version Registry -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
   <script src="version.js"></script>
 
   <style>
+    :root {
+      --bg-space: #070a14;
+      --bg-card: #0d1527;
+      --bg-card-hover: #121c33;
+      --border-subtle: rgba(255, 255, 255, 0.10);
+      --border-glow: rgba(0, 243, 255, 0.35);
+      --accent-cyan: #00f3ff;
+      --accent-magenta: #ff0055;
+      --accent-amber: #ffb703;
+      --accent-green: #30d158;
+      --accent-blue: #38bdf8;
+      --accent-purple: #bf5af2;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -27,28 +50,34 @@
     }
 
     body {
-      background-color: #0b0c10;
-      color: #e0e6ed;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-space);
+      background: radial-gradient(circle at 50% 0%, #101c38 0%, #070a14 75%);
+      color: var(--text-main);
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       line-height: 1.6;
       padding: 16px;
       padding-top: max(16px, env(safe-area-inset-top));
-      padding-bottom: max(32px, env(safe-area-inset-bottom));
+      padding-bottom: max(36px, env(safe-area-inset-bottom));
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
     }
 
     .container {
-      max-width: 680px;
+      max-width: 820px;
       margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
 
-    /* Top Navigation Header */
+    /* Top Sticky Navigation Header */
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-bottom: 16px;
-      border-bottom: 1px solid #1f2937;
-      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-subtle);
       gap: 12px;
       flex-wrap: wrap;
     }
@@ -56,681 +85,1106 @@
     .header-title-group {
       display: flex;
       flex-direction: column;
+      gap: 2px;
+    }
+
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.68rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .brand-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      box-shadow: 0 0 8px var(--accent-cyan);
     }
 
     .header-title {
-      font-size: 1.5rem;
-      font-weight: 900;
+      font-size: 1.75rem;
+      font-weight: 800;
       color: #ffffff;
-      letter-spacing: 1px;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
     }
 
     .header-tagline {
-      font-size: 0.85rem;
-      color: #00d4ff;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
     }
 
     .header-nav-btns {
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
-    .btn-back {
-      background: #1f2937;
-      color: #4cd964;
-      border: 1px solid #374151;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 0.9rem;
-      font-weight: 800;
-      text-decoration: none;
+    .nav-btn {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: background 0.15s ease, transform 0.1s ease;
-      cursor: pointer;
-    }
-
-    .btn-back:active {
-      transform: scale(0.94);
-      background: #374151;
-    }
-
-    .btn-terminal-header {
-      background: rgba(255, 176, 0, 0.12);
-      color: #ffb000;
-      border: 1px solid #ffb000;
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 800;
+      padding: 7px 14px;
+      border-radius: 10px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
       text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-family: "Courier New", Courier, monospace;
-      transition: background 0.15s ease, transform 0.1s ease;
+      transition: all 0.15s ease;
       cursor: pointer;
+      border: 1px solid var(--border-subtle);
     }
 
-    .btn-terminal-header:active {
-      transform: scale(0.94);
-      background: #ffb000;
-      color: #000000;
+    .nav-btn:active {
+      transform: scale(0.96);
     }
 
-    /* GPS Quick Help Banner */
-    .gps-guide-banner {
-      background: #161b22;
-      border: 1px solid #00d4ff;
-      box-shadow: 0 0 14px rgba(0, 212, 255, 0.12);
-      border-radius: 12px;
-      padding: 12px 16px;
-      margin-bottom: 20px;
+    .nav-btn-dash {
+      background: rgba(48, 209, 88, 0.12);
+      color: var(--accent-green);
+      border-color: rgba(48, 209, 88, 0.35);
+    }
+    .nav-btn-dash:hover {
+      background: rgba(48, 209, 88, 0.22);
+      border-color: var(--accent-green);
+    }
+
+    .nav-btn-stats {
+      background: rgba(255, 183, 3, 0.10);
+      color: var(--accent-amber);
+      border-color: rgba(255, 183, 3, 0.35);
+    }
+    .nav-btn-stats:hover {
+      background: rgba(255, 183, 3, 0.20);
+      border-color: var(--accent-amber);
+    }
+
+    .nav-btn-arcade {
+      background: rgba(255, 0, 85, 0.10);
+      color: var(--accent-magenta);
+      border-color: rgba(255, 0, 85, 0.35);
+    }
+    .nav-btn-arcade:hover {
+      background: rgba(255, 0, 85, 0.20);
+      border-color: var(--accent-magenta);
+    }
+
+    /* Firmware Pill Banner */
+    .firmware-banner {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
+      padding: 7px 14px;
+      border-radius: 12px;
+      background: rgba(13, 21, 39, 0.85);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.72rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
-    .gps-guide-text {
-      font-size: 0.92rem;
-      font-weight: 600;
-      color: #ffffff;
+    .firmware-right {
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    .btn-gps-guide {
-      color: #000000;
-      background: #00d4ff;
-      font-weight: 900;
-      font-size: 0.82rem;
-      text-decoration: none;
-      padding: 6px 12px;
+    .firmware-version-badge {
+      color: var(--accent-cyan);
+      font-weight: 700;
+      background: rgba(0, 243, 255, 0.10);
+      border: 1px solid rgba(0, 243, 255, 0.30);
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+
+    /* Search & Filter Bar */
+    .search-bar-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(13, 21, 39, 0.90);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 10px 16px 10px 42px;
+      color: #ffffff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.88rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 16px rgba(0, 243, 255, 0.20);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+
+    /* Interactive Segmented Tab Controls */
+    .tabs-segmented-wrap {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 6px;
+      background: rgba(11, 19, 37, 0.75);
+      padding: 6px;
       border-radius: 14px;
-      white-space: nowrap;
-      letter-spacing: 0.5px;
-      transition: background 0.15s ease, transform 0.1s ease;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .tab-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+      background: transparent;
+      border: 1px solid transparent;
       cursor: pointer;
+      transition: all 0.18s ease;
+      white-space: nowrap;
     }
 
-    .btn-gps-guide:active {
-      transform: scale(0.94);
-      background: #4cd964;
+    .tab-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.05);
     }
 
-    /* Feature Category Card */
+    .tab-btn.active {
+      color: #050811;
+      background: #ffffff;
+      box-shadow: 0 0 14px rgba(255, 255, 255, 0.60);
+      border-color: #ffffff;
+    }
+
+    .tab-btn.tab-universal.active {
+      background: var(--accent-cyan);
+      color: #050811;
+      box-shadow: 0 0 14px rgba(0, 243, 255, 0.50);
+      border-color: var(--accent-cyan);
+    }
+
+    .tab-btn.tab-hyperspace.active {
+      background: var(--accent-magenta);
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(255, 0, 85, 0.50);
+      border-color: var(--accent-magenta);
+    }
+
+    .tab-btn.tab-roadtrip.active {
+      background: var(--accent-blue);
+      color: #050811;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.50);
+      border-color: var(--accent-blue);
+    }
+
+    .tab-btn.tab-digit.active {
+      background: var(--accent-green);
+      color: #050811;
+      box-shadow: 0 0 14px rgba(48, 209, 88, 0.50);
+      border-color: var(--accent-green);
+    }
+
+    /* Guide Panes */
+    .guide-pane {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .guide-pane.active {
+      display: flex;
+    }
+
+    /* Section Cards */
     .feature-card {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 14px;
-      padding: 18px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 20px 22px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .feature-card.highlight {
-      border-color: #00d4ff;
-      box-shadow: 0 0 16px rgba(0, 212, 255, 0.15);
+    .feature-card:hover {
+      border-color: rgba(255, 255, 255, 0.20);
     }
 
-    .feature-card.arcade-suite {
-      border-color: #ff007f;
-      background: linear-gradient(180deg, #161b22 0%, #170b1c 100%);
-      box-shadow: 0 0 18px rgba(255, 0, 127, 0.18);
+    .feature-card.card-universal {
+      border-color: rgba(0, 243, 255, 0.35);
+      background: linear-gradient(180deg, rgba(13, 21, 39, 0.95) 0%, rgba(9, 14, 28, 0.95) 100%);
     }
 
-    .feature-card.terminal-suite {
-      border-color: #ffb000;
-      background: linear-gradient(180deg, #161b22 0%, #1c1407 100%);
-      box-shadow: 0 0 18px rgba(255, 176, 0, 0.15);
+    .feature-card.card-hyperspace {
+      border-color: rgba(255, 0, 85, 0.35);
+      background: linear-gradient(180deg, rgba(26, 10, 22, 0.95) 0%, rgba(13, 21, 39, 0.95) 100%);
+    }
+
+    .feature-card.card-roadtrip {
+      border-color: rgba(56, 189, 248, 0.35);
+      background: linear-gradient(180deg, rgba(10, 24, 40, 0.95) 0%, rgba(13, 21, 39, 0.95) 100%);
+    }
+
+    .feature-card.card-digit {
+      border-color: rgba(48, 209, 88, 0.35);
+      background: linear-gradient(180deg, rgba(8, 24, 16, 0.95) 0%, rgba(13, 21, 39, 0.95) 100%);
+    }
+
+    .card-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 12px;
+    }
+
+    .card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--border-subtle);
+      flex-shrink: 0;
     }
 
     .card-heading {
       font-size: 1.25rem;
       font-weight: 800;
       color: #ffffff;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
     }
 
-    .badge-icon {
+    .card-subtitle {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .card-launch-btn {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      width: 28px;
-      height: 28px;
+      gap: 4px;
+      padding: 6px 12px;
       border-radius: 8px;
-      font-size: 0.95rem;
-    }
-
-    .badge-core { background: rgba(0, 212, 255, 0.15); color: #00d4ff; }
-    .badge-weather { background: rgba(76, 217, 100, 0.15); color: #4cd964; }
-    .badge-secret { background: rgba(255, 0, 127, 0.15); color: #ff007f; }
-    .badge-amber { background: rgba(255, 176, 0, 0.15); color: #ffb000; }
-
-    /* Key-Value Feature Matrix */
-    .feature-row {
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    .feature-row:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-
-    .feature-name {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 4px;
-      gap: 8px;
-    }
-
-    .feature-action-pill {
-      font-size: 0.75rem;
+      font-size: 0.74rem;
       font-weight: 800;
-      padding: 2px 8px;
-      border-radius: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      background: #21262d;
-      color: #a5d6ff;
-      border: 1px solid #30363d;
+      font-family: 'JetBrains Mono', monospace;
+      text-decoration: none;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-subtle);
+      transition: all 0.15s ease;
       white-space: nowrap;
     }
 
-    .feature-action-pill.secret {
-      background: rgba(255, 0, 127, 0.2);
-      color: #ff79c6;
-      border-color: #ff007f;
+    .card-launch-btn:hover {
+      background: #ffffff;
+      color: #000000;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.80);
     }
 
-    .feature-action-pill.amber {
-      background: rgba(255, 176, 0, 0.18);
-      color: #ffb000;
-      border-color: #ffb000;
-    }
-
-    .feature-desc {
-      font-size: 0.9rem;
-      color: #8b949e;
-      line-height: 1.45;
-    }
-
-    /* Secret Vault Highlight Box */
-    .secret-box {
-      background: rgba(255, 0, 127, 0.08);
-      border: 1px dashed #ff007f;
-      border-radius: 10px;
-      padding: 12px 14px;
-      margin-top: 12px;
-    }
-
-    .secret-title {
-      font-size: 0.95rem;
-      font-weight: 800;
-      color: #ff007f;
-      margin-bottom: 4px;
+    /* Feature Item Rows */
+    .feature-rows-stack {
       display: flex;
-      align-items: center;
-      gap: 6px;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    .secret-desc {
-      font-size: 0.85rem;
-      color: #f1f1f1;
-      line-height: 1.4;
-    }
-
-    /* Visualizer Cards Grid Inside Guide */
-    .vis-guide-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .vis-guide-item {
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid #30363d;
+    .feature-row {
+      padding: 10px 12px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.05);
       border-radius: 10px;
-      padding: 10px;
       display: flex;
       flex-direction: column;
       gap: 4px;
     }
 
-    .vis-guide-header {
-      font-size: 0.92rem;
-      font-weight: 800;
+    .feature-name-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .feature-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #ffffff;
       display: flex;
       align-items: center;
       gap: 6px;
     }
 
-    .vis-guide-desc {
-      font-size: 0.8rem;
-      color: #aaaaaa;
-      line-height: 1.35;
+    .feature-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 2px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border: 1px solid currentColor;
+      white-space: nowrap;
     }
 
-    /* Action Buttons in Cards */
-    .btn-card-action {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      width: 100%;
-      padding: 10px;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      font-weight: 800;
-      text-decoration: none;
-      margin-top: 12px;
-      transition: transform 0.1s ease, background 0.15s ease;
-      cursor: pointer;
+    .badge-cyan { color: var(--accent-cyan); background: rgba(0, 243, 255, 0.10); }
+    .badge-magenta { color: var(--accent-magenta); background: rgba(255, 0, 85, 0.10); }
+    .badge-amber { color: var(--accent-amber); background: rgba(255, 183, 3, 0.10); }
+    .badge-green { color: var(--accent-green); background: rgba(48, 209, 88, 0.10); }
+    .badge-blue { color: var(--accent-blue); background: rgba(56, 189, 248, 0.10); }
+    .badge-purple { color: var(--accent-purple); background: rgba(191, 90, 242, 0.10); }
+
+    .feature-desc {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      line-height: 1.5;
     }
 
-    .btn-card-action:active {
-      transform: scale(0.96);
-    }
-
-    .btn-vis-hub {
-      background: linear-gradient(90deg, rgba(255, 0, 127, 0.25), rgba(0, 212, 255, 0.25));
-      border: 1.5px solid #ff007f;
+    .feature-desc strong {
       color: #ffffff;
-      box-shadow: 0 0 12px rgba(255, 0, 127, 0.3);
     }
 
-    .btn-term-hub {
-      background: rgba(255, 176, 0, 0.15);
-      border: 1.5px solid #ffb000;
-      color: #ffb000;
-      font-family: "Courier New", Courier, monospace;
-      box-shadow: 0 0 10px rgba(255, 176, 0, 0.25);
+    .feature-list {
+      margin: 6px 0 4px 18px;
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    /* Sub-Grid for Mini Cards (e.g. Visualizer Hub or Quick Help) */
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .mini-card {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .mini-card-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mini-card-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.4;
     }
 
     /* Footer */
-    .footer {
+    footer {
       text-align: center;
-      margin-top: 32px;
-      font-size: 0.85rem;
-      color: #6e7681;
+      font-size: 0.74rem;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+      padding: 18px 0;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
 
-    .footer a {
-      color: #00d4ff;
+    footer a {
+      color: var(--accent-cyan);
       text-decoration: none;
-      font-weight: 700;
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <!-- Header -->
-    <div class="header">
+
+    <!-- Top Sticky Header -->
+    <header class="header">
       <div class="header-title-group">
-        <div class="header-title">NOMAD: Hyperspace</div>
-        <div class="header-tagline">Version 4 &bull; Kinetic Telemetry &amp; Navigation HUD</div>
-      </div>
-      <div class="header-nav-btns">
-        <a href="geek-stats.html" class="btn-terminal-header" onclick="window.location.replace('geek-stats.html'); return false;">&gt;_ VT220</a>
-        <a href="index.html" class="btn-back" onclick="window.location.replace('index.html'); return false;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4cd964" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
-          </svg>
-          DASHBOARD
-        </a>
-      </div>
-    </div>
-
-    <!-- GPS Troubleshooting Link Banner -->
-    <div class="gps-guide-banner">
-      <div class="gps-guide-text">
-        <span>🛰️</span>
-        <span>Need help locking GPS on iOS or Android?</span>
-      </div>
-      <a href="gps-setup.html" class="btn-gps-guide" onclick="window.location.replace('gps-setup.html'); return false;">GPS GUIDE &rarr;</a>
-    </div>
-
-    <!-- 1. HYPERSPACE KINETIC DATA BUBBLES & GEOMETRY ENGINE -->
-    <div class="feature-card highlight">
-      <div class="card-heading">
-        <span class="badge-icon badge-core">💫</span>
-        Hyperspace Kinetic Data Bubbles &amp; Geometries
+        <div class="brand-badge">
+          <span class="brand-dot"></span>
+          <span>NOMAD // MISSION CONTROL</span>
+        </div>
+        <h1 class="header-title">USER GUIDE &amp; FIELD MANUAL</h1>
+        <p class="header-tagline">Universal Avionics Specifications &bull; Interactive Cockpit Guides</p>
       </div>
 
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Autonomous Floating Kinetic Physics</span>
-          <span class="feature-action-pill">Newtonian Bounce</span>
-        </div>
-        <div class="feature-desc">
-          Telemetry previously locked to fixed corner gauges now floats freely in kinetic data bubbles across the entire vector map canvas. Bubbles feature autonomous velocity momentum, perimeter screen-wall deflection, and direct pointer flicking with continuous inertia.
-        </div>
-      </div>
+      <nav class="header-nav-btns">
+        <a href="nomad_suite/" class="nav-btn nav-btn-dash">🚀 START HUD ↗</a>
+        <a href="geek-stats.html" class="nav-btn nav-btn-stats">&gt;_ VT220</a>
+        <a href="visualizer.html" class="nav-btn nav-btn-arcade">✨ ARCADE</a>
+        <a href="gps-setup.html" class="nav-btn" style="color: var(--accent-cyan); border-color: rgba(0, 243, 255, 0.35);">🛰️ GPS GUIDE</a>
+      </nav>
+    </header>
 
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Curated Geometric Defaults &amp; True Shapes</span>
-          <span class="feature-action-pill">Curated Tuning</span>
-        </div>
-        <div class="feature-desc">
-          Every telemetry channel features an architecturally curated optimal default geometry tailored specifically to its metric:
-          <ul style="margin: 6px 0 6px 18px; font-size: 0.85rem; line-height: 1.5; color: #b0b8c4;">
-            <li><strong>Speed</strong>: Egg / Oval for fluid horizontal velocity dynamics.</li>
-            <li><strong>Weather &amp; Temp</strong>: Squirkle (smooth continuous superellipse).</li>
-            <li><strong>Compass (CMPS)</strong>: Pentagon pointing toward the course vector.</li>
-            <li><strong>Atmospheric Barometer (ATMO)</strong>: Hexagon for atmospheric data stacking.</li>
-            <li><strong>Lat/Lon Coordinates</strong>: Specialized <strong>Seesaw Rectangle</strong> with center fulcrum pivot and buoyant pendulum wobble physics, perfectly cradling two-line GPS coordinates.</li>
-            <li><strong>Route Shields</strong>: Tactical Interstate &amp; State Highway shield badge.</li>
-          </ul>
-          <span style="font-size: 0.84rem; color: #8ea0b4;">
-            Fully customizable in the bubble editor: <strong>Circle, Egg/Oval, Triangle, True Square (razor-sharp right-angle corners), Squirkle, Rectangle, Pentagon, Hexagon, and Octagon</strong>.
-          </span>
-        </div>
+    <!-- Firmware & System Registry Bar -->
+    <div class="firmware-banner">
+      <div>
+        <span>CENTRAL SYSTEM REGISTRY // CRAFTED BY </span>
+        <a href="https://instagram.com/neurocosm" target="_blank" rel="noopener noreferrer" style="color: var(--accent-amber); font-weight: 700; text-decoration: none;">BostonyFX (@neurocosm)</a>
       </div>
-
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Catch-on-Hover / Touch ("Catch the Bubble")</span>
-          <span class="feature-action-pill">Hover / Touch Stop</span>
-        </div>
-        <div class="feature-desc">
-          Simply hover your mouse cursor over any floating bubble or rest your finger on it to immediately freeze its motion in place with a cyan glow resonance. Eliminates the frustration of having to chase floating data across the display.
-        </div>
-      </div>
-
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Dual Motion Modes (Kinetic vs. Stationary Pinned)</span>
-          <span class="feature-action-pill">Long-Press (600ms)</span>
-        </div>
-        <div class="feature-desc">
-          Long-press any bubble to access its Hyperspace Configurator. Toggle between <strong>🚀 Kinetic Bounce</strong> (free-floating physics) and <strong>📌 Stationary Pinned</strong> (drag and drop anywhere on the vector map to lock your custom cockpit layout with a 📌 indicator).
-        </div>
-      </div>
-
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Vehicle Safe Zone Forcefield</span>
-          <span class="feature-action-pill">Holographic Shield</span>
-        </div>
-        <div class="feature-desc">
-          Dedicated protective forcefield around the central vehicle marker (Chevron or Galaga Fighter) guarantees floating telemetry never obscures vital navigation. Configurable per bubble: <strong>Bounce Off</strong> (elastic collision deflection) or <strong>Pass Underneath</strong> (smoothly glides underneath the vehicle icon).
-        </div>
-      </div>
-
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Crystal Transparent Glass &amp; Dynamic Lighting</span>
-          <span class="feature-action-pill">0% – 80% Alpha</span>
-        </div>
-        <div class="feature-desc">
-          True alpha-channel crystalline glass with contour-conforming drop-shadows and zero square-corner clipping artifacts. Automatically adapts sheer glass tints to Natural Dark Navigation (semi-transparent deep obsidian) and Natural Light Navigation (frosted crystal off-white).
-        </div>
-      </div>
-
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Dynamic Outer Shape Rotation Modes</span>
-          <span class="feature-action-pill">Speed / Compass Spin</span>
-        </div>
-        <div class="feature-desc">
-          The outer geometric shape frame rotates dynamically while telemetry readings and unit badges stay locked strictly upright. Choose between <strong>Speed Spin (GPS)</strong> scaling with travel velocity, <strong>Compass Orientation (Gyro)</strong> aligning with vehicle heading, or <strong>Static</strong>.
-        </div>
+      <div class="firmware-right">
+        <span>FIRMWARE</span>
+        <span class="firmware-version-badge nomad-version" id="ug-firmware-val">v4.10052026.1702</span>
       </div>
     </div>
 
-    <!-- 2. EDGE-TO-EDGE VECTOR COCKPIT & MINIMAL CONTROLS -->
-    <div class="feature-card">
-      <div class="card-heading">
-        <span class="badge-icon badge-core">🗺️</span>
-        Edge-to-Edge Vector Cockpit &amp; Minimal Controls
-      </div>
-
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Bottom-Docked Location Channel Space Block</span>
-          <span class="feature-action-pill">Tap to Share GPS</span>
-        </div>
-        <div class="feature-desc">
-          Sleek, low-profile glass plaque docked along the bottom edge, displaying Street/Highway Name, City/State, and County/ZIP with subtle cyan dot divider. Tap anywhere on the plaque to copy a direct Google Maps GPS link to your clipboard with instant toast confirmation.
-        </div>
-      </div>
-
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Deep Corner Glassy Controls</span>
-          <span class="feature-action-pill">36px Minimal Pods</span>
-        </div>
-        <div class="feature-desc">
-          <ul style="margin: 6px 0 6px 18px; font-size: 0.85rem; line-height: 1.5; color: #b0b8c4;">
-            <li><strong>Top-Left (Map Theme)</strong>: Circular glassy pod toggles Natural Dark Navigation and Natural Light Navigation with instant WebGL palette switching.</li>
-            <li><strong>Top-Center (Fullscreen)</strong>: Native borderless immersive fullscreen with automatic screen wake-lock prevention.</li>
-            <li><strong>Top-Right (Craft Mode Toggle)</strong>: Glassy toggle with dynamic "other option" icon switching between the standard Cruise Chevron and retro Galaga Fighter.</li>
-            <li><strong>Center Vehicle Chevron (Perspective Switch)</strong>: Tapping the center vehicle marker directly switches between <strong>3D Take-Off Drive (58° road perspective tilt)</strong>, <strong>Top-Down Track-Up</strong>, and <strong>Top-Down North-Up</strong>.</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Highway Corridor Grid Axis Engine</span>
-          <span class="feature-action-pill">Auto-Hysteresis</span>
-        </div>
-        <div class="feature-desc">
-          Intelligent corridor logic constrains directional headings along highway corridors (Odd Interstates North/South, Even Interstates East/West) with ±15° directional hysteresis deadband preventing jitter along circumferential highway curves.
-        </div>
-      </div>
-
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Universal 50-State Route Shields &amp; Dual Concurrency</span>
-          <span class="feature-action-pill">Automatic Cycling</span>
-        </div>
-        <div class="feature-desc">
-          State-agnostic shield parsing engine extracts Interstate, US Highway, and State Highway designations across all 50 states (e.g. Route 2A, 62, 4, US-3, CA-1, SR-114). On concurrent highways, an automatic 4-second alternating flipper smoothly cycles between primary and secondary designations.
-        </div>
-      </div>
-
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Smart Speed-Adaptive Auto-Scale &amp; Multi-Tap Zoom</span>
-          <span class="feature-action-pill">Double / Triple Tap</span>
-        </div>
-        <div class="feature-desc">
-          Intelligent camera automatically adapts to travel velocity: <strong>17.2 Tactical Zoom</strong> for parking &amp; neighborhood speeds (&le;15 MPH), <strong>16.4 Urban Zoom</strong> for city traffic, and <strong>15.2 Expressway Zoom</strong> for highway cruising (&gt;55 MPH). <strong>Double-tap the map</strong> to cycle through 3 elevated zoom override tiers (+0.8, +1.5, +2.2), and <strong>triple-tap</strong> to restore Smart Auto-Scale.
-        </div>
-      </div>
+    <!-- Quick Search & Filter Bar -->
+    <div class="search-bar-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="guide-search-input" class="search-input" placeholder="Search features (e.g. Safe Zone, Odometer, GPX, Speed Sign, ASCII, Galaga, Die)..." oninput="handleGuideSearch(this.value)" />
     </div>
 
-    <!-- 3. SENSORY CONSOLES & WEATHER ENGINE -->
-    <div class="feature-card">
-      <div class="card-heading">
-        <span class="badge-icon badge-weather">⚡</span>
-        Sensory Consoles &amp; Weather Engine
-      </div>
-
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Cinematic Maps &amp; Kinetic Sensory Consoles</span>
-          <span class="feature-action-pill">Die Button 🎲</span>
-        </div>
-        <div class="feature-desc">
-          Seamless split navigation separates live cartography from kinetic sensory fidget consoles:
-          <ul style="margin: 6px 0 6px 18px; font-size: 0.85rem; line-height: 1.5; color: #b0b8c4;">
-            <li><strong>Amber Cosmic Starfield</strong>: Interactive space-flight console with velocity warp vectors, rotating celestial rings, and temperature-reactive nebular blooms.</li>
-            <li><strong>Underwater Ocean Deep</strong>: Relaxing marine simulation featuring caustic sunlight beams, reactive swimming aquatic life, rising bubbles, and hydrodynamic shockwaves.</li>
-            <li><strong>Synthomatic Sensory Console</strong>: 1:1 square retro-futuristic PCB with central SYNTH-DSP 8800 chip, quartz crystal clock, 45° gold traces, and regenerative braking energy pulse surges.</li>
-            <li><strong>Stampede Canyon Charge (Ark Stampede)</strong>: Scenic kinetic prairie sanctuary with pairs of diverse fauna racing beneath a starlit night sky toward the illuminated Ark beacon.</li>
-          </ul>
-          <div style="margin-top: 6px; font-size: 0.84rem; color: #8ea0b4;">
-            <strong>Auto-Cycle Screensaver</strong>: Long-press the Die button for 700ms to activate the automated 60-second console countdown cycle (6 &rarr; 5 &rarr; 4 &rarr; 3 &rarr; 2 &rarr; 1).
-          </div>
-        </div>
-      </div>
-
-      <div class="feature-row">
-        <div class="feature-name">
-          <span>Live Weather, UV &amp; Barometric Telemetry</span>
-          <span class="feature-action-pill">Open-Meteo GPS</span>
-        </div>
-        <div class="feature-desc">
-          Real-time meteorological conditions including dynamic weather icons, relative humidity percentage, barometric pressure, and color-graded UV index warnings. Tap temperature to toggle between <strong>°F</strong> and <strong>°C</strong>. Long-press to configure custom update polling (Time intervals 10m–60m or Distance triggers 15mi–50mi).
-        </div>
-      </div>
+    <!-- Interactive Segmented Navigation Tabs -->
+    <div class="tabs-segmented-wrap" id="guide-tabs">
+      <button class="tab-btn tab-universal active" data-tab="universal" onclick="switchGuideTab('universal')">🌐 UNIVERSAL AVIONICS</button>
+      <button class="tab-btn tab-hyperspace" data-tab="hyperspace" onclick="switchGuideTab('hyperspace')">🚀 HYPERSPACE (v4)</button>
+      <button class="tab-btn tab-roadtrip" data-tab="roadtrip" onclick="switchGuideTab('roadtrip')">🚗 ROAD TRIP (v3)</button>
+      <button class="tab-btn tab-digit" data-tab="digit" onclick="switchGuideTab('digit')">📟 DIGIT (CRT)</button>
+      <button class="tab-btn" data-tab="all" onclick="switchGuideTab('all')">📑 ALL CARDS</button>
     </div>
 
-    <!-- 3. VISUALIZER ARCADE SUITE -->
-    <div class="feature-card arcade-suite">
-      <div class="card-heading">
-        <span class="badge-icon badge-secret">✨</span>
-        Visualizer Arcade Suite
-      </div>
-      <div class="feature-desc" style="color: #cccccc;">
-        Full-screen, motion-reactive visualizers driven by real-time GPS speed, heading vectors, and device gyroscope telemetry with standard HUD scaffolding and persistent screen wake locks.
-      </div>
-
-      <div class="vis-guide-grid">
-        <!-- 0. K.I.T.T. Pursuit -->
-        <div class="vis-guide-item" style="border-color: #ff0033;">
-          <div class="vis-guide-header" style="color: #ff3344;">
-            <span>🎙️</span> K.I.T.T. Pursuit HUD
+    <!-- ========================================================
+         PANE 1: UNIVERSAL AVIONICS (SHARED CORE FOUNDATION)
+         ======================================================== -->
+    <div class="guide-pane active" id="pane-universal">
+      
+      <!-- Core Telemetry & Sensory Engine -->
+      <div class="feature-card card-universal" data-keywords="gps haversine stationary deadband speed telemetry satellite lock accuracy">
+        <div class="card-header-row">
+          <div class="card-title-group">
+            <div class="card-avatar" style="color: var(--accent-cyan); border-color: rgba(0, 243, 255, 0.4);">🛰️</div>
+            <div>
+              <div class="card-heading">1. Shared Sensory &amp; GPS Telemetry Core</div>
+              <div class="card-subtitle">Decoupled Hardware Sensor Layer (nomad-telemetry-engine.js)</div>
+            </div>
           </div>
-          <div class="vis-guide-desc">
-            Iconic 3-bar stepped red LED voice synthesizer, bidirectional halogen scanner sweep, cabin mic reactivity, and 4 dynamic velocity modes (Standby, Cruise, Pursuit, and Super Pursuit Mode).
-          </div>
+          <span class="feature-badge badge-cyan">ALL HUDS SHARE</span>
         </div>
 
-        <!-- 1. Panic Disco -->
-        <div class="vis-guide-item" style="border-color: #ff007f;">
-          <div class="vis-guide-header" style="color: #ff007f;">
-            <span>🤩</span> Panic: Disco
+        <div class="feature-rows-stack">
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Hardware GPS Haversine Tracking</span>
+              <span class="feature-badge badge-cyan">Precision WGS-84</span>
+            </div>
+            <div class="feature-desc">
+              High-frequency GPS geolocation tracking utilizing standard spherical earth Haversine geodesy. Coordinates, true bearing, and speed are continuously broadcast via the global <code>nomad-telemetry</code> event pipeline.
+            </div>
           </div>
-          <div class="vis-guide-desc">
-            Neon spectrum tunnel with speed-reactive radial light beams, dual EQ towers, and star-eyed mascot.
-          </div>
-        </div>
 
-        <!-- 2. Festival of Joy -->
-        <div class="vis-guide-item" style="border-color: #00f0ff;">
-          <div class="vis-guide-header" style="color: #00f0ff;">
-            <span>🍄</span> Festival of Joy
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">1.8 MPH Stationary Deadband &amp; Multipath Drift Rejection</span>
+              <span class="feature-badge badge-green">Zero Indoor Drift</span>
+            </div>
+            <div class="feature-desc">
+              Completely eliminates annoying indoor drift, table shaking, and multipath satellite jitter. Any reading under <strong>1.8 MPH (2.9 KM/H)</strong> is clamped strictly to 0 MPH when stationary, preserving rock-solid standing stability.
+            </div>
           </div>
-          <div class="vis-guide-desc">
-            360° kaleidoscope sacred geometry, shades-wearing mushroom mascot, and exploding musical notes.
-          </div>
-        </div>
 
-        <!-- 3. The Slam Dance -->
-        <div class="vis-guide-item" style="border-color: #39ff14;">
-          <div class="vis-guide-header" style="color: #39ff14;">
-            <span>🤘</span> The Slam Dance
-          </div>
-          <div class="vis-guide-desc">
-            Headbanging punk skull with hot mohawk spikes, rock horns, crossed sticks, lightning bolts, and flying instrument emojis on pitch-black void.
-          </div>
-        </div>
-
-        <!-- 4. Seasons -->
-        <div class="vis-guide-item" style="border-color: #ffbb00;">
-          <div class="vis-guide-header" style="color: #ffbb00;">
-            <span>☀️</span> Seasons
-          </div>
-          <div class="vis-guide-desc">
-            Auto-detects Spring, Summer, Autumn, or Winter calendar dates with custom dynamic horizons, seasonal mascots, and manual override pills.
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Teleport Jump &amp; Velocity Spike Shield</span>
+              <span class="feature-badge badge-amber">&gt;112 m/s Filtered</span>
+            </div>
+            <div class="feature-desc">
+              Protective boundary filters impossible GPS teleportation jumps (&gt;112 m/s / 250 MPH) often caused by cell tower handover or tunnel re-acquisition, ensuring telemetry logs remain clean and accurate.
+            </div>
           </div>
         </div>
       </div>
 
-      <a href="visualizer.html" class="btn-card-action btn-vis-hub" onclick="window.location.replace('visualizer.html'); return false;">
-        OPEN VISUALIZER ARCADE &rarr;
-      </a>
+      <!-- Trip Computer & GPX Flight Recorder (Item 8) -->
+      <div class="feature-card card-universal" data-keywords="trip computer odometer gpx flight recorder export black box distance moving idle timer">
+        <div class="card-header-row">
+          <div class="card-title-group">
+            <div class="card-avatar" style="color: var(--accent-green); border-color: rgba(48, 209, 88, 0.4);">📍</div>
+            <div>
+              <div class="card-heading">2. Trip Computer &amp; GPX 1.1 Flight Recorder</div>
+              <div class="card-subtitle">Standardized GIS Tracklog Engine (nomad-trip-engine.js)</div>
+            </div>
+          </div>
+          <span class="feature-badge badge-green">GIS SPEC 1.1</span>
+        </div>
+
+        <div class="feature-rows-stack">
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Live Dual Odometer &amp; Distance Tracking</span>
+              <span class="feature-badge badge-green">Miles &amp; KM</span>
+            </div>
+            <div class="feature-desc">
+              Accumulates true wheel distance traveled in real time with simultaneous Miles and Kilometers display. Features one-tap pause/resume and zero-out reset controls.
+            </div>
+          </div>
+
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Split Moving vs. Idle Drive Timers</span>
+              <span class="feature-badge badge-cyan">Split Analytics</span>
+            </div>
+            <div class="feature-desc">
+              Accurately separates active highway drive time from stopped idle time (red lights, traffic congestion, drive-throughs), calculating moving time efficiency percentages and true non-zero average cruising velocity.
+            </div>
+          </div>
+
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Standardized GPX 1.1 Flight Recorder Export</span>
+              <span class="feature-badge badge-amber">Instant .GPX Download</span>
+            </div>
+            <div class="feature-desc">
+              Exports full flight tracks in standardized <strong>GPX 1.1 XML</strong> format compatible with Google Earth, Strava, Garmin, Gaia GPS, and GIS tools. Each trackpoint includes <code>&lt;ele&gt;</code> elevation, <code>&lt;time&gt;</code> ISO-8601 timestamp, <code>&lt;speed&gt;</code> in m/s, and <code>&lt;course&gt;</code> bearing with BostonyFX author metadata.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Meteorological Weather Engine -->
+      <div class="feature-card card-universal" data-keywords="weather temperature uv barometer humidity open-meteo celsius fahrenheit">
+        <div class="card-header-row">
+          <div class="card-title-group">
+            <div class="card-avatar" style="color: var(--accent-amber); border-color: rgba(255, 183, 3, 0.4);">⛅</div>
+            <div>
+              <div class="card-heading">3. Atmospheric &amp; Meteorological Cockpit</div>
+              <div class="card-subtitle">Live Open-Meteo GPS Engine (nomad-weather-engine.js)</div>
+            </div>
+          </div>
+          <span class="feature-badge badge-amber">LIVE SENSORS</span>
+        </div>
+
+        <div class="feature-rows-stack">
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Dynamic Conditions &amp; Temperature Toggling</span>
+              <span class="feature-badge badge-cyan">°F &harr; °C</span>
+            </div>
+            <div class="feature-desc">
+              Real-time temperature with dynamic WMO weather icons (Sunny, Cloud, Rain, Storm, Snow, Fog). Tap the temperature readout anywhere to instantly toggle between Fahrenheit (°F) and Celsius (°C).
+            </div>
+          </div>
+
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Atmospheric Triumvirate: Humidity, UV &amp; Barometer</span>
+              <span class="feature-badge badge-amber">InHg &amp; hPa</span>
+            </div>
+            <div class="feature-desc">
+              Stacked atmospheric readings including relative humidity percentage (droplet), color-graded UV Index warning pill (sun), and barometric pressure gauge with rising/falling trends.
+            </div>
+          </div>
+
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Custom Polling Cadence (Time vs. Distance)</span>
+              <span class="feature-badge badge-green">Configurable</span>
+            </div>
+            <div class="feature-desc">
+              Configure how frequently weather updates along long highway routes: choose time intervals (10m, 20m, 30m, 60m) or travel distance triggers (15mi, 30mi, 50mi).
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shared Utilities: Arcade, Geek Stats, Backup & Reset -->
+      <div class="feature-card card-universal" data-keywords="visualizer arcade geek stats vt220 download zip backup purge cache hard reload">
+        <div class="card-header-row">
+          <div class="card-title-group">
+            <div class="card-avatar" style="color: var(--accent-magenta); border-color: rgba(255, 0, 85, 0.4);">🧰</div>
+            <div>
+              <div class="card-heading">4. Shared Sensory &amp; Maintenance Suite</div>
+              <div class="card-subtitle">Arcade, VT220 Terminal, ZIP Archive, and Hard Reset</div>
+            </div>
+          </div>
+          <span class="feature-badge badge-magenta">ALL HUDS SHARE</span>
+        </div>
+
+        <div class="mini-grid">
+          <div class="mini-card" style="border-color: rgba(255, 0, 127, 0.4);">
+            <div class="mini-card-title" style="color: #ff007f;">✨ Visualizer Arcade Hub</div>
+            <div class="mini-card-desc">
+              Motion-reactive kinetic canvases driven by real-time GPS speed: K.I.T.T. Pursuit Voice Synth, Panic Disco, Festival of Joy, The Slam Dance, and Seasons.
+            </div>
+          </div>
+
+          <div class="mini-card" style="border-color: rgba(255, 176, 0, 0.4);">
+            <div class="mini-card-title" style="color: #ffb000;">&gt;_ VT220 Geek Stats</div>
+            <div class="mini-card-desc">
+              Monochrome amber CRT telemetry terminal displaying live coordinate streams, satellite fixes, memory allocation, and black-box diagnostic logs.
+            </div>
+          </div>
+
+          <div class="mini-card" style="border-color: rgba(16, 185, 129, 0.4);">
+            <div class="mini-card-title" style="color: #10b981;">📦 Full ZIP Download</div>
+            <div class="mini-card-desc">
+              One-click instant download of the complete NOMAD codebase, offline maps, and assets via <code>/api/download-zip</code> for true offline backups.
+            </div>
+          </div>
+
+          <div class="mini-card" style="border-color: rgba(255, 0, 79, 0.4);">
+            <div class="mini-card-title" style="color: #ff004f;">⚠️ Purge Cache &amp; Reload</div>
+            <div class="mini-card-desc">
+              Performs a total hardware reset: flushes local storage, unregisters Service Workers, clears tile caches, and reboots the interface cleanly.
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- 4. RETRO VT220 GEEK STATS TERMINAL -->
-    <div class="feature-card terminal-suite">
-      <div class="card-heading">
-        <span class="badge-icon badge-amber">&gt;_</span>
-        VT220 Amber Phosphor Terminal
-      </div>
-      <div class="feature-desc" style="color: #cccccc;">
-        A DEC VT220-inspired retro CRT terminal running live GPS telemetry, coordinate stream logging, and diagnostic vehicle stats.
+    <!-- ========================================================
+         PANE 2: HYPERSPACE (v4 KINETIC HUD)
+         ======================================================== -->
+    <div class="guide-pane" id="pane-hyperspace">
+      
+      <div class="feature-card card-hyperspace" data-keywords="hyperspace kinetic bubble egg squirkle pentagon hexagon seesaw rectangle safe zone bounce galaga 3d tilt">
+        <div class="card-header-row">
+          <div class="card-title-group">
+            <div class="card-avatar" style="color: var(--accent-magenta); border-color: rgba(255, 0, 85, 0.4);">🚀</div>
+            <div>
+              <div class="card-heading">HYPERSPACE (Version 4 Kinetic HUD)</div>
+              <div class="card-subtitle">Floating Newtonian Data Bubbles &bull; 3D Perspective &bull; Galaga Interceptor</div>
+            </div>
+          </div>
+          <a href="hyperspace.html" class="card-launch-btn">LAUNCH HYPERSPACE ↗</a>
+        </div>
+
+        <div class="feature-rows-stack">
+          <!-- Bubble Physics & Inertia -->
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Autonomous Newtonian Kinetic Bubbles</span>
+              <span class="feature-badge badge-magenta">Momentum &amp; Deflection</span>
+            </div>
+            <div class="feature-desc">
+              Telemetry values float freely across the full-screen vector map. Bubbles feature autonomous velocity momentum, elastic screen boundary deflection, and direct pointer flicking with smooth continuous inertia.
+            </div>
+          </div>
+
+          <!-- Curated Optimal Geometries -->
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Curated Aesthetic Geometry Defaults</span>
+              <span class="feature-badge badge-cyan">Curated Tuning</span>
+            </div>
+            <div class="feature-desc">
+              Every telemetry metric is paired with an architecturally curated optimal default geometry:
+              <ul class="feature-list">
+                <li><strong>Speed</strong>: Egg / Oval for fluid horizontal aerodynamics.</li>
+                <li><strong>Weather &amp; Temperature</strong>: Squirkle (smooth continuous superellipse).</li>
+                <li><strong>Compass Course (CMPS)</strong>: Pentagon pointing toward current heading.</li>
+                <li><strong>Atmospheric Barometer (ATMO)</strong>: Hexagon for stacked air metrics.</li>
+                <li><strong>Lat/Lon Coordinates</strong>: Specialized <strong>Seesaw Rectangle</strong> with center fulcrum pivot and buoyant pendulum wobble physics.</li>
+                <li><strong>Route Shields</strong>: Tactical Interstate &amp; State Highway shield.</li>
+              </ul>
+              Customizable in the editor: <em>Circle, Egg, Triangle, Square, Squirkle, Rectangle, Pentagon, Hexagon, Octagon</em>.
+            </div>
+          </div>
+
+          <!-- Catch-on-Hover -->
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Catch-on-Hover / Touch ("Catch the Bubble")</span>
+              <span class="feature-badge badge-green">Zero-Frustration</span>
+            </div>
+            <div class="feature-desc">
+              Hovering your mouse or resting a finger on any floating bubble immediately halts its kinetic physics loop and illuminates a cyan resonance glow. You never have to chase moving telemetry across the screen.
+            </div>
+          </div>
+
+          <!-- Kinetic vs Pinned -->
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Dual Movement: Kinetic Bounce vs. Stationary Pinned</span>
+              <span class="feature-badge badge-amber">Long-Press (600ms)</span>
+            </div>
+            <div class="feature-desc">
+              Long-press any bubble to open the Hyperspace Configurator. Toggle between <strong>🚀 Kinetic Bounce</strong> (free-floating physics) and <strong>📌 Stationary Pinned</strong> (drag and drop anywhere to lock your custom cockpit layout with a 📌 badge).
+            </div>
+          </div>
+
+          <!-- Safe Zone Bubble -->
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Vehicle Safe Zone Protective Forcefield</span>
+              <span class="feature-badge badge-cyan">Holographic Shield</span>
+            </div>
+            <div class="feature-desc">
+              A dedicated protective forcefield around the central vehicle craft ensures telemetry bubbles never obscure navigation. Configurable per bubble: <strong>Bounce Off</strong> (elastic collision deflection) or <strong>Pass Underneath</strong> (glides smoothly below the vehicle).
+            </div>
+          </div>
+
+          <!-- 3D Perspective Tilt -->
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">3D Road Perspective (58° Pitch &amp; 42° Tilt)</span>
+              <span class="feature-badge badge-magenta">Take-Off Perspective</span>
+            </div>
+            <div class="feature-desc">
+              Tap the center vehicle marker directly to cycle between <strong>3D Take-Off Drive</strong> (camera pitches 58° with 42° craft tilt aligned to the road plane), <strong>Top-Down Track-Up</strong>, and <strong>Top-Down North-Up</strong>.
+            </div>
+          </div>
+
+          <!-- Retro Galaga Fighter & Stealth Interceptor -->
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Cruise Chevron &amp; 8-Bit Galaga Fighter</span>
+              <span class="feature-badge badge-purple">Laser Salvos</span>
+            </div>
+            <div class="feature-desc">
+              Toggle between the minimalist Cruise Chevron and the retro 8-Bit Galaga Fighter via the top-right glassy button. In Light GPS mode, the Galaga Fighter transforms automatically into the matte charcoal <strong>F-117 Stealth Fighter</strong>. Tap the fighter to unleash triple-laser salvos (pew-pew ... pew-pew ... pew-pew!).
+            </div>
+          </div>
+
+          <!-- Glassy Location Plaque -->
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Bottom Location Plaque &amp; Tap-to-Share GPS</span>
+              <span class="feature-badge badge-cyan">1px Glass Plaque</span>
+            </div>
+            <div class="feature-desc">
+              Ultra-low profile glassy plaque docked along the bottom edge, displaying Street, City/State, and County/ZIP with subtle cyan dot divider. Tap anywhere on the plaque to copy a direct Google Maps GPS link to your clipboard.
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="feature-row" style="margin-top: 10px;">
-        <div class="feature-name">
-          <span style="color: #ffb000;">Amber CRT Phosphor Glow</span>
-          <span class="feature-action-pill amber">VT220 Scanlines</span>
-        </div>
-        <div class="feature-desc">
-          Monospace typography with hardware CRT scanline overlays and amber phosphor persistent illumination.
-        </div>
-      </div>
-
-      <div class="feature-row">
-        <div class="feature-name">
-          <span style="color: #ffb000;">Raw Telemetry Stream</span>
-          <span class="feature-action-pill amber">Real-Time</span>
-        </div>
-        <div class="feature-desc">
-          Live streaming logs for GPS Fix, Velocity Vectors, True Bearing, Barometric/GPS Altitude, Sat Accuracy, and Trip Coordinates.
-        </div>
-      </div>
-
-      <a href="geek-stats.html" class="btn-card-action btn-term-hub" onclick="window.location.replace('geek-stats.html'); return false;">
-        &gt; LAUNCH GEEK-STATS.HTML _
-      </a>
     </div>
 
-    <!-- 5. VEHICLE CRAFT & ARCADE VAULT -->
-    <div class="feature-card vault">
-      <div class="card-heading">
-        <span class="badge-icon badge-secret">👾</span>
-        Vehicle Craft &amp; Arcade Vault
-      </div>
+    <!-- ========================================================
+         PANE 3: ROAD TRIP (v3 CLASSIC HUD)
+         ======================================================== -->
+    <div class="guide-pane" id="pane-roadtrip">
+      
+      <div class="feature-card card-roadtrip" data-keywords="roadtrip speed sign mutcd interstate route shield rosette compass weather die fidget starfield ocean synthomatic stampede">
+        <div class="card-header-row">
+          <div class="card-title-group">
+            <div class="card-avatar" style="color: var(--accent-blue); border-color: rgba(56, 189, 248, 0.4);">🚗</div>
+            <div>
+              <div class="card-heading">ROAD TRIP (Version 3 Classic HUD)</div>
+              <div class="card-subtitle">Highway Speed Signs &bull; Dual Route Shields &bull; Rosette Compass &bull; Fidget Consoles</div>
+            </div>
+          </div>
+          <a href="roadtrip.html" class="card-launch-btn">LAUNCH ROAD TRIP ↗</a>
+        </div>
 
-      <!-- Mode 1: Cruise Chevron -->
-      <div class="secret-box" style="border-color: #00d4ff; background: rgba(0, 212, 255, 0.08);">
-        <div class="secret-title" style="color: #00d4ff;">🚀 Cruise Chevron &amp; 3D Perspective Tilt</div>
-        <div class="secret-desc">
-          <strong>Alignment:</strong> Automatically tilts into the road plane in 3D Perspective Mode (pitch: 58°, tilt: 42°), resetting cleanly to flat overhead in 2D North-Up and Track-Up modes.<br />
-          <strong>Perspective Switch:</strong> Tap the center Chevron directly to cycle between <strong>3D Take-Off Drive</strong>, <strong>Top-Down Track-Up</strong>, and <strong>Top-Down North-Up</strong>.
+        <div class="feature-rows-stack">
+          <!-- MUTCD Speed Sign -->
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Authentic MUTCD Highway Speed Sign</span>
+              <span class="feature-badge badge-blue">Zero Distraction</span>
+            </div>
+            <div class="feature-desc">
+              High-visibility speed sign modeled strictly after the Federal Highway Administration MUTCD standard (crisp black-on-white border, high-contrast bold numerals, and real-time velocity updates).
+            </div>
+          </div>
+
+          <!-- 30° Tactical Rosette Compass -->
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">30° Tactical Rosette Compass</span>
+              <span class="feature-badge badge-cyan">30° Radial Graduation</span>
+            </div>
+            <div class="feature-desc">
+              Military-spec circular rosette compass featuring 30-degree incremental tic marks, 8-cardinal quadrant markings (N, NE, E, SE, S, SW, W, NW), and smooth rotational alignment with vehicle heading.
+            </div>
+          </div>
+
+          <!-- Dual Route Shield Banners -->
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Universal Route Shields &amp; Concurrency Flipper</span>
+              <span class="feature-badge badge-amber">50-State Parsing</span>
+            </div>
+            <div class="feature-desc">
+              Automatic route parser detects Interstate (e.g. I-95), US Highway (e.g. US-3), and State Routes across all 50 states. On concurrent highways, an automated 4-second alternating flipper smoothly cycles between primary and secondary designations.
+            </div>
+          </div>
+
+          <!-- Weather Cockpit Stack -->
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Integrated Atmospheric Weather Stack</span>
+              <span class="feature-badge badge-green">Atmospheric Trio</span>
+            </div>
+            <div class="feature-desc">
+              Companion weather cockpit displaying large hero temperature digits alongside stacked micro-stats: relative humidity droplet, barometric pressure gauge, and UV solar warning pill.
+            </div>
+          </div>
+
+          <!-- Die Fidget Consoles -->
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Die Fidget Consoles &amp; 60s Auto-Cycle Countdown</span>
+              <span class="feature-badge badge-purple">Dice Button 🎲</span>
+            </div>
+            <div class="feature-desc">
+              Tap the bottom-right Die button to cycle through 4 soothing sensory fidget simulations:
+              <ul class="feature-list">
+                <li><strong>Cosmic Starfield</strong>: Interactive deep space warp vectors with nebular blooms.</li>
+                <li><strong>Underwater Ocean</strong>: Relaxing marine simulation with sunlight caustics and rising bubbles.</li>
+                <li><strong>Synthomatic Console</strong>: 1:1 square PCB with central DSP chip and regenerative braking pulses.</li>
+                <li><strong>Ark Stampede</strong>: Scenic kinetic prairie sanctuary with fauna running beneath starlight.</li>
+              </ul>
+              <strong>60s Auto-Cycle:</strong> Long-press the Die for 700ms to turn it vibrant gold and begin the automated screensaver countdown (6 &rarr; 5 &rarr; 4 &rarr; 3 &rarr; 2 &rarr; 1).
+            </div>
+          </div>
+
+          <!-- Vehicle Audio Horn Dixie -->
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Vehicle Horn Dixie Tune &amp; Arcade Sounds</span>
+              <span class="feature-badge badge-amber">Web Audio API</span>
+            </div>
+            <div class="feature-desc">
+              Authentic synthesizer plays the iconic multi-note Dixie horn sequence or retro arcade laser sweeps using zero-latency Web Audio oscillators.
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Mode 2: Galaga Fighter -->
-      <div class="secret-box">
-        <div class="secret-title">👾 8-Bit Galaga Fighter &amp; Triple Laser Salvos</div>
-        <div class="secret-desc">
-          <strong>Activation:</strong> Tap the glassy top-right vehicle toggle button (featuring a dynamic alternate vehicle icon).<br />
-          <strong>Dual Themes:</strong> Neon magenta/cyan retro arcade craft in Dark mode, dynamically transforming into the matte charcoal <strong>F-117 Stealth Fighter</strong> interceptor in Light mode.<br />
-          <strong>Blaster Action:</strong> Tap the Galaga Fighter to fire <strong>three dual-laser salvos (pew-pew ... pew-pew ... pew-pew!)</strong> with recoil pulse animations.
+    </div>
+
+    <!-- ========================================================
+         PANE 4: DIGIT (TACTICAL MONOSPACE CRT)
+         ======================================================== -->
+    <div class="guide-pane" id="pane-digit">
+      
+      <div class="feature-card card-digit" data-keywords="digit monospace ascii crt matrix terminal 256 gray titanium slate zen philosophy tabular telemetry">
+        <div class="card-header-row">
+          <div class="card-title-group">
+            <div class="card-avatar" style="color: var(--accent-green); border-color: rgba(48, 209, 88, 0.4);">📟</div>
+            <div>
+              <div class="card-heading">DIGIT (Tactical Monospace CRT Matrix)</div>
+              <div class="card-subtitle">Military Monospace Telemetry &bull; 256-Gray Slate &bull; Zen Terminal</div>
+            </div>
+          </div>
+          <a href="digit.html" class="card-launch-btn">LAUNCH DIGIT ↗</a>
+        </div>
+
+        <div class="feature-rows-stack">
+          <!-- Monospace CRT Matrix -->
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Military ASCII Matrix &amp; Hardware Scanlines</span>
+              <span class="feature-badge badge-green">Pure Monospace</span>
+            </div>
+            <div class="feature-desc">
+              Constructed entirely using high-density monospace typography (<code>JetBrains Mono</code>) with ASCII border brackets, tabular grid dividers, and subtle hardware CRT scanlines for an authentic tactical cockpit feel.
+            </div>
+          </div>
+
+          <!-- Relaxed 256-Gray Mode -->
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Relaxed 256-Gray (Monochrome Titanium Slate)</span>
+              <span class="feature-badge badge-cyan">Night Eye-Strain Relief</span>
+            </div>
+            <div class="feature-desc">
+              Eliminates harsh white and blinding glare during pitch-black night drives. Features a calm matte titanium silver text palette (<code>#9ea7b4</code>) and deep slate cards designed for effortless arm's-length night legibility.
+            </div>
+          </div>
+
+          <!-- Tabular Telemetry Cluster -->
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Raw Tabular Telemetry Matrix</span>
+              <span class="feature-badge badge-green">Tabular Precision</span>
+            </div>
+            <div class="feature-desc">
+              All flight metrics are presented in precise tabular alignment: Latitude, Longitude, Altitude, Bearing, HDOP fix quality, satellite count, velocity in MPH/KMH/Knots, and trip odometer accumulations.
+            </div>
+          </div>
+
+          <!-- ASCII Compass Rose -->
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">ASCII Monospace Compass Rose</span>
+              <span class="feature-badge badge-amber">Text Radar</span>
+            </div>
+            <div class="feature-desc">
+              A dynamic ASCII compass rose rotating in monospace matrix characters, pointing true track course angles with numerical degrees and cardinal brackets <code>[ N ] [ S ] [ E ] [ W ]</code>.
+            </div>
+          </div>
+
+          <!-- Zen Philosophy Mode -->
+          <div class="feature-row">
+            <div class="feature-name-row">
+              <span class="feature-name">Zen Philosophy Mode &amp; Minimal Telemetry</span>
+              <span class="feature-badge badge-cyan">Mindful Driving</span>
+            </div>
+            <div class="feature-desc">
+              Tap the Zen toggle to hide high-frequency peripheral gauges, leaving only a massive clean speed sign alongside timeless philosophical reflections on travel and movement.
+            </div>
+          </div>
         </div>
       </div>
+
     </div>
 
     <!-- Footer -->
-    <div class="footer">
-      [merge_footer]
-      <div id="features-version" class="nomad-version" style="margin-top: 6px; font-size: 0.72rem; font-family: 'Courier New', Courier, monospace; color: #555555; letter-spacing: 0.5px;"></div>
-    </div>
+    <footer>
+      <div>NOMAD // Central Vehicular Navigation Architecture &bull; Crafted by <a href="https://instagram.com/neurocosm" target="_blank">BostonyFX</a></div>
+      <div>Unified User Guide &amp; Avionics Field Manual &bull; All Rights Reserved</div>
+    </footer>
+
   </div>
+
+  <!-- Interactive Scripts: Tabs, Search, Hash Sync, Version -->
+  <script>
+    (function() {
+      // 1. Version Sync
+      if (window.NOMAD_VERSION) {
+        const vEl = document.getElementById('ug-firmware-val');
+        if (vEl) vEl.innerText = window.NOMAD_VERSION;
+      }
+
+      // 2. Tab Navigation
+      window.switchGuideTab = function(tabKey) {
+        // Update tab buttons
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        tabButtons.forEach(btn => {
+          if (btn.getAttribute('data-tab') === tabKey) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        });
+
+        // Update panes
+        const panes = document.querySelectorAll('.guide-pane');
+        if (tabKey === 'all') {
+          panes.forEach(p => p.classList.add('active'));
+        } else {
+          panes.forEach(p => {
+            if (p.id === `pane-${tabKey}`) {
+              p.classList.add('active');
+            } else {
+              p.classList.remove('active');
+            }
+          });
+        }
+
+        // Update URL hash without scroll jumps
+        if (tabKey !== 'all') {
+          history.replaceState(null, null, `#${tabKey}`);
+        } else {
+          history.replaceState(null, null, '#all');
+        }
+
+        // Clear search input on manual tab switch
+        const searchInput = document.getElementById('guide-search-input');
+        if (searchInput && searchInput.value.trim() !== '') {
+          searchInput.value = '';
+          resetSearchFilter();
+        }
+      };
+
+      // 3. Search & Filter
+      function resetSearchFilter() {
+        const cards = document.querySelectorAll('.feature-card');
+        cards.forEach(card => card.style.display = 'flex');
+      }
+
+      window.handleGuideSearch = function(query) {
+        const q = (query || '').toLowerCase().trim();
+        const cards = document.querySelectorAll('.feature-card');
+
+        if (!q) {
+          resetSearchFilter();
+          // Restore active tab view
+          const activeTabBtn = document.querySelector('.tab-btn.active');
+          const currentTabKey = activeTabBtn ? activeTabBtn.getAttribute('data-tab') : 'universal';
+          if (currentTabKey !== 'all') {
+            document.querySelectorAll('.guide-pane').forEach(p => {
+              p.classList.toggle('active', p.id === `pane-${currentTabKey}`);
+            });
+          }
+          return;
+        }
+
+        // When searching, show all panes so matches across all cockpits are visible
+        document.querySelectorAll('.guide-pane').forEach(p => p.classList.add('active'));
+
+        cards.forEach(card => {
+          const text = (card.innerText || '').toLowerCase();
+          const keywords = (card.getAttribute('data-keywords') || '').toLowerCase();
+          if (text.includes(q) || keywords.includes(q)) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      };
+
+      // 4. Initial Hash Handler
+      function handleInitialHash() {
+        const hash = (window.location.hash || '').replace('#', '').toLowerCase();
+        if (['universal', 'hyperspace', 'roadtrip', 'digit', 'all'].includes(hash)) {
+          switchGuideTab(hash);
+        } else {
+          switchGuideTab('universal');
+        }
+      }
+
+      window.addEventListener('hashchange', handleInitialHash);
+      handleInitialHash();
+    })();
+  </script>
 
 </body>
 </html>
