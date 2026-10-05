@@ -1,0 +1,2976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>NOMAD: SUITE — Multi-Cockpit Navigation</title>
+  <meta name="description" content="NOMAD: SUITE - Unified RoadTrip, Hyperspace & DIGIT by BostonyFX (@neurocosm)" />
+  <meta name="theme-color" content="#050811" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <!-- MapLibre GL Vector Engine -->
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      background-color: #050811;
+      color: #f8fafc;
+      font-family: 'Space Grotesk', -apple-system, sans-serif;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      text-align: center;
+    }
+    .hud-card {
+      background: #0b1325;
+      border: 1.5px solid rgba(0, 243, 255, 0.35);
+      border-radius: 20px;
+      max-width: 440px;
+      width: 100%;
+      padding: 28px 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 0 0 24px rgba(0, 243, 255, 0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .brand-badge {
+      font-size: 0.76rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: #00f3ff;
+      background: rgba(0, 243, 255, 0.12);
+      border: 1px solid rgba(0, 243, 255, 0.4);
+      padding: 4px 12px;
+      border-radius: 14px;
+    }
+    h1 {
+      font-size: 1.65rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: #ffffff;
+    }
+    p.tagline {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      line-height: 1.45;
+    }
+    .truth-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      margin: 8px 0;
+    }
+    .truth-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(0, 243, 255, 0.2);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #f8fafc;
+      text-decoration: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .truth-item:hover, .truth-item:active {
+      background: rgba(0, 243, 255, 0.12);
+      border-color: #00f3ff;
+      transform: translateY(-1px);
+    }
+    .truth-item span.ready {
+      color: #10b981;
+      font-weight: 700;
+      font-size: 0.72rem;
+    }
+    .status-box {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #10b981;
+      width: 100%;
+    }
+    .avionics-monitor {
+      width: 100%;
+      background: rgba(2, 6, 17, 0.75);
+      border: 1px solid rgba(0, 243, 255, 0.28);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-align: left;
+    }
+    .mon-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.68rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #94a3b8;
+      letter-spacing: 0.08em;
+    }
+    .mon-badge {
+      font-size: 0.64rem;
+      font-weight: 700;
+      color: #00f3ff;
+      border: 1px solid #00f3ff;
+      padding: 2px 6px;
+      border-radius: 8px;
+    }
+    .mon-street {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .mon-subloc {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      margin-top: -6px;
+    }
+    .mon-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .mon-cell {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+    .mon-lbl {
+      font-size: 0.64rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #64748b;
+      margin-bottom: 2px;
+    }
+    .mon-val {
+      font-size: 1.05rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: #00f3ff;
+    }
+    .mon-unit {
+      font-size: 0.68rem;
+      color: #94a3b8;
+      font-weight: 400;
+    }
+    .mon-coords {
+      font-size: 0.70rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #64748b;
+      text-align: center;
+      margin-top: 2px;
+    }
+    .mon-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.25), transparent);
+      margin: 6px 0;
+    }
+    .weather-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: -2px;
+    }
+    .weather-temp-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+    .weather-temp-val {
+      font-size: 1.65rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: #ffffff;
+      line-height: 1;
+    }
+    .weather-temp-unit {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #00f3ff;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .weather-temp-c {
+      font-size: 0.80rem;
+      color: #64748b;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .weather-cond-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: #e2e8f0;
+      font-weight: 600;
+    }
+    .weather-cond-icon {
+      display: flex;
+      align-items: center;
+    }
+    .vehicle-testbed-row {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .vehicle-showcase-row {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+      width: 100%;
+    }
+    .vehicle-hero-pod {
+      flex: 1.15;
+      background: rgba(8, 14, 26, 0.7);
+      border: 1.5px solid rgba(0, 243, 255, 0.3);
+      border-radius: 16px;
+      padding: 14px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+    }
+    .vehicle-hero-pod:active {
+      transform: scale(0.97);
+    }
+    .vehicle-hero-pod.is-light-theme {
+      background: #e2e8f0;
+      border-color: #94a3b8;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
+    }
+    .vehicle-hero-pod.is-light-theme .vehicle-hero-name {
+      color: #0f172a;
+    }
+    .vehicle-hero-pod.is-light-theme .vehicle-hero-hint {
+      color: #475569;
+    }
+    .vehicle-hero-icon-slot {
+      width: 68px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 6px;
+      transition: transform 0.2s ease;
+    }
+    .vehicle-hero-name {
+      font-size: 0.85rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      color: #00f3ff;
+      margin-bottom: 2px;
+      text-align: center;
+    }
+    .vehicle-hero-hint {
+      font-size: 0.65rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #94a3b8;
+      text-align: center;
+    }
+
+    /* RoadTrip Telemetry Heading Squircle (Medium Scale Extraction) */
+    .action-badge-card {
+      flex: 1;
+      background: rgba(8, 14, 26, 0.7);
+      border: 1.5px solid rgba(0, 243, 255, 0.3);
+      border-radius: 16px;
+      padding: 14px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+    }
+    .action-badge-card.is-light-theme {
+      background: #e2e8f0;
+      border-color: #94a3b8;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
+    }
+    .action-badge-card.is-light-theme .action-card-label {
+      color: #0f172a;
+    }
+    .action-card-label {
+      font-size: 0.62rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: #00f3ff;
+      letter-spacing: 0.05em;
+      text-align: center;
+    }
+    .telemetry-squircle-pod {
+      width: 74px;
+      height: 74px;
+      border-radius: 20px;
+      background: rgba(12, 16, 26, 0.90);
+      border: 2.2px solid rgba(203, 213, 225, 0.48);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      transition: all 0.2s ease;
+      overflow: hidden;
+      position: relative;
+    }
+    .telemetry-squircle-pod.is-light-theme {
+      background: rgba(255, 255, 255, 0.96);
+      border-color: rgba(15, 23, 42, 0.50);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+    }
+    .telemetry-squircle-pod.is-light-theme .telemetry-circle-val {
+      color: #0f172a;
+    }
+    .telemetry-squircle-pod.is-light-theme .telemetry-circle-label {
+      color: #334155;
+    }
+    .telemetry-circle-val {
+      font-size: 1.45rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: #00f3ff;
+      line-height: 1;
+    }
+    .telemetry-circle-label {
+      font-size: 0.54rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: #94a3b8;
+      letter-spacing: 0.08em;
+      margin-top: 2px;
+    }
+
+    /* Vehicle Pulsing Animations from RoadTrip */
+    @keyframes vehicleHornPulse {
+      0%   { transform: scale(1.0); }
+      50%  { transform: scale(1.22); filter: drop-shadow(0 0 12px #ff5500); }
+      100% { transform: scale(1.0); }
+    }
+    .vehicle-hero-icon-slot.vehicle-pulsing-horn {
+      animation: vehicleHornPulse 0.28s infinite ease-in-out !important;
+    }
+    .vehicle-hero-icon-slot.vehicle-pulsing-horn polygon {
+      fill: #ff5500 !important;
+      stroke: #ffffff !important;
+    }
+
+    @keyframes galagaLaserPulse {
+      0%   { transform: scale(1.0); }
+      35%  { transform: scale(1.28); filter: drop-shadow(0 0 16px #ff0055); }
+      100% { transform: scale(1.0); }
+    }
+    .vehicle-hero-icon-slot.vehicle-pulsing-laser {
+      animation: galagaLaserPulse 0.22s infinite ease-in-out !important;
+    }
+
+    /* General Lee [01] Homage Badge from RoadTrip */
+    @keyframes generalLeeBadgePulse {
+      0%   { transform: scale(1.0); box-shadow: 0 0 16px rgba(255, 85, 0, 0.9), inset 0 0 8px rgba(0,0,0,0.4); }
+      50%  { transform: scale(1.10); box-shadow: 0 0 30px rgba(255, 85, 0, 1), 0 0 45px rgba(255, 140, 0, 0.8), inset 0 0 12px rgba(0,0,0,0.5); }
+      100% { transform: scale(1.0); box-shadow: 0 0 16px rgba(255, 85, 0, 0.9), inset 0 0 8px rgba(0,0,0,0.4); }
+    }
+    .telemetry-squircle-pod.general-lee-active {
+      background: #ff5500 !important;
+      border: 2.5px solid #ffffff !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 22px rgba(255, 85, 0, 1), inset 0 0 10px rgba(0,0,0,0.4) !important;
+      padding: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      animation: generalLeeBadgePulse 0.28s infinite ease-in-out !important;
+      transform-origin: center center !important;
+    }
+    .telemetry-squircle-pod.general-lee-active svg {
+      width: 66px !important;
+      height: 33px !important;
+      max-width: 88% !important;
+      max-height: 88% !important;
+      display: block !important;
+      margin: auto !important;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6)) !important;
+    }
+
+    /* Galaga FIRE! Badge from RoadTrip */
+    @keyframes galagaFirePulse {
+      0%   { transform: scale(1.0); text-shadow: 0 0 8px #ff0033; }
+      50%  { transform: scale(1.16); text-shadow: 0 0 20px #ff0033, 0 0 30px #ff0055; }
+      100% { transform: scale(1.0); text-shadow: 0 0 8px #ff0033; }
+    }
+    .telemetry-squircle-pod.galaga-fire-active {
+      border: 2.5px solid #ff0055 !important;
+      background: rgba(255, 0, 85, 0.15) !important;
+      box-shadow: 0 0 22px rgba(255, 0, 85, 0.8), inset 0 0 10px rgba(255, 0, 85, 0.4) !important;
+    }
+    .galaga-fire-val {
+      color: #ff0033 !important;
+      font-size: 1.25rem !important;
+      font-weight: 900 !important;
+      letter-spacing: 2px !important;
+      font-family: 'JetBrains Mono', monospace;
+      animation: galagaFirePulse 0.18s infinite alternate !important;
+    }
+
+    .vehicle-controls-bar {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+      justify-content: center;
+    }
+    .vehicle-ctrl-btn {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(0, 243, 255, 0.3);
+      border-radius: 8px;
+      padding: 9px 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #00f3ff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+    .vehicle-ctrl-btn:active {
+      background: rgba(0, 243, 255, 0.15);
+    }
+    .vehicle-status-pill {
+      font-size: 0.68rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #64748b;
+      text-align: center;
+    }
+
+    /* --- Item 4: Kinematics, Compass & VSI Styles --- */
+    .telemetry-mode-bar-wrap {
+      width: 100%;
+      margin-top: 10px;
+    }
+    .telemetry-mode-label {
+      font-size: 0.65rem;
+      color: #64748b;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .kinematics-segmented-bar {
+      display: flex;
+      gap: 6px;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .kin-mode-btn {
+      flex: 1;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 6px 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.66rem;
+      font-weight: 700;
+      color: #94a3b8;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+    .kin-mode-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .kin-mode-btn.is-active {
+      background: rgba(0, 243, 255, 0.18);
+      border-color: #00f3ff;
+      color: #00f3ff;
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+    }
+    .vsi-tag-climbing {
+      color: #30d158 !important;
+      text-shadow: 0 0 8px rgba(48, 209, 88, 0.6);
+    }
+    .vsi-tag-descending {
+      color: #ff9f0a !important;
+      text-shadow: 0 0 8px rgba(255, 159, 10, 0.6);
+    }
+    .vsi-tag-level {
+      color: #00f3ff !important;
+    }
+
+    /* --- Item 6: Vector Map & Highway Shields Styles --- */
+    .live-map-card {
+      position: relative;
+      width: 100%;
+      height: 240px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1.5px solid rgba(0, 243, 255, 0.4);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 0 16px rgba(0, 0, 0, 0.4);
+      margin-top: 6px;
+      background: #070b14;
+    }
+    #live-map-canvas {
+      width: 100%;
+      height: 100%;
+    }
+    .map-vehicle-marker {
+      position: absolute;
+      top: 66%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: auto;
+      cursor: pointer;
+      z-index: 20;
+      transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.3, 1), top 0.35s cubic-bezier(0.2, 0.8, 0.3, 1);
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .map-vehicle-marker:active {
+      filter: drop-shadow(0 0 12px #00f3ff);
+    }
+    .map-overlay-pill {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(8, 14, 26, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 243, 255, 0.4);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 0.62rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #f8fafc;
+      z-index: 30;
+      pointer-events: none;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    /* RoadTrip Tactical Compass Rosette Pod */
+    .map-overlay-compass {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: rgba(8, 14, 26, 0.88);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 2px solid rgba(0, 243, 255, 0.5);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.75), inset 0 0 10px rgba(0, 243, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 40;
+      transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      pointer-events: auto !important;
+    }
+    .map-overlay-compass:hover {
+      border-color: #00f3ff;
+      box-shadow: 0 0 18px rgba(0, 243, 255, 0.6), inset 0 0 12px rgba(0, 243, 255, 0.2);
+    }
+    .map-overlay-compass:active {
+      transform: scale(0.90) !important;
+      border-color: #00f3ff !important;
+      box-shadow: 0 0 22px rgba(0, 243, 255, 0.85), inset 0 0 14px rgba(0, 243, 255, 0.3) !important;
+    }
+    .map-overlay-compass.active-heading-up {
+      border: 2px solid rgba(0, 243, 255, 0.85);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.75), inset 0 0 12px rgba(0, 243, 255, 0.2);
+    }
+    .map-overlay-compass.perspective-north-up {
+      border: 2px solid rgba(148, 163, 184, 0.55);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.75), inset 0 0 10px rgba(255, 255, 255, 0.05);
+    }
+    .map-overlay-compass.perspective-north-up .compass-rose-svg line {
+      stroke: #64748b;
+    }
+    /* Light Theme Compass Adaptation */
+    .live-map-card.theme-light-active .map-overlay-compass {
+      background: rgba(240, 244, 250, 0.94);
+      border: 2px solid rgba(15, 23, 42, 0.35);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), inset 0 0 10px rgba(255, 255, 255, 0.8);
+    }
+    .live-map-card.theme-light-active .map-overlay-compass .compass-rose-svg line {
+      stroke: #334155 !important;
+    }
+    .live-map-card.theme-light-active .map-overlay-compass .compass-rose-svg text {
+      fill: #0f172a !important;
+    }
+    .compass-wrapper-overlay {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .compass-rose-svg {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .compass-needle-svg {
+      position: absolute;
+      width: 84%;
+      height: 84%;
+      pointer-events: none;
+      transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.3, 1);
+      transform-origin: center center;
+    }
+
+    /* Ephemeral Map Toast */
+    .map-toast {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(8, 14, 26, 0.90);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid #00f3ff;
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.68rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: #00f3ff;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.3, 1);
+      white-space: nowrap;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.8), 0 0 12px rgba(0, 243, 255, 0.4);
+    }
+    .map-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .highway-shields-row {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      margin-top: 10px;
+      align-items: stretch;
+    }
+    .shield-cell {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 10px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .shield-slot {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .shield-slot .highway-shield-badge {
+      width: 54px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+    }
+    .shield-caption {
+      font-size: 0.62rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* --- Item 7: Sensory Visualizers & Fidget Consoles Styles --- */
+    .fidget-canvas-card {
+      position: relative;
+      width: 100%;
+      height: 240px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1.5px solid rgba(0, 243, 255, 0.4);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 0 16px rgba(0, 0, 0, 0.4);
+      margin-top: 6px;
+      background: #020617;
+    }
+    .fidget-canvas-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    .fidget-canvas-inner canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
+    .fidget-die-pod {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: rgba(8, 14, 26, 0.88);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.45);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.75), inset 0 0 10px rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 40;
+      transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      padding: 6px;
+    }
+    .fidget-die-pod:hover {
+      border-color: #ffffff;
+      box-shadow: 0 0 18px rgba(255, 255, 255, 0.6);
+    }
+    .fidget-die-pod:active {
+      transform: scale(0.90) !important;
+    }
+    .fidget-die-pod.auto-cycling {
+      border-color: #ffb703 !important;
+      box-shadow: 0 0 20px rgba(255, 183, 3, 0.85), inset 0 0 10px rgba(255, 183, 3, 0.3) !important;
+    }
+    @keyframes diceSnapSpin {
+      0%   { transform: rotate(0deg) scale(1); }
+      45%  { transform: rotate(180deg) scale(1.18); }
+      90%  { transform: rotate(360deg) scale(1.04); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+    .nomad-dice-svg.snap-spinning {
+      animation: diceSnapSpin 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    }
+    .nomad-dice-svg.auto-cycling-die {
+      color: #ffb703 !important;
+      filter: drop-shadow(0 0 8px rgba(255, 183, 3, 0.9));
+    }
+    .fidget-tagline-pill {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(8, 14, 26, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 243, 255, 0.4);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 0.62rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #f8fafc;
+      z-index: 30;
+      pointer-events: none;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+    .fidget-progress-wrap {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .fidget-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #00f3ff, #ffb703);
+      transition: width 0.3s linear;
+    }
+    .fidget-countdown-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4px;
+      font-size: 0.65rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #94a3b8;
+    }
+
+    /* Item 8: Trip Computer & GPX Flight Recorder Styles */
+    .trip-odometer-wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-top: 4px;
+      padding: 10px 14px;
+      background: rgba(48, 209, 88, 0.05);
+      border: 1px solid rgba(48, 209, 88, 0.22);
+      border-radius: 10px;
+    }
+    .trip-dist-hero {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .trip-dist-val {
+      font-size: 1.85rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: #30d158;
+      line-height: 1;
+    }
+    .trip-dist-unit {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #94a3b8;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .trip-dist-km {
+      font-size: 0.78rem;
+      color: #64748b;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .trip-time-cluster {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .trip-time-elapsed {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.1;
+    }
+    .trip-time-breakdown {
+      font-size: 0.65rem;
+      color: #94a3b8;
+    }
+    .trip-gpx-hud {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-top: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+    }
+    .trip-gpx-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .trip-gpx-fix {
+      color: #cbd5e1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .trip-gpx-badge {
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: #30d158;
+      border: 1px solid rgba(48, 209, 88, 0.4);
+      background: rgba(48, 209, 88, 0.1);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    /* Item 9: Cockpit Switcher Styles */
+    .cockpit-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .cockpit-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 10px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .cockpit-card:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: #ffffff;
+    }
+    .cockpit-card.is-active {
+      background: rgba(0, 243, 255, 0.08);
+      border-color: #00f3ff;
+      box-shadow: 0 0 16px rgba(0, 243, 255, 0.25);
+    }
+    .cockpit-card-icon {
+      font-size: 1.6rem;
+      margin-bottom: 4px;
+    }
+    .cockpit-card-name {
+      font-size: 0.76rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: #ffffff;
+      margin-bottom: 2px;
+    }
+    .cockpit-card-sub {
+      font-size: 0.60rem;
+      color: #94a3b8;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 8px;
+    }
+    .cockpit-launch-btn {
+      font-size: 0.62rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-decoration: none;
+      display: inline-block;
+      border: 1px solid currentColor;
+      transition: all 0.15s ease;
+    }
+    .cockpit-launch-btn:active {
+      transform: scale(0.95);
+    }
+
+    footer {
+      font-size: 0.68rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #475569;
+      margin-top: 8px;
+    }
+    footer a {
+      color: #00f3ff;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hud-card">
+    <div class="brand-badge">NOMAD: SUITE // DEV HUB</div>
+    <h1>NOMAD SUITE</h1>
+    <p class="tagline">Unified Multi-Cockpit Navigation Architecture<br/>RoadTrip • Hyperspace • DIGIT</p>
+
+    <div class="truth-grid">
+      <a href="./ground_truth/roadtrip/" class="truth-item">
+        <span>🚗 RoadTrip (v3)</span>
+        <span class="ready">LAUNCH BENCHMARK ↗</span>
+      </a>
+      <a href="./ground_truth/hyperspace/" class="truth-item">
+        <span>🚀 Hyperspace (v4)</span>
+        <span class="ready">LAUNCH BENCHMARK ↗</span>
+      </a>
+      <a href="./ground_truth/digit/" class="truth-item">
+        <span>📟 DIGIT (Text-Only)</span>
+        <span class="ready">LAUNCH BENCHMARK ↗</span>
+      </a>
+    </div>
+
+    <div class="status-box" id="engine-status">
+      ACTIVE // Shared Avionics &amp; Atmospheric Engines Online
+    </div>
+
+    <!-- Live Avionics Stream Monitor -->
+    <div class="avionics-monitor">
+      <div class="mon-header">
+        <span>SHARED TELEMETRY STREAM</span>
+        <span class="mon-badge" id="mon-lock">CONNECTING...</span>
+      </div>
+      <div class="mon-street" id="mon-street">Locating...</div>
+      <div class="mon-subloc" id="mon-subloc">--</div>
+      <div class="mon-grid">
+        <div class="mon-cell">
+          <div class="mon-lbl">SPEED</div>
+          <div class="mon-val" id="mon-speed">0 <span class="mon-unit">MPH</span></div>
+        </div>
+        <div class="mon-cell">
+          <div class="mon-lbl">BEARING</div>
+          <div class="mon-val" id="mon-heading">0° <span class="mon-unit" id="mon-cardinal">N</span></div>
+        </div>
+        <div class="mon-cell">
+          <div class="mon-lbl">ALTITUDE</div>
+          <div class="mon-val" id="mon-alt">-- <span class="mon-unit">FT</span></div>
+        </div>
+        <div class="mon-cell">
+          <div class="mon-lbl">ACCURACY</div>
+          <div class="mon-val" id="mon-acc">-- <span class="mon-unit">FT</span></div>
+        </div>
+      </div>
+      <div class="mon-coords" id="mon-coords">Lat: -- | Lon: --</div>
+
+      <!-- Atmospheric Telemetry Stream -->
+      <div class="mon-divider"></div>
+      <div class="mon-header">
+        <span>ATMOSPHERIC &amp; WEATHER STREAM</span>
+        <span class="mon-badge" id="weather-status-badge" style="cursor: pointer;" title="Tap to refresh weather">REFRESH ⟳</span>
+      </div>
+      <div class="weather-row">
+        <div class="weather-temp-wrap">
+          <span class="weather-temp-val" id="mon-temp">--</span>
+          <span class="weather-temp-unit">°F</span>
+          <span class="weather-temp-c" id="mon-temp-c">(--°C)</span>
+        </div>
+        <div class="weather-cond-wrap" id="mon-cond">
+          <span class="weather-cond-icon" id="mon-cond-icon"></span>
+          <span class="weather-cond-text" id="mon-cond-text">Fetching weather...</span>
+        </div>
+      </div>
+      <div class="mon-grid">
+        <div class="mon-cell">
+          <div class="mon-lbl">HUMIDITY</div>
+          <div class="mon-val" id="mon-hum">-- <span class="mon-unit">%</span></div>
+        </div>
+        <div class="mon-cell">
+          <div class="mon-lbl">PRESSURE</div>
+          <div class="mon-val" id="mon-press">-- <span class="mon-unit">inHg</span></div>
+        </div>
+        <div class="mon-cell">
+          <div class="mon-lbl">UV INDEX</div>
+          <div class="mon-val" id="mon-uv">-- <span class="mon-unit" id="mon-uv-tier"></span></div>
+        </div>
+        <div class="mon-cell">
+          <div class="mon-lbl">TERRAIN ELEV</div>
+          <div class="mon-val" id="mon-elev">-- <span class="mon-unit">FT</span></div>
+        </div>
+      </div>
+
+      <!-- Vehicle & Acoustic Action Showcase -->
+      <div class="mon-divider"></div>
+      <div class="mon-header">
+        <span>VEHICLE &amp; ACOUSTIC ACTION TEST BED</span>
+        <span class="mon-badge" id="vehicle-mode-badge">TAP VEHICLE TO FIRE</span>
+      </div>
+
+      <div class="vehicle-testbed-row">
+        <!-- Dual Pods: Vehicle Marker & Tactical Telemetry Heading Square -->
+        <div class="vehicle-showcase-row">
+          <!-- 1. Hero Vehicle Marker Pod -->
+          <div class="vehicle-hero-pod" id="vehicle-hero-pod" title="Tap vehicle to trigger horn / laser salvo">
+            <div class="vehicle-hero-icon-slot" id="vehicle-hero-icon"></div>
+            <div class="vehicle-hero-name" id="vehicle-hero-name">CRUISE CHEVRON</div>
+            <div class="vehicle-hero-hint" id="vehicle-hero-hint">🎺 TAP TO HEAR DIXIE HORN</div>
+          </div>
+
+          <!-- 2. RoadTrip Telemetry Square (Heading / [01] / FIRE!) -->
+          <div class="action-badge-card" id="action-badge-card" title="RoadTrip Telemetry Square (Tap to test)">
+            <div class="telemetry-squircle-pod" id="telemetry-squircle-slot">
+              <div class="telemetry-circle-val" id="tactical-heading-deg">0°</div>
+              <div class="telemetry-circle-label" id="tactical-heading-card">NORTH</div>
+            </div>
+            <div class="action-card-label" id="action-card-label">HEADING SQUIRCLE</div>
+          </div>
+        </div>
+
+        <!-- Controls: Switch Vehicle & Theme Preview -->
+        <div class="vehicle-controls-bar">
+          <button class="vehicle-ctrl-btn" id="btn-toggle-persona">
+            ⇄ <span id="toggle-persona-label">SWITCH TO FIGHTER</span>
+          </button>
+          <button class="vehicle-ctrl-btn" id="btn-theme-toggle">
+            🎨 <span id="theme-btn-label">DARK (ARCADE NEON)</span>
+          </button>
+        </div>
+        <div class="vehicle-status-pill" id="vehicle-storage-status">
+          Mode: chevron | Action: IDLE | localStorage saved
+        </div>
+      </div>
+
+      <!-- 4. COMPASS, ELEVATION & KINEMATICS (ITEM 4) -->
+      <div class="mon-divider"></div>
+      <div class="mon-header">
+        <span>4. COMPASS, ELEVATION &amp; KINEMATICS</span>
+        <span class="mon-badge" id="kin-sensor-badge">FUSION: GPS TRACK</span>
+      </div>
+      <div class="mon-grid">
+        <div class="mon-cell">
+          <span class="mon-lbl">16-PT COMPASS</span>
+          <span class="mon-val" id="kin-heading-16pt" style="color: #00f3ff;">0° N</span>
+          <span class="mon-sub" id="kin-heading-word">NORTH</span>
+        </div>
+        <div class="mon-cell">
+          <span class="mon-lbl">ALTIMETER (MSL)</span>
+          <span class="mon-val" id="kin-alt-val">-- FT</span>
+          <span class="mon-sub" id="kin-alt-sub">-- M • SOURCE: GPS</span>
+        </div>
+        <div class="mon-cell">
+          <span class="mon-lbl">CLIMB RATE (VSI)</span>
+          <span class="mon-val" id="kin-vsi-val">LEVEL</span>
+          <span class="mon-sub" id="kin-vsi-sub">0 FT/MIN • 0.0 M/S</span>
+        </div>
+        <div class="mon-cell">
+          <span class="mon-lbl">GPS FIDELITY</span>
+          <span class="mon-val" id="kin-signal-val">±-- FT</span>
+          <span class="mon-sub" id="kin-signal-tier" style="color: #64748b;">TIER: ESTIMATE</span>
+        </div>
+      </div>
+
+      <!-- Telemetry Squircle Mode Selector -->
+      <div class="telemetry-mode-bar-wrap">
+        <div class="telemetry-mode-label">SQUIRCLE HUD TELEMETRY MODE (TAP SQUIRCLE OR BUTTON):</div>
+        <div class="kinematics-segmented-bar" id="telemetry-mode-bar">
+          <button class="kin-mode-btn is-active" data-mode="0" id="btn-mode-0">0: HEADING (16-PT)</button>
+          <button class="kin-mode-btn" data-mode="1" id="btn-mode-1">1: ALTITUDE</button>
+          <button class="kin-mode-btn" data-mode="2" id="btn-mode-2">2: CLIMB RATE</button>
+          <button class="kin-mode-btn" data-mode="3" id="btn-mode-3">3: GPS SIGNAL</button>
+        </div>
+      </div>
+
+      <!-- 5. SCREEN WAKE LOCK & APP LIFECYCLE GUARD (ITEM 5) -->
+      <div class="mon-divider"></div>
+      <div class="mon-header">
+        <span>5. SCREEN WAKE LOCK &amp; LIFECYCLE GUARD</span>
+        <span class="mon-badge" id="lifecycle-badge" style="color: #10b981; border-color: #10b981;">WAKE LOCK: ACTIVE</span>
+      </div>
+      <div class="mon-grid">
+        <div class="mon-cell">
+          <span class="mon-lbl">WAKE LOCK STATUS</span>
+          <span class="mon-val" id="lifecycle-lock-val" style="color: #10b981;">ENGAGED</span>
+          <span class="mon-sub" id="lifecycle-lock-sub">CAR DASH KEEP-AWAKE</span>
+        </div>
+        <div class="mon-cell">
+          <span class="mon-lbl">PAGE VISIBILITY</span>
+          <span class="mon-val" id="lifecycle-vis-val" style="color: #00f3ff;">VISIBLE</span>
+          <span class="mon-sub" id="lifecycle-vis-sub">ACTIVE FOREGROUND</span>
+        </div>
+        <div class="mon-cell">
+          <span class="mon-lbl">WATCHDOG HEARTBEAT</span>
+          <span class="mon-val" id="lifecycle-watchdog-val" style="color: #00f3ff;">15S ACTIVE</span>
+          <span class="mon-sub" id="lifecycle-watchdog-sub">REACQUIRE COUNT: 1</span>
+        </div>
+        <div class="mon-cell">
+          <span class="mon-lbl">LIFECYCLE RESUMES</span>
+          <span class="mon-val" id="lifecycle-resumes-val">0</span>
+          <span class="mon-sub" id="lifecycle-resumes-sub">VIEWPORT RE-ANCHORS</span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; margin-top: 10px;">
+        <button class="vehicle-ctrl-btn" id="btn-toggle-wakelock">
+          ⚡ <span id="toggle-wakelock-label">TOGGLE WAKE LOCK</span>
+        </button>
+      </div>
+
+      <!-- 6. DUAL VECTOR MAP THEMES & WEBGL PIPELINE (ITEM 6) -->
+      <div class="mon-divider"></div>
+      <div class="mon-header">
+        <span>6. DUAL VECTOR MAP THEMES &amp; WEBGL</span>
+        <span class="mon-badge" id="map-theme-badge">NATURAL DARK</span>
+      </div>
+
+      <!-- Live MapLibre GL Vector Canvas -->
+      <div class="live-map-card" id="live-map-card">
+        <div id="live-map-canvas"></div>
+
+        <!-- Tactical Compass Rosette Pod (RoadTrip Left Side - Tap to cycle 3 perspectives!) -->
+        <div class="map-overlay-compass" id="compass-btn" title="Tap Compass to Cycle Perspective (3D Drive -> 2D Track -> 2D North-Up)">
+          <div class="compass-wrapper-overlay">
+            <svg class="compass-rose-svg" viewBox="0 0 100 100">
+              <!-- 30° Tactical Chronometer Tick Marks -->
+              <line x1="72" y1="12" x2="69" y2="17" stroke="#475569" stroke-width="1.8" stroke-linecap="round" />
+              <line x1="88" y1="28" x2="83" y2="31" stroke="#475569" stroke-width="1.8" stroke-linecap="round" />
+              <line x1="88" y1="72" x2="83" y2="69" stroke="#475569" stroke-width="1.8" stroke-linecap="round" />
+              <line x1="72" y1="88" x2="69" y2="83" stroke="#475569" stroke-width="1.8" stroke-linecap="round" />
+              <line x1="28" y1="88" x2="31" y2="83" stroke="#475569" stroke-width="1.8" stroke-linecap="round" />
+              <line x1="12" y1="72" x2="17" y2="69" stroke="#475569" stroke-width="1.8" stroke-linecap="round" />
+              <line x1="12" y1="28" x2="17" y2="31" stroke="#475569" stroke-width="1.8" stroke-linecap="round" />
+              <line x1="28" y1="12" x2="31" y2="17" stroke="#475569" stroke-width="1.8" stroke-linecap="round" />
+
+              <!-- Outward Anchored Cardinal Text Indicators -->
+              <text x="50" y="16" fill="#ff3b30" font-size="13.5" font-weight="700" text-anchor="middle">N</text>
+              <text x="91" y="54" fill="#94a3b8" font-size="11.5" font-weight="700" text-anchor="middle">E</text>
+              <text x="50" y="93" fill="#94a3b8" font-size="11.5" font-weight="700" text-anchor="middle">S</text>
+              <text x="9" y="54" fill="#94a3b8" font-size="11.5" font-weight="700" text-anchor="middle">W</text>
+            </svg>
+
+            <!-- Precision Dual-Taper Needle -->
+            <svg class="compass-needle-svg" id="needle-svg" viewBox="0 0 100 100">
+              <polygon points="50,15 44,50 50,47" fill="#ff3b30" />
+              <polygon points="50,15 56,50 50,47" fill="#e02b20" />
+              <polygon points="50,85 44,50 50,53" fill="#64748b" />
+              <polygon points="50,85 56,50 50,44" fill="#475569" />
+              <circle cx="50" cy="50" r="4.5" fill="#0f172a" stroke="#cbd5e1" stroke-width="2.2" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- 3D Perspective Vehicle Overlay -->
+        <div class="map-vehicle-marker" id="map-vehicle-marker">
+          <div id="map-vehicle-svg-slot"></div>
+        </div>
+
+        <!-- Top Floating Overlay with Current Theme and Coordinates -->
+        <div class="map-overlay-pill" id="map-overlay-pill">
+          <span id="map-pill-name">NATURAL DARK NAVIGATION</span> • <span id="map-pill-coords">42.3765, -71.2356</span>
+        </div>
+
+        <!-- Ephemeral Map Toast -->
+        <div class="map-toast" id="map-toast">3D Take-Off Drive (58°)</div>
+      </div>
+
+      <!-- Highway Route Shields Showcase -->
+      <div class="highway-shields-row" id="highway-shields-row">
+        <div class="shield-cell">
+          <div class="shield-slot" id="slot-interstate-shield">
+            <!-- Rendered Interstate SVG -->
+          </div>
+          <div class="shield-caption" id="caption-interstate-shield">INTERSTATE SHIELD</div>
+        </div>
+        <div class="shield-cell">
+          <div class="shield-slot" id="slot-route-shield">
+            <!-- Rendered Route SVG -->
+          </div>
+          <div class="shield-caption" id="caption-route-shield">STATE ROUTE SHIELD</div>
+        </div>
+      </div>
+
+      <!-- Theme Controls -->
+      <div class="vehicle-controls-bar" style="margin-top: 10px;">
+        <button class="vehicle-ctrl-btn" id="btn-toggle-map-theme">
+          🗺️ <span id="toggle-map-theme-label">SWITCH TO NATURAL LIGHT</span>
+        </button>
+        <button class="vehicle-ctrl-btn" id="btn-map-tilt-toggle">
+          📐 <span id="map-tilt-label">3D PERSPECTIVE (58°)</span>
+        </button>
+      </div>
+      <div class="vehicle-status-pill" id="map-pipeline-status">
+        WebGL 2.0 Pipeline // Zero-Reload Style Diffing Active
+      </div>
+    </div>
+
+    <!-- 7. SENSORY VISUALIZERS & KINETIC SCREENSAVER CONSOLES (ITEM 7) -->
+    <div class="mon-divider"></div>
+    <div class="mon-header">
+      <span>7. SENSORY VISUALIZERS &amp; THE FIDGET ARCADE</span>
+      <span class="mon-badge" id="fidget-console-badge" style="color: #00f3ff; border-color: #00f3ff;">STARFIELD</span>
+    </div>
+
+    <!-- Kinetic Screensaver Console Viewport -->
+    <div class="fidget-canvas-card" id="fidget-canvas-card">
+      <div class="fidget-canvas-inner" id="fidget-canvas-stage"></div>
+
+      <!-- Floating Tagline Pill (Top-Left) -->
+      <div class="fidget-tagline-pill" id="fidget-tagline-pill">
+        <span id="fidget-hero-title">STARFIELD WARP DRIVE</span>
+      </div>
+
+      <!-- Interactive Countdown Die Pod (Top-Right: Tap to browse, Long-press for 60s Auto-Cycle) -->
+      <div class="fidget-die-pod" id="fidget-die-pod" title="Tap: Next Console (White 5) • Long-Press (700ms): 60s Auto-Cycle (Yellow 6->1)">
+        <div id="fidget-die-slot" style="width: 100%; height: 100%;">
+          <!-- Rendered Die SVG -->
+        </div>
+      </div>
+
+      <!-- Ephemeral Toast -->
+      <div class="map-toast" id="fidget-toast">STARFIELD WARP DRIVE</div>
+    </div>
+
+    <!-- 60-Second Auto-Cycle Countdown Progress -->
+    <div class="fidget-progress-wrap">
+      <div class="fidget-progress-fill" id="fidget-progress-bar"></div>
+    </div>
+    <div class="fidget-countdown-row">
+      <span>STATUS: <span id="fidget-auto-status" style="color: #64748b; font-weight: 700;">MANUAL (WHITE FACE 5)</span></span>
+      <span>COUNTDOWN: <span id="fidget-timer-text" style="color: #00f3ff; font-weight: 700;">READY</span></span>
+      <span>SNAP-SPIN: <span id="fidget-snap-status" style="color: #94a3b8;">9S SYNC</span></span>
+    </div>
+
+    <!-- Console Selector Segmented Buttons -->
+    <div class="kinematics-segmented-bar" style="margin-top: 10px;">
+      <button class="kinematics-mode-btn active" id="btn-console-starfield">
+        ✨ STARFIELD
+      </button>
+      <button class="kinematics-mode-btn" id="btn-console-underwater">
+        🐠 OCEAN
+      </button>
+      <button class="kinematics-mode-btn" id="btn-console-synthomatic">
+        ⚡ SYNTHOMATIC
+      </button>
+      <button class="kinematics-mode-btn" id="btn-console-stampede">
+        🏜️ STAMPEDE
+      </button>
+    </div>
+
+    <!-- Controls Row -->
+    <div class="vehicle-controls-bar" style="margin-top: 10px;">
+      <button class="vehicle-ctrl-btn" id="btn-toggle-autocycle">
+        🎲 <span id="toggle-autocycle-label">START 60s AUTO-CYCLE</span>
+      </button>
+      <button class="vehicle-ctrl-btn" id="btn-advance-autocycle" style="border-color: #ffb703; color: #ffb703;">
+        ⏩ <span>ADVANCE SCENE (AUTO-CYCLE)</span>
+      </button>
+      <button class="vehicle-ctrl-btn" id="btn-spin-die-test">
+        🔄 <span>SNAP SPIN DIE TEST</span>
+      </button>
+    </div>
+    <div class="vehicle-status-pill" id="fidget-engine-status">
+      High-Performance 2D Canvas Fluid &amp; Particle Simulator // Ready
+    </div>
+
+    <!-- 8. TRIP COMPUTER & GPX FLIGHT RECORDER (ITEM 8) -->
+    <div class="mon-divider"></div>
+    <div class="mon-header">
+      <span>8. TRIP COMPUTER &amp; GPX FLIGHT RECORDER</span>
+      <span class="mon-badge" id="trip-status-badge" style="color: #30d158; border-color: #30d158;">RECORDING</span>
+    </div>
+
+    <!-- Odometer & Time Breakdown Hero -->
+    <div class="trip-odometer-wrap" id="trip-odometer-wrap">
+      <div class="trip-dist-hero">
+        <span class="trip-dist-val" id="trip-dist-miles">0.00</span>
+        <span class="trip-dist-unit">MI</span>
+        <span class="trip-dist-km" id="trip-dist-km">(0.00 KM)</span>
+      </div>
+      <div class="trip-time-cluster">
+        <div class="trip-time-elapsed" id="trip-time-elapsed">00:00</div>
+        <div class="trip-time-breakdown">
+          <span style="color: #30d158;" id="trip-time-moving">00:00 MOV</span> • <span style="color: #ffb703;" id="trip-time-idle">00:00 IDLE</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Speed Analytics Cluster -->
+    <div class="mon-grid" style="margin-top: 6px;">
+      <div class="mon-cell">
+        <div class="mon-lbl">CURRENT SPEED</div>
+        <div class="mon-val" id="trip-speed-cur">0 <span class="mon-unit">MPH</span></div>
+      </div>
+      <div class="mon-cell">
+        <div class="mon-lbl">AVG MOVING SPEED</div>
+        <div class="mon-val" id="trip-speed-avg-mov" style="color: #30d158;">0.0 <span class="mon-unit">MPH</span></div>
+      </div>
+      <div class="mon-cell">
+        <div class="mon-lbl">AVG TOTAL SPEED</div>
+        <div class="mon-val" id="trip-speed-avg-tot" style="color: #94a3b8;">0.0 <span class="mon-unit">MPH</span></div>
+      </div>
+      <div class="mon-cell">
+        <div class="mon-lbl">PEAK / TOP SPEED</div>
+        <div class="mon-val" id="trip-speed-max" style="color: #ff7700;">0 <span class="mon-unit">MPH</span></div>
+      </div>
+    </div>
+
+    <!-- GPX 1.1 Flight Recorder Monitor -->
+    <div class="trip-gpx-hud">
+      <div class="trip-gpx-row">
+        <span style="color: #94a3b8;">FLIGHT RECORDER // GPX 1.1</span>
+        <span class="trip-gpx-badge" id="trip-trkpt-badge">0 TRKPTS LOGGED</span>
+      </div>
+      <div class="trip-gpx-fix" id="trip-gpx-latest-fix">
+        Lat: -- | Lon: -- | Alt: -- | Course: --
+      </div>
+    </div>
+
+    <!-- Controls Row -->
+    <div class="vehicle-controls-bar" style="margin-top: 10px;">
+      <button class="vehicle-ctrl-btn" id="btn-trip-export" style="border-color: #30d158; color: #30d158;">
+        📍 <span>EXPORT .GPX</span>
+      </button>
+      <button class="vehicle-ctrl-btn" id="btn-trip-pause">
+        <span id="trip-pause-icon">⏸️</span> <span id="trip-pause-label">PAUSE TRIP</span>
+      </button>
+      <button class="vehicle-ctrl-btn" id="btn-trip-reset">
+        🔄 <span>RESET ODOMETER</span>
+      </button>
+      <button class="vehicle-ctrl-btn" id="btn-trip-simulate" style="border-color: #00f3ff; color: #00f3ff;">
+        🚗 <span>SIMULATE +0.2 MI</span>
+      </button>
+    </div>
+
+    <!-- Ephemeral Toast for Trip Actions -->
+    <div class="map-toast" id="trip-toast" style="margin-top: 8px;">GPX Flight Recorder Active</div>
+
+    <div class="vehicle-status-pill" id="trip-engine-status">
+      GPX 1.1 Compliant // 1.8 MPH Hardware Deadband // LocalStorage Sync Active
+    </div>
+
+    <!-- 9. THE COCKPIT MODE SWITCHER & STARTUP MEMORY (ITEM 9) -->
+    <div class="mon-divider"></div>
+    <div class="mon-header">
+      <span>9. THE COCKPIT MODE SWITCHER &amp; STARTUP MEMORY</span>
+      <span class="mon-badge" id="cockpit-active-badge" style="color: #ff0055; border-color: #ff0055;">HYPERSPACE</span>
+    </div>
+
+    <!-- 3 Cockpit Cards Grid -->
+    <div class="cockpit-grid">
+      <div class="cockpit-card" id="card-cockpit-roadtrip">
+        <div class="cockpit-card-icon">🚗</div>
+        <div class="cockpit-card-name">ROAD TRIP</div>
+        <div class="cockpit-card-sub">v3 Classic Navigation</div>
+        <a href="../roadtrip.html" class="cockpit-launch-btn" style="color: #00f3ff;">LAUNCH ↗</a>
+      </div>
+      <div class="cockpit-card is-active" id="card-cockpit-hyperspace">
+        <div class="cockpit-card-icon">🚀</div>
+        <div class="cockpit-card-name">HYPERSPACE</div>
+        <div class="cockpit-card-sub">v4 Kinetic Canvas</div>
+        <a href="../hyperspace.html" class="cockpit-launch-btn" style="color: #ff0055;">LAUNCH ↗</a>
+      </div>
+      <div class="cockpit-card" id="card-cockpit-digit">
+        <div class="cockpit-card-icon">📟</div>
+        <div class="cockpit-card-name">DIGIT</div>
+        <div class="cockpit-card-sub">Tactical Monospace CRT</div>
+        <a href="../digit.html" class="cockpit-launch-btn" style="color: #30d158;">LAUNCH ↗</a>
+      </div>
+    </div>
+
+    <!-- Default Boot Cockpit Selector -->
+    <div class="trip-odometer-wrap" style="margin-top: 8px; background: rgba(0, 243, 255, 0.04); border-color: rgba(0, 243, 255, 0.2);">
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <span style="font-size: 0.65rem; color: #94a3b8; font-family: 'JetBrains Mono', monospace;">DEFAULT BOOT COCKPIT</span>
+        <span style="font-size: 0.95rem; font-weight: 800; color: #ffffff; font-family: 'JetBrains Mono', monospace;" id="cockpit-default-label">HYPERSPACE (v4)</span>
+      </div>
+      <div class="kinematics-segmented-bar" style="margin-top: 0; width: auto; gap: 4px;">
+        <button class="kinematics-mode-btn" id="btn-set-default-roadtrip" style="padding: 4px 8px; font-size: 0.65rem;">🚗 RT</button>
+        <button class="kinematics-mode-btn active" id="btn-set-default-hyperspace" style="padding: 4px 8px; font-size: 0.65rem;">🚀 HS</button>
+        <button class="kinematics-mode-btn" id="btn-set-default-digit" style="padding: 4px 8px; font-size: 0.65rem;">📟 DG</button>
+      </div>
+    </div>
+
+    <!-- Shared Utilities Bar -->
+    <div class="vehicle-controls-bar" style="margin-top: 8px;">
+      <a href="../visualizer.html" class="vehicle-ctrl-btn" style="border-color: #ff007f; color: #ffffff; text-decoration: none; text-align: center; line-height: 2.2;">
+        ✨ <span>ARCADE</span>
+      </a>
+      <a href="../geek-stats.html" class="vehicle-ctrl-btn" style="border-color: #ffb000; color: #ffb000; text-decoration: none; text-align: center; line-height: 2.2;">
+        &gt; <span>GEEK STATS</span>
+      </a>
+      <a href="../features.html" class="vehicle-ctrl-btn" style="border-color: #38bdf8; color: #38bdf8; text-decoration: none; text-align: center; line-height: 2.2;">
+        📖 <span>MANUAL</span>
+      </a>
+      <a href="/api/download-zip" download="nomad-roadtrip.zip" class="vehicle-ctrl-btn" style="border-color: #10b981; color: #10b981; text-decoration: none; text-align: center; line-height: 2.2;">
+        📦 <span>ZIP BACKUP</span>
+      </a>
+    </div>
+
+    <div class="vehicle-status-pill" id="cockpit-engine-status" style="margin-top: 8px;">
+      Unified Cockpit Engine // 3 Viewports Synchronized // Continuous GPS Lock
+    </div>
+
+    <footer>
+      Crafted by <a href="https://www.instagram.com/neurocosm" target="_blank">BostonyFX</a>
+    </footer>
+  </div>
+
+  <script src="../kinetic-console.js"></script>
+  <script src="./js/nomad-telemetry-engine.js"></script>
+  <script src="./js/nomad-weather-engine.js"></script>
+  <script src="./js/nomad-vehicle-engine.js"></script>
+  <script src="./js/nomad-kinematics-engine.js"></script>
+  <script src="./js/nomad-lifecycle-engine.js"></script>
+  <script src="./js/nomad-map-engine.js"></script>
+  <script src="./js/nomad-fidget-engine.js"></script>
+  <script src="./js/nomad-trip-engine.js"></script>
+  <script src="./js/nomad-cockpit-engine.js"></script>
+  <script>
+    (function() {
+      const lockEl = document.getElementById('mon-lock');
+      const streetEl = document.getElementById('mon-street');
+      const sublocEl = document.getElementById('mon-subloc');
+      const speedEl = document.getElementById('mon-speed');
+      const headingEl = document.getElementById('mon-heading');
+      const cardinalEl = document.getElementById('mon-cardinal');
+      const altEl = document.getElementById('mon-alt');
+      const accEl = document.getElementById('mon-acc');
+      const coordsEl = document.getElementById('mon-coords');
+
+      // Weather Elements
+      const tempEl = document.getElementById('mon-temp');
+      const tempCEl = document.getElementById('mon-temp-c');
+      const condIconEl = document.getElementById('mon-cond-icon');
+      const condTextEl = document.getElementById('mon-cond-text');
+      const humEl = document.getElementById('mon-hum');
+      const pressEl = document.getElementById('mon-press');
+      const uvEl = document.getElementById('mon-uv');
+      const uvTierEl = document.getElementById('mon-uv-tier');
+      const elevEl = document.getElementById('mon-elev');
+      const weatherBadge = document.getElementById('weather-status-badge');
+
+      // Vehicle & Action Elements
+      const vehicleHeroPod = document.getElementById('vehicle-hero-pod');
+      const vehicleHeroIcon = document.getElementById('vehicle-hero-icon');
+      const vehicleHeroName = document.getElementById('vehicle-hero-name');
+      const vehicleHeroHint = document.getElementById('vehicle-hero-hint');
+      const vehicleModeBadge = document.getElementById('vehicle-mode-badge');
+      const actionBadgeCard = document.getElementById('action-badge-card');
+      const telemetrySquircleSlot = document.getElementById('telemetry-squircle-slot');
+      const actionCardLabel = document.getElementById('action-card-label');
+      const btnTogglePersona = document.getElementById('btn-toggle-persona');
+      const togglePersonaLabel = document.getElementById('toggle-persona-label');
+      const btnThemeToggle = document.getElementById('btn-theme-toggle');
+      const themeBtnLabel = document.getElementById('theme-btn-label');
+      const vehicleStorageStatus = document.getElementById('vehicle-storage-status');
+
+      // Kinematics & Compass Elements (Item 4)
+      const kinSensorBadge = document.getElementById('kin-sensor-badge');
+      const kinHeading16pt = document.getElementById('kin-heading-16pt');
+      const kinHeadingWord = document.getElementById('kin-heading-word');
+      const kinAltVal = document.getElementById('kin-alt-val');
+      const kinAltSub = document.getElementById('kin-alt-sub');
+      const kinVsiVal = document.getElementById('kin-vsi-val');
+      const kinVsiSub = document.getElementById('kin-vsi-sub');
+      const kinSignalVal = document.getElementById('kin-signal-val');
+      const kinSignalTier = document.getElementById('kin-signal-tier');
+      const modeButtons = [
+        document.getElementById('btn-mode-0'),
+        document.getElementById('btn-mode-1'),
+        document.getElementById('btn-mode-2'),
+        document.getElementById('btn-mode-3')
+      ];
+
+      let isLightPreview = false;
+      let isActionPlaying = false;
+      let actionAnimationTimer = null;
+
+      function renderVehicleView() {
+        if (!window.NomadVehicleEngine) return;
+        const mode = window.NomadVehicleEngine.getMode();
+
+        if (vehicleHeroPod) vehicleHeroPod.classList.toggle('is-light-theme', isLightPreview);
+        if (actionBadgeCard) actionBadgeCard.classList.toggle('is-light-theme', isLightPreview);
+        if (telemetrySquircleSlot) telemetrySquircleSlot.classList.toggle('is-light-theme', isLightPreview);
+
+        if (vehicleHeroIcon) {
+          vehicleHeroIcon.innerHTML = window.NomadVehicleEngine.getVehicleSvg(mode, isLightPreview, { size: 52 });
+        }
+
+        if (vehicleHeroName) {
+          if (mode === 'galaga') {
+            vehicleHeroName.innerText = isLightPreview ? 'F-117 STEALTH' : 'GALAGA FIGHTER';
+            vehicleHeroName.style.color = isLightPreview ? '#0f172a' : '#ff0055';
+          } else {
+            vehicleHeroName.innerText = 'CRUISE CHEVRON';
+            vehicleHeroName.style.color = isLightPreview ? '#007aff' : '#00f3ff';
+          }
+        }
+
+        if (vehicleHeroHint) {
+          if (mode === 'galaga') {
+            vehicleHeroHint.innerText = '⚡ TAP TO FIRE LASERS';
+          } else {
+            vehicleHeroHint.innerText = '🎺 TAP TO HEAR DIXIE HORN';
+          }
+        }
+
+        if (togglePersonaLabel) {
+          togglePersonaLabel.innerText = mode === 'galaga' ? 'SWITCH TO CHEVRON' : 'SWITCH TO FIGHTER';
+        }
+
+        if (vehicleModeBadge) {
+          vehicleModeBadge.innerText = mode === 'galaga' ? 'GALAGA MODE' : 'CHEVRON MODE';
+          vehicleModeBadge.style.color = mode === 'galaga' ? '#ff0055' : '#00f3ff';
+          vehicleModeBadge.style.borderColor = mode === 'galaga' ? 'rgba(255, 0, 85, 0.5)' : 'rgba(0, 243, 255, 0.4)';
+        }
+
+        if (themeBtnLabel) {
+          themeBtnLabel.innerText = isLightPreview ? 'LIGHT (STEALTH SLATE)' : 'DARK (ARCADE NEON)';
+        }
+
+        if (!isActionPlaying) {
+          renderSquircleTelemetry();
+          if (vehicleStorageStatus) {
+            vehicleStorageStatus.innerText = `Mode: ${mode} | Action: IDLE | Ready`;
+          }
+        }
+      }
+
+      function renderSquircleTelemetry() {
+        if (isActionPlaying || !telemetrySquircleSlot) return;
+
+        // Retrieve kinematics state
+        const kState = (window.NomadKinematicsEngine && window.NomadKinematicsEngine.getState)
+          ? window.NomadKinematicsEngine.getState()
+          : { telemetryMode: 0, headingDeg: 0, adaptiveCardinalText: 'NORTH', cardinal16Short: 'N', altitudeFeet: null, accuracyFeet: null, verticalSpeedFpm: 0, climbStatus: 'LEVEL' };
+
+        const mode = kState.telemetryMode || 0;
+        telemetrySquircleSlot.className = 'telemetry-squircle-pod' + (isLightPreview ? ' is-light-theme' : '');
+
+        // Update active class on segmented buttons
+        modeButtons.forEach((btn, idx) => {
+          if (btn) btn.classList.toggle('is-active', idx === mode);
+        });
+
+        if (mode === 0) {
+          // Mode 0: HEADING & 16-POINT CARDINAL
+          const shortStyle = kState.adaptiveCardinalShort
+            ? ' style="font-size: 1.25em; letter-spacing: 2px; font-weight: 900;"'
+            : '';
+          telemetrySquircleSlot.innerHTML = `
+            <div class="telemetry-circle-val">${kState.headingDeg}°</div>
+            <div class="telemetry-circle-label"${shortStyle}>${kState.adaptiveCardinalText}</div>
+          `;
+          if (actionCardLabel) {
+            actionCardLabel.innerText = `HEADING (${kState.cardinal16Short})`;
+            actionCardLabel.style.color = isLightPreview ? '#0f172a' : '#00f3ff';
+          }
+        } else if (mode === 1) {
+          // Mode 1: ALTITUDE (FT ALT)
+          const altStr = kState.altitudeFeet !== null ? kState.altitudeFeet.toLocaleString() : '--';
+          telemetrySquircleSlot.innerHTML = `
+            <div class="telemetry-circle-val" style="font-size: 1.6rem;">${altStr}</div>
+            <div class="telemetry-circle-label">FT ALT</div>
+          `;
+          if (actionCardLabel) {
+            actionCardLabel.innerText = 'ALTITUDE SQUIRCLE';
+            actionCardLabel.style.color = isLightPreview ? '#0f172a' : '#00f3ff';
+          }
+        } else if (mode === 2) {
+          // Mode 2: CLIMB RATE (VSI)
+          let valText = 'LEVEL';
+          let sign = '';
+          if (kState.climbStatus === 'CLIMBING') {
+            valText = `+${kState.verticalSpeedFpm}`;
+            sign = '▲ ';
+          } else if (kState.climbStatus === 'DESCENDING') {
+            valText = `${kState.verticalSpeedFpm}`;
+            sign = '▼ ';
+          }
+          telemetrySquircleSlot.innerHTML = `
+            <div class="telemetry-circle-val" style="font-size: 1.45rem;">${sign}${valText}</div>
+            <div class="telemetry-circle-label">${kState.climbStatus === 'LEVEL' ? '±0 FPM' : 'FT/MIN'}</div>
+          `;
+          if (actionCardLabel) {
+            actionCardLabel.innerText = 'CLIMB RATE (VSI)';
+            actionCardLabel.style.color = isLightPreview ? '#0f172a' : '#00f3ff';
+          }
+        } else if (mode === 3) {
+          // Mode 3: GPS ACCURACY (FT GPS)
+          const accStr = kState.accuracyFeet !== null ? `±${kState.accuracyFeet}` : '±--';
+          telemetrySquircleSlot.innerHTML = `
+            <div class="telemetry-circle-val" style="font-size: 1.55rem;">${accStr}</div>
+            <div class="telemetry-circle-label">FT GPS</div>
+          `;
+          if (actionCardLabel) {
+            actionCardLabel.innerText = 'GPS ACCURACY';
+            actionCardLabel.style.color = isLightPreview ? '#0f172a' : '#00f3ff';
+          }
+        }
+      }
+
+      function triggerVehicleAction() {
+        if (!window.NomadVehicleEngine || !window.NomadAudioEngine) return;
+        const mode = window.NomadVehicleEngine.getMode();
+
+        clearTimeout(actionAnimationTimer);
+        isActionPlaying = true;
+
+        if (mode === 'chevron') {
+          // --- CHEVRON ACTION: Dixie Horn + Vehicle Pulse + [01] General Lee Homage ---
+          if (vehicleHeroIcon) {
+            vehicleHeroIcon.classList.remove('vehicle-pulsing-laser');
+            vehicleHeroIcon.classList.add('vehicle-pulsing-horn');
+          }
+
+          if (telemetrySquircleSlot) {
+            telemetrySquircleSlot.className = 'telemetry-squircle-pod general-lee-active';
+            telemetrySquircleSlot.innerHTML = window.NomadVehicleEngine.getGeneralLeeSvg();
+          }
+
+          if (actionCardLabel) {
+            actionCardLabel.innerText = '[01] GENERAL LEE';
+            actionCardLabel.style.color = '#ff5500';
+          }
+
+          if (vehicleStorageStatus) {
+            vehicleStorageStatus.innerText = 'Mode: chevron | Action: DIXIE HORN (2.8s) | Pulsing [01]';
+          }
+
+          const hornDuration = window.NomadAudioEngine.playDixieHorn(() => {
+            endVehicleAction();
+          });
+
+          actionAnimationTimer = setTimeout(endVehicleAction, hornDuration || 2820);
+
+        } else {
+          // --- GALAGA FIGHTER ACTION: Laser Salvo + Fighter Kick + FIRE! Badge ---
+          if (vehicleHeroIcon) {
+            vehicleHeroIcon.classList.remove('vehicle-pulsing-horn');
+            vehicleHeroIcon.classList.add('vehicle-pulsing-laser');
+          }
+
+          if (telemetrySquircleSlot) {
+            telemetrySquircleSlot.className = 'telemetry-squircle-pod galaga-fire-active';
+            telemetrySquircleSlot.innerHTML = '<div class="telemetry-circle-val galaga-fire-val">FIRE!</div>';
+          }
+
+          if (actionCardLabel) {
+            actionCardLabel.innerText = 'LASER SALVO';
+            actionCardLabel.style.color = '#ff0033';
+          }
+
+          if (vehicleStorageStatus) {
+            vehicleStorageStatus.innerText = 'Mode: galaga | Action: LASER SALVO (0.8s) | Flashing FIRE!';
+          }
+
+          const laserDuration = window.NomadAudioEngine.playGalagaLaser(() => {
+            endVehicleAction();
+          });
+
+          actionAnimationTimer = setTimeout(endVehicleAction, laserDuration || 805);
+        }
+      }
+
+      function endVehicleAction() {
+        clearTimeout(actionAnimationTimer);
+        isActionPlaying = false;
+        if (vehicleHeroIcon) {
+          vehicleHeroIcon.classList.remove('vehicle-pulsing-horn', 'vehicle-pulsing-laser');
+        }
+        if (telemetrySquircleSlot) {
+          telemetrySquircleSlot.classList.remove('general-lee-active', 'galaga-fire-active');
+        }
+        renderSquircleTelemetry();
+        const mode = window.NomadVehicleEngine ? window.NomadVehicleEngine.getMode() : 'chevron';
+        if (vehicleStorageStatus) {
+          vehicleStorageStatus.innerText = `Mode: ${mode} | Action: IDLE | Ready`;
+        }
+      }
+
+      // Render Item 4 Kinematics Monitor
+      function renderKinematicsMonitor(k) {
+        if (!k) return;
+
+        // Sensor Badge
+        if (kinSensorBadge) {
+          if (k.headingSource === 'gyro') {
+            kinSensorBadge.innerText = 'FUSION: GYRO SENSOR';
+            kinSensorBadge.style.color = '#30d158';
+            kinSensorBadge.style.borderColor = '#30d158';
+          } else {
+            kinSensorBadge.innerText = 'FUSION: GPS TRACK';
+            kinSensorBadge.style.color = '#00f3ff';
+            kinSensorBadge.style.borderColor = '#00f3ff';
+          }
+        }
+
+        // 16-Pt Compass
+        if (kinHeading16pt) {
+          kinHeading16pt.innerHTML = `${k.headingDeg}° <span class="mon-unit" style="color: #00f3ff; font-weight: 900;">${k.cardinal16Short}</span>`;
+        }
+        if (kinHeadingWord) {
+          kinHeadingWord.innerText = k.cardinal16Word;
+        }
+
+        // Altimeter
+        if (kinAltVal) {
+          const feetStr = k.altitudeFeet !== null ? `${k.altitudeFeet.toLocaleString()} FT` : '-- FT';
+          kinAltVal.innerText = feetStr;
+        }
+        if (kinAltSub) {
+          const metersStr = k.altitudeMeters !== null ? `${k.altitudeMeters} M` : '-- M';
+          const src = k.altitudeSource === 'gps' ? 'GPS MSL' : (k.altitudeSource === 'digital_model' ? 'DIGITAL MODEL' : 'PENDING');
+          kinAltSub.innerText = `${metersStr} • SOURCE: ${src}`;
+        }
+
+        // Climb Rate (VSI)
+        if (kinVsiVal) {
+          if (k.climbStatus === 'CLIMBING') {
+            kinVsiVal.innerHTML = `<span class="vsi-tag-climbing">▲ +${k.verticalSpeedFpm} FT/MIN</span>`;
+          } else if (k.climbStatus === 'DESCENDING') {
+            kinVsiVal.innerHTML = `<span class="vsi-tag-descending">▼ ${k.verticalSpeedFpm} FT/MIN</span>`;
+          } else {
+            kinVsiVal.innerHTML = `<span class="vsi-tag-level">― LEVEL CRUISE</span>`;
+          }
+        }
+        if (kinVsiSub) {
+          const mpsStr = (k.verticalSpeedMps > 0 ? '+' : '') + k.verticalSpeedMps.toFixed(1) + ' M/S';
+          kinVsiSub.innerText = `${mpsStr} • STATUS: ${k.climbStatus}`;
+        }
+
+        // GPS Fidelity
+        if (kinSignalVal) {
+          const accFeetStr = k.accuracyFeet !== null ? `±${k.accuracyFeet} FT` : '±-- FT';
+          kinSignalVal.innerHTML = `${accFeetStr} <span class="mon-unit">${k.accuracyMeters !== null ? `(±${k.accuracyMeters}m)` : ''}</span>`;
+        }
+        if (kinSignalTier) {
+          kinSignalTier.innerText = `TIER: ${k.signalQualityTier}`;
+          kinSignalTier.style.color = k.signalQualityColor || '#64748b';
+        }
+
+        // Sync squircle telemetry
+        if (!isActionPlaying) {
+          renderSquircleTelemetry();
+        }
+      }
+
+      if (window.NomadVehicleEngine) {
+        window.NomadVehicleEngine.onModeChange(() => {
+          endVehicleAction();
+          renderVehicleView();
+        });
+
+        // Touch-shielded vehicle trigger (unlocks mobile Web Audio immediately on touch)
+        let isVehicleTouchHandled = false;
+        if (vehicleHeroPod) {
+          vehicleHeroPod.addEventListener('touchstart', () => {
+            isVehicleTouchHandled = true;
+            if (window.NomadAudioEngine && window.NomadAudioEngine.unlock) {
+              window.NomadAudioEngine.unlock();
+            }
+            triggerVehicleAction();
+          }, { passive: true });
+
+          vehicleHeroPod.addEventListener('touchend', () => {
+            setTimeout(() => { isVehicleTouchHandled = false; }, 350);
+          });
+
+          vehicleHeroPod.addEventListener('click', (e) => {
+            if (isVehicleTouchHandled) return;
+            e.preventDefault();
+            if (window.NomadAudioEngine && window.NomadAudioEngine.unlock) {
+              window.NomadAudioEngine.unlock();
+            }
+            triggerVehicleAction();
+          });
+        }
+
+        // Touch-shielded telemetry squircle trigger (Cycles telemetry modes 0 -> 1 -> 2 -> 3)
+        let isSquircleTouchHandled = false;
+        if (actionBadgeCard) {
+          actionBadgeCard.addEventListener('touchstart', () => {
+            isSquircleTouchHandled = true;
+            if (!isActionPlaying && window.NomadKinematicsEngine) {
+              window.NomadKinematicsEngine.cycleTelemetryMode();
+            }
+          }, { passive: true });
+
+          actionBadgeCard.addEventListener('touchend', () => {
+            setTimeout(() => { isSquircleTouchHandled = false; }, 350);
+          });
+
+          actionBadgeCard.addEventListener('click', (e) => {
+            if (isSquircleTouchHandled) return;
+            e.preventDefault();
+            if (!isActionPlaying && window.NomadKinematicsEngine) {
+              window.NomadKinematicsEngine.cycleTelemetryMode();
+            }
+          });
+        }
+
+        // Tapping "SWITCH VEHICLE" toggles persona cleanly
+        if (btnTogglePersona) {
+          btnTogglePersona.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.NomadVehicleEngine.toggleMode();
+          });
+        }
+
+        // Theme preview toggle
+        if (btnThemeToggle) {
+          btnThemeToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            isLightPreview = !isLightPreview;
+            renderVehicleView();
+          });
+        }
+      }
+
+      // Segmented Telemetry Mode Buttons (Item 4)
+      modeButtons.forEach((btn, idx) => {
+        if (btn) {
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!isActionPlaying && window.NomadKinematicsEngine) {
+              window.NomadKinematicsEngine.setTelemetryMode(idx);
+            }
+          });
+        }
+      });
+
+      // Gyroscope / Sensor Calibration Click
+      if (kinSensorBadge) {
+        kinSensorBadge.addEventListener('click', async () => {
+          if (window.NomadKinematicsEngine) {
+            const granted = await window.NomadKinematicsEngine.requestOrientationPermission();
+            if (granted) {
+              kinSensorBadge.innerText = 'CALIBRATING...';
+              setTimeout(() => {
+                const state = window.NomadKinematicsEngine.getState();
+                renderKinematicsMonitor(state);
+              }, 400);
+            }
+          }
+        });
+      }
+
+      if (window.NomadKinematicsEngine) {
+        window.NomadKinematicsEngine.onUpdate((kinematics) => {
+          renderKinematicsMonitor(kinematics);
+        });
+        window.NomadKinematicsEngine.start();
+      }
+
+      if (window.NomadTelemetryEngine) {
+        window.NomadTelemetryEngine.onUpdate((telemetry) => {
+          if (lockEl) {
+            if (telemetry.hasRealGpsLock) {
+              lockEl.innerText = 'SATELLITE GNSS';
+              lockEl.style.color = '#10b981';
+              lockEl.style.borderColor = '#10b981';
+            } else {
+              lockEl.innerText = 'NET / WI-FI GEO';
+              lockEl.style.color = '#00f3ff';
+              lockEl.style.borderColor = '#00f3ff';
+            }
+          }
+          if (streetEl) streetEl.innerText = telemetry.streetName || 'Locating...';
+          if (sublocEl) {
+            const parts = [telemetry.cityState, telemetry.countyZip].filter(Boolean);
+            sublocEl.innerText = parts.length > 0 ? parts.join(' • ') : 'Acquiring local jurisdiction...';
+          }
+          if (speedEl) speedEl.innerHTML = `${telemetry.speedMph} <span class="mon-unit">MPH</span>`;
+          if (headingEl) headingEl.innerHTML = `${telemetry.headingDeg}° <span class="mon-unit" id="mon-cardinal">${telemetry.cardinalWord}</span>`;
+          if (altEl) altEl.innerHTML = `${telemetry.altitudeFeet !== null ? telemetry.altitudeFeet.toLocaleString() : '--'} <span class="mon-unit">FT</span>`;
+          if (accEl) accEl.innerHTML = `±${telemetry.accuracyFeet !== null ? telemetry.accuracyFeet : '--'} <span class="mon-unit">FT</span>`;
+          if (coordsEl) {
+            if (telemetry.latitude !== null && telemetry.longitude !== null) {
+              coordsEl.innerText = `Lat: ${telemetry.latitude.toFixed(5)} | Lon: ${telemetry.longitude.toFixed(5)}`;
+            }
+          }
+
+          currentTelemetryDeg = telemetry.headingDeg;
+          currentTelemetryCard = telemetry.cardinalShort || 'N';
+          if (!isActionPlaying) {
+            renderSquircleTelemetry();
+          }
+        });
+
+        window.NomadTelemetryEngine.start();
+      }
+
+      // Lifecycle & Screen Wake Lock Elements (Item 5)
+      const lifecycleBadge = document.getElementById('lifecycle-badge');
+      const lifecycleLockVal = document.getElementById('lifecycle-lock-val');
+      const lifecycleLockSub = document.getElementById('lifecycle-lock-sub');
+      const lifecycleVisVal = document.getElementById('lifecycle-vis-val');
+      const lifecycleVisSub = document.getElementById('lifecycle-vis-sub');
+      const lifecycleWatchdogVal = document.getElementById('lifecycle-watchdog-val');
+      const lifecycleWatchdogSub = document.getElementById('lifecycle-watchdog-sub');
+      const lifecycleResumesVal = document.getElementById('lifecycle-resumes-val');
+      const lifecycleResumesSub = document.getElementById('lifecycle-resumes-sub');
+      const btnToggleWakelock = document.getElementById('btn-toggle-wakelock');
+      const toggleWakelockLabel = document.getElementById('toggle-wakelock-label');
+      let resumeCounter = 0;
+
+      function renderLifecycleMonitor(s) {
+        if (!s) return;
+
+        if (lifecycleBadge) {
+          if (s.isActive) {
+            lifecycleBadge.innerText = 'WAKE LOCK: ACTIVE';
+            lifecycleBadge.style.color = '#10b981';
+            lifecycleBadge.style.borderColor = '#10b981';
+          } else {
+            lifecycleBadge.innerText = s.isSupported ? 'WAKE LOCK: INACTIVE' : 'WAKE LOCK: UNSUPPORTED';
+            lifecycleBadge.style.color = '#ff9f0a';
+            lifecycleBadge.style.borderColor = '#ff9f0a';
+          }
+        }
+
+        if (lifecycleLockVal) {
+          if (s.isActive) {
+            lifecycleLockVal.innerText = 'ENGAGED';
+            lifecycleLockVal.style.color = '#10b981';
+          } else {
+            lifecycleLockVal.innerText = s.isSupported ? 'RELEASED' : 'UNAVAILABLE';
+            lifecycleLockVal.style.color = '#ff9f0a';
+          }
+        }
+
+        if (lifecycleLockSub) {
+          if (s.isActive) {
+            lifecycleLockSub.innerText = 'CAR DASH KEEP-AWAKE ON';
+          } else {
+            lifecycleLockSub.innerText = s.failureReason ? `INFO: ${s.failureReason}` : (s.userWakeLockEnabled === false ? 'USER DISABLED (MANUAL)' : 'TAP TOGGLE TO ENGAGE');
+          }
+        }
+
+        if (toggleWakelockLabel) {
+          if (s.isActive) {
+            toggleWakelockLabel.innerText = 'RELEASE WAKE LOCK (ALLOW SLEEP)';
+            if (btnToggleWakelock) {
+              btnToggleWakelock.style.borderColor = 'rgba(16, 185, 129, 0.5)';
+              btnToggleWakelock.style.color = '#10b981';
+            }
+          } else {
+            toggleWakelockLabel.innerText = 'ENGAGE WAKE LOCK (KEEP AWAKE)';
+            if (btnToggleWakelock) {
+              btnToggleWakelock.style.borderColor = 'rgba(255, 159, 10, 0.5)';
+              btnToggleWakelock.style.color = '#ff9f0a';
+            }
+          }
+        }
+
+        if (lifecycleVisVal) {
+          lifecycleVisVal.innerText = s.isVisible ? 'VISIBLE' : 'HIDDEN';
+          lifecycleVisVal.style.color = s.isVisible ? '#00f3ff' : '#64748b';
+        }
+
+        if (lifecycleVisSub) {
+          lifecycleVisSub.innerText = s.isVisible ? 'ACTIVE FOREGROUND' : 'BACKGROUND SUSPENDED';
+        }
+
+        if (lifecycleWatchdogVal) {
+          lifecycleWatchdogVal.innerText = s.isActive ? '15S ACTIVE' : 'WATCHING';
+          lifecycleWatchdogVal.style.color = s.isActive ? '#00f3ff' : '#64748b';
+        }
+
+        if (lifecycleWatchdogSub) {
+          lifecycleWatchdogSub.innerText = `REACQUIRE COUNT: ${s.reacquireCount}`;
+        }
+      }
+
+      if (window.NomadLifecycleEngine) {
+        window.NomadLifecycleEngine.onStateChange((state) => {
+          renderLifecycleMonitor(state);
+        });
+
+        window.NomadLifecycleEngine.onWakeResume((detail) => {
+          resumeCounter++;
+          if (lifecycleResumesVal) lifecycleResumesVal.innerText = `${resumeCounter}`;
+          if (lifecycleResumesSub) lifecycleResumesSub.innerText = `LAST: ${detail.source.toUpperCase()}`;
+        });
+
+        if (btnToggleWakelock) {
+          btnToggleWakelock.addEventListener('touchstart', (e) => {
+            e.stopPropagation();
+          }, { passive: true });
+
+          btnToggleWakelock.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (window.NomadLifecycleEngine && window.NomadLifecycleEngine.toggleWakeLock) {
+              await window.NomadLifecycleEngine.toggleWakeLock();
+            }
+          });
+        }
+
+        window.NomadLifecycleEngine.start();
+      }
+
+      if (window.NomadWeatherEngine) {
+        window.NomadWeatherEngine.onUpdate((w) => {
+          if (tempEl && w.tempF !== null) tempEl.innerText = w.tempF.toFixed(1);
+          if (tempCEl && w.tempC !== null) tempCEl.innerText = `(${w.tempC.toFixed(1)}°C)`;
+          if (condIconEl && w.conditionIconSvg) condIconEl.innerHTML = w.conditionIconSvg;
+          if (condTextEl && w.conditionText) condTextEl.innerText = w.conditionText;
+          if (humEl && w.humidity !== null) humEl.innerHTML = `${w.humidity} <span class="mon-unit">%</span>`;
+          if (pressEl && w.pressureInHg !== null) pressEl.innerHTML = `${w.pressureInHg.toFixed(2)} <span class="mon-unit">inHg</span>`;
+          if (uvEl && w.uvIndex !== null) {
+            uvEl.innerHTML = `<span style="color: ${w.uvColor};">${w.uvDisplay}</span> <span class="mon-unit" style="color: ${w.uvColor}; font-weight: 700;">${w.uvTier}</span>`;
+          }
+          if (elevEl && w.elevationFeet !== null) elevEl.innerHTML = `${w.elevationFeet.toLocaleString()} <span class="mon-unit">FT</span>`;
+        });
+
+        if (weatherBadge) {
+          weatherBadge.addEventListener('click', () => {
+            weatherBadge.innerText = 'FETCHING...';
+            window.NomadWeatherEngine.refreshNow();
+            setTimeout(() => { weatherBadge.innerText = 'REFRESH ⟳'; }, 1200);
+          });
+        }
+
+        window.NomadWeatherEngine.start();
+      }
+
+      // --- Item 6: Vector Map & Highway Shields Controller ---
+      const mapThemeBadge = document.getElementById('map-theme-badge');
+      const compassBtn = document.getElementById('compass-btn');
+      const needleSvg = document.getElementById('needle-svg');
+      const mapVehicleSvgSlot = document.getElementById('map-vehicle-svg-slot');
+      const mapVehicleMarker = document.getElementById('map-vehicle-marker');
+      const mapPillName = document.getElementById('map-pill-name');
+      const mapPillCoords = document.getElementById('map-pill-coords');
+      const mapToast = document.getElementById('map-toast');
+      const slotInterstateShield = document.getElementById('slot-interstate-shield');
+      const slotRouteShield = document.getElementById('slot-route-shield');
+      const captionInterstateShield = document.getElementById('caption-interstate-shield');
+      const captionRouteShield = document.getElementById('caption-route-shield');
+      const btnToggleMapTheme = document.getElementById('btn-toggle-map-theme');
+      const toggleMapThemeLabel = document.getElementById('toggle-map-theme-label');
+      const btnMapTiltToggle = document.getElementById('btn-map-tilt-toggle');
+      const mapTiltLabel = document.getElementById('map-tilt-label');
+      const mapPipelineStatus = document.getElementById('map-pipeline-status');
+
+      let liveMap = null;
+      let cameraPerspectiveMode = 'perspective'; // 'perspective' (3D Drive), 'overview' (2D Track-Up), 'north-up' (2D North-Up Locked)
+      let currentMapPitch = 58;
+      let isHeadingUp = true;
+      let currentTelemetryHeading = 0;
+      let mapToastTimeout = null;
+      let currentMapCenter = [-71.2356, 42.3765]; // Default Waltham, MA coordinate until GPS fix arrives
+
+      function showMapToast(msg) {
+        if (!mapToast) return;
+        clearTimeout(mapToastTimeout);
+        mapToast.innerText = msg;
+        mapToast.classList.add('show');
+        mapToastTimeout = setTimeout(() => {
+          mapToast.classList.remove('show');
+        }, 1800);
+      }
+
+      // Authentic RoadTrip 3-Perspective Mode Switcher
+      function cyclePerspectiveMode(e) {
+        if (e) {
+          if (e.cancelable) e.preventDefault();
+          e.stopPropagation();
+        }
+
+        // Haptic feedback bump
+        if (typeof navigator !== 'undefined' && navigator.vibrate) {
+          try { navigator.vibrate(25); } catch (err) {}
+        }
+
+        if (window.NomadMapEngine && typeof window.NomadMapEngine.cyclePerspectiveMode === 'function') {
+          const res = window.NomadMapEngine.cyclePerspectiveMode(liveMap, currentTelemetryHeading);
+          cameraPerspectiveMode = res.id;
+          currentMapPitch = res.pitch;
+          isHeadingUp = res.isHeadingUp;
+          showMapToast(res.name);
+        } else {
+          if (cameraPerspectiveMode === 'perspective') {
+            cameraPerspectiveMode = 'overview';
+            currentMapPitch = 0;
+            isHeadingUp = true;
+            showMapToast('2D Overview Track (Track-Up)');
+          } else if (cameraPerspectiveMode === 'overview') {
+            cameraPerspectiveMode = 'north-up';
+            currentMapPitch = 0;
+            isHeadingUp = false;
+            showMapToast('2D North-Up Locked');
+          } else {
+            cameraPerspectiveMode = 'perspective';
+            currentMapPitch = 58;
+            isHeadingUp = true;
+            showMapToast('3D Perspective Drive (58°)');
+          }
+        }
+
+        applyPerspectiveMode();
+      }
+
+      function applyPerspectiveMode() {
+        const h = currentTelemetryHeading || 0;
+        const targetBearing = isHeadingUp ? h : 0;
+
+        if (liveMap) {
+          const mapCard = document.getElementById('live-map-card');
+          const containerHeight = mapCard ? mapCard.clientHeight : 240;
+          const topPadding = (cameraPerspectiveMode === 'perspective') ? Math.round(containerHeight * 0.36) : 0;
+          if (typeof liveMap.setPadding === 'function') {
+            liveMap.setPadding({ top: topPadding, bottom: 0, left: 0, right: 0 });
+          }
+
+          liveMap.easeTo({
+            pitch: currentMapPitch,
+            bearing: targetBearing,
+            duration: 400
+          });
+        }
+
+        // Compass pod visual state classes
+        if (compassBtn) {
+          compassBtn.classList.remove('perspective-3d', 'perspective-overview', 'perspective-north-up', 'active-heading-up');
+          compassBtn.classList.add(`perspective-${cameraPerspectiveMode}`);
+          if (cameraPerspectiveMode === 'north-up') {
+            compassBtn.classList.remove('active-heading-up');
+          } else {
+            compassBtn.classList.add('active-heading-up');
+          }
+        }
+
+        // Sync toggle button label
+        if (mapTiltLabel) {
+          if (cameraPerspectiveMode === 'perspective') {
+            mapTiltLabel.innerText = '3D DRIVE (58°)';
+          } else if (cameraPerspectiveMode === 'overview') {
+            mapTiltLabel.innerText = '2D TRACK-UP (0°)';
+          } else {
+            mapTiltLabel.innerText = '2D NORTH-UP (LOCKED)';
+          }
+        }
+
+        updateCompassAndVehicleOrientation(h);
+      }
+
+      // Synchronize needle and vehicle marker (RoadTrip core logic)
+      function updateCompassAndVehicleOrientation(heading) {
+        const h = (heading !== null && !isNaN(heading)) ? heading : 0;
+        currentTelemetryHeading = h;
+
+        // 1. Compass Rosette Dual-Taper Needle orientation
+        if (needleSvg) {
+          if (cameraPerspectiveMode === 'north-up') {
+            // In North-Up, map is locked to North, so needle points straight up (0°)
+            needleSvg.style.transform = 'rotate(0deg)';
+          } else {
+            // In Track-Up (3D Drive or 2D Overview), map rotates with vehicle heading,
+            // so needle rotates counter-clockwise (-h) to point toward magnetic/true North!
+            needleSvg.style.transform = `rotate(${-h}deg)`;
+          }
+        }
+
+        // 2. Vehicle Marker Overlay 3D perspective tilt & rotation
+        if (mapVehicleMarker) {
+          if (cameraPerspectiveMode === 'north-up') {
+            // In North-Up, vehicle centers (50%) and rotates towards heading
+            mapVehicleMarker.style.top = '50%';
+            mapVehicleMarker.style.transform = `translate(-50%, -50%) perspective(600px) rotateX(0deg) rotate(${h}deg)`;
+          } else if (cameraPerspectiveMode === 'overview') {
+            // In 2D Track-Up, vehicle is flat and points straight up (road turns under vehicle)
+            mapVehicleMarker.style.top = '50%';
+            mapVehicleMarker.style.transform = 'translate(-50%, -50%) perspective(600px) rotateX(0deg) rotate(0deg)';
+          } else {
+            // In 3D Drive, vehicle is in lower third (66%) with 42° road perspective tilt
+            mapVehicleMarker.style.top = '66%';
+            mapVehicleMarker.style.transform = 'translate(-50%, -50%) perspective(600px) rotateX(42deg) rotate(0deg)';
+          }
+        }
+      }
+
+      async function initVectorMap() {
+        if (typeof maplibregl === 'undefined') {
+          console.warn('MapLibre GL not loaded yet, retrying...');
+          setTimeout(initVectorMap, 200);
+          return;
+        }
+
+        const mapContainer = document.getElementById('live-map-canvas');
+        if (!mapContainer || liveMap !== null) return;
+
+        try {
+          const initialThemeId = window.NomadMapEngine ? window.NomadMapEngine.getActiveThemeId() : 'natural-dark';
+          const initialStyle = window.NomadMapEngine ? await window.NomadMapEngine.getStyleObject(initialThemeId) : 'https://tiles.openfreemap.org/styles/dark';
+
+          liveMap = new maplibregl.Map({
+            container: 'live-map-canvas',
+            style: initialStyle,
+            center: currentMapCenter,
+            zoom: 15.6,
+            pitch: currentMapPitch,
+            bearing: isHeadingUp ? currentTelemetryHeading : 0,
+            attributionControl: false,
+            interactive: true
+          });
+
+          liveMap.on('load', () => {
+            liveMap.resize();
+            updateMapVehicleSvg();
+            applyPerspectiveMode();
+          });
+
+          if (window.NomadVehicleEngine) {
+            window.NomadVehicleEngine.onModeChange(() => {
+              updateMapVehicleSvg();
+            });
+          }
+        } catch (err) {
+          console.error('Failed to init live vector map:', err);
+        }
+      }
+
+      function updateMapVehicleSvg() {
+        if (!mapVehicleSvgSlot || !window.NomadVehicleEngine) return;
+        const mode = window.NomadVehicleEngine.getMode();
+        const activeTheme = window.NomadMapEngine ? window.NomadMapEngine.getActiveTheme() : { isLight: false };
+        mapVehicleSvgSlot.innerHTML = window.NomadVehicleEngine.getVehicleSvg(mode, activeTheme.isLight, { size: 48 });
+        updateCompassAndVehicleOrientation(currentTelemetryHeading);
+      }
+
+      function renderMapThemeUI(theme) {
+        if (!theme) return;
+        if (mapThemeBadge) {
+          mapThemeBadge.innerText = theme.name.toUpperCase();
+          mapThemeBadge.style.color = theme.accentColor;
+          mapThemeBadge.style.borderColor = theme.accentColor;
+        }
+        if (mapPillName) {
+          mapPillName.innerText = theme.name.toUpperCase();
+        }
+        if (toggleMapThemeLabel) {
+          toggleMapThemeLabel.innerText = theme.id === 'natural-dark' ? 'SWITCH TO NATURAL LIGHT' : 'SWITCH TO NATURAL DARK';
+        }
+        if (mapPipelineStatus) {
+          mapPipelineStatus.innerText = `${theme.name} // GPU Tile Cache Preserved (Zero-Reload)`;
+        }
+        const liveMapCard = document.getElementById('live-map-card');
+        if (liveMapCard) {
+          if (theme.id === 'natural-light') {
+            liveMapCard.classList.add('theme-light-active');
+          } else {
+            liveMapCard.classList.remove('theme-light-active');
+          }
+        }
+        updateMapVehicleSvg();
+      }
+
+      function renderShieldsUI(shieldData) {
+        if (!shieldData) return;
+
+        // Interstate shield
+        if (slotInterstateShield) {
+          if (shieldData.hasInterstate && shieldData.interstateSvg) {
+            slotInterstateShield.innerHTML = shieldData.interstateSvg;
+            if (captionInterstateShield) captionInterstateShield.innerText = `I-${shieldData.interstateNum}${shieldData.direction ? ' ' + shieldData.direction : ''}`;
+          } else {
+            slotInterstateShield.innerHTML = window.NomadMapEngine.createInterstateShieldSvg('95', shieldData.direction || 'South');
+            if (captionInterstateShield) captionInterstateShield.innerText = `I-95 (MUTCD CORRIDOR)`;
+          }
+        }
+
+        // State / US Route shield
+        if (slotRouteShield) {
+          if (shieldData.hasRoute && shieldData.routeSvg) {
+            slotRouteShield.innerHTML = shieldData.routeSvg;
+            if (captionRouteShield) captionRouteShield.innerText = `ROUTE ${shieldData.routeNum}${shieldData.direction ? ' ' + shieldData.direction : ''}`;
+          } else {
+            slotRouteShield.innerHTML = window.NomadMapEngine.createRouteShieldSvg('128', shieldData.direction || 'North');
+            if (captionRouteShield) captionRouteShield.innerText = `ROUTE 128 (STATE SHIELD)`;
+          }
+        }
+      }
+
+      // Wire theme toggle button
+      if (btnToggleMapTheme) {
+        btnToggleMapTheme.addEventListener('click', async (e) => {
+          e.preventDefault();
+          if (window.NomadMapEngine) {
+            const nextTheme = await window.NomadMapEngine.toggleTheme(liveMap);
+            renderMapThemeUI(nextTheme);
+          }
+        });
+      }
+
+      // Wire Compass Rosette and Perspective Button to cyclePerspectiveMode (3 perspectives)
+      // Pressing the compass (rosette) cycles: 3D Drive (58°) -> 2D Track-Up -> 2D North-Up Locked
+      if (compassBtn) {
+        let isCompassTouch = false;
+
+        compassBtn.addEventListener('touchstart', (e) => {
+          isCompassTouch = true;
+          if (e.cancelable) e.preventDefault();
+          e.stopPropagation();
+          cyclePerspectiveMode(e);
+        }, { passive: false });
+
+        compassBtn.addEventListener('touchend', (e) => {
+          if (e.cancelable) e.preventDefault();
+          e.stopPropagation();
+          setTimeout(() => { isCompassTouch = false; }, 350);
+        }, { passive: false });
+
+        compassBtn.addEventListener('click', (e) => {
+          if (isCompassTouch) {
+            isCompassTouch = false;
+            return;
+          }
+          cyclePerspectiveMode(e);
+        });
+      }
+
+      if (btnMapTiltToggle) {
+        btnMapTiltToggle.addEventListener('click', cyclePerspectiveMode);
+      }
+
+      // Also allow tapping the center vehicle marker directly (RoadTrip authentic HUD trick)
+      if (mapVehicleMarker) {
+        let isVehTouch = false;
+        mapVehicleMarker.addEventListener('touchstart', (e) => {
+          isVehTouch = true;
+          if (e.cancelable) e.preventDefault();
+          e.stopPropagation();
+          cyclePerspectiveMode(e);
+        }, { passive: false });
+
+        mapVehicleMarker.addEventListener('touchend', (e) => {
+          if (e.cancelable) e.preventDefault();
+          e.stopPropagation();
+          setTimeout(() => { isVehTouch = false; }, 350);
+        }, { passive: false });
+
+        mapVehicleMarker.addEventListener('click', (e) => {
+          if (isVehTouch) {
+            isVehTouch = false;
+            return;
+          }
+          cyclePerspectiveMode(e);
+        });
+      }
+
+      // Subscribe to Map Engine
+      if (window.NomadMapEngine) {
+        window.NomadMapEngine.onThemeChange(renderMapThemeUI);
+        window.NomadMapEngine.onShieldsChange(renderShieldsUI);
+        if (typeof window.NomadMapEngine.onPerspectiveChange === 'function') {
+          window.NomadMapEngine.onPerspectiveChange((details) => {
+            if (!details) return;
+            cameraPerspectiveMode = details.id;
+            currentMapPitch = details.pitch;
+            isHeadingUp = details.isHeadingUp;
+            applyPerspectiveMode();
+          });
+        }
+      }
+
+      // Sync map center & heading from Telemetry Engine
+      if (window.NomadTelemetryEngine) {
+        window.NomadTelemetryEngine.onUpdate((telemetry) => {
+          if (telemetry.latitude !== null && telemetry.longitude !== null) {
+            currentMapCenter = [telemetry.longitude, telemetry.latitude];
+            if (mapPillCoords) {
+              mapPillCoords.innerText = `${telemetry.latitude.toFixed(4)}, ${telemetry.longitude.toFixed(4)}`;
+            }
+            if (liveMap) {
+              liveMap.setCenter(currentMapCenter);
+            }
+          }
+          if (telemetry.headingRaw !== null && !isNaN(telemetry.headingRaw)) {
+            updateCompassAndVehicleOrientation(telemetry.headingRaw);
+            if (liveMap && isHeadingUp) {
+              liveMap.setBearing(telemetry.headingRaw);
+            }
+          }
+        });
+      }
+
+      // Sync map resize on screen wake resume
+      if (window.NomadLifecycleEngine) {
+        window.NomadLifecycleEngine.onWakeResume(() => {
+          if (liveMap) {
+            requestAnimationFrame(() => {
+              if (liveMap) liveMap.resize();
+            });
+          }
+        });
+      }
+
+      // --- Item 7: Sensory Visualizers & Fidget Consoles Controller ---
+      const fidgetStage = document.getElementById('fidget-canvas-stage');
+      const fidgetConsoleBadge = document.getElementById('fidget-console-badge');
+      const fidgetHeroTitle = document.getElementById('fidget-hero-title');
+      const fidgetDieSlot = document.getElementById('fidget-die-slot');
+      const fidgetDiePod = document.getElementById('fidget-die-pod');
+      const fidgetToast = document.getElementById('fidget-toast');
+      const fidgetProgressBar = document.getElementById('fidget-progress-bar');
+      const fidgetAutoStatus = document.getElementById('fidget-auto-status');
+      const fidgetTimerText = document.getElementById('fidget-timer-text');
+      const fidgetSnapStatus = document.getElementById('fidget-snap-status');
+      const fidgetEngineStatus = document.getElementById('fidget-engine-status');
+      const btnToggleAutocycle = document.getElementById('btn-toggle-autocycle');
+      const toggleAutocycleLabel = document.getElementById('toggle-autocycle-label');
+      const btnSpinDieTest = document.getElementById('btn-spin-die-test');
+      const btnAdvanceAutocycle = document.getElementById('btn-advance-autocycle');
+
+      const btnConsoleStarfield = document.getElementById('btn-console-starfield');
+      const btnConsoleUnderwater = document.getElementById('btn-console-underwater');
+      const btnConsoleSynthomatic = document.getElementById('btn-console-synthomatic');
+      const btnConsoleStampede = document.getElementById('btn-console-stampede');
+
+      const consoleButtons = {
+        starfield: btnConsoleStarfield,
+        underwater: btnConsoleUnderwater,
+        kitt: btnConsoleSynthomatic,
+        stampede: btnConsoleStampede
+      };
+
+      let fidgetToastTimeout = null;
+      function showFidgetToast(msg) {
+        if (!fidgetToast) return;
+        clearTimeout(fidgetToastTimeout);
+        fidgetToast.innerText = msg;
+        fidgetToast.classList.add('show');
+        fidgetToastTimeout = setTimeout(() => {
+          fidgetToast.classList.remove('show');
+        }, 1800);
+      }
+
+      function renderDieUI(state) {
+        if (!fidgetDieSlot || !window.NomadFidgetEngine) return;
+        const diceSvg = document.getElementById('nomad-dice-svg');
+        const pipsEl = document.getElementById('nomad-dice-pips');
+
+        if (diceSvg && pipsEl) {
+          pipsEl.innerHTML = window.NomadFidgetEngine.getDiePipsSvg(state.face);
+          const color = state.isAutoCycling ? '#ffb703' : '#ffffff';
+          diceSvg.style.color = color;
+          pipsEl.style.color = color;
+          if (state.isAutoCycling) {
+            diceSvg.classList.add('auto-cycling-die');
+            diceSvg.classList.remove('manual-die');
+          } else {
+            diceSvg.classList.remove('auto-cycling-die');
+            diceSvg.classList.add('manual-die');
+          }
+        } else {
+          fidgetDieSlot.innerHTML = window.NomadFidgetEngine.getDieSvg(state.face, state.isAutoCycling);
+        }
+
+        if (fidgetDiePod) {
+          if (state.isAutoCycling) {
+            fidgetDiePod.classList.add('auto-cycling');
+            fidgetDiePod.setAttribute('title', `Auto-Cycle Active (Die: ${state.face}) - Tap to Stop`);
+          } else {
+            fidgetDiePod.classList.remove('auto-cycling');
+            fidgetDiePod.setAttribute('title', 'Tap: Next Console (White 5) • Long-Press (700ms): 60s Auto-Cycle');
+          }
+        }
+
+        if (fidgetAutoStatus) {
+          if (state.isAutoCycling) {
+            fidgetAutoStatus.innerText = `AUTO-CYCLING (FACE ${state.face})`;
+            fidgetAutoStatus.style.color = '#ffb703';
+          } else {
+            fidgetAutoStatus.innerText = 'MANUAL (WHITE FACE 5)';
+            fidgetAutoStatus.style.color = '#64748b';
+          }
+        }
+
+        if (toggleAutocycleLabel) {
+          toggleAutocycleLabel.innerText = state.isAutoCycling ? 'PAUSE AUTO-CYCLE' : 'START 60s AUTO-CYCLE';
+        }
+      }
+
+      function renderConsoleUI(consoleObj) {
+        if (!consoleObj) return;
+        if (fidgetConsoleBadge) {
+          fidgetConsoleBadge.innerText = consoleObj.shortName;
+          fidgetConsoleBadge.style.color = consoleObj.accentColor;
+          fidgetConsoleBadge.style.borderColor = consoleObj.accentColor;
+        }
+        if (fidgetHeroTitle) {
+          fidgetHeroTitle.innerText = `${consoleObj.icon} ${consoleObj.name.toUpperCase()}`;
+        }
+        if (fidgetEngineStatus) {
+          fidgetEngineStatus.innerText = `${consoleObj.name} // ${consoleObj.tagline}`;
+        }
+
+        // Highlight active segmented button
+        Object.keys(consoleButtons).forEach(id => {
+          const btn = consoleButtons[id];
+          if (btn) {
+            if (id === consoleObj.id) {
+              btn.classList.add('active');
+            } else {
+              btn.classList.remove('active');
+            }
+          }
+        });
+
+        showFidgetToast(consoleObj.name);
+      }
+
+      function renderCountdownTick(tickData) {
+        if (!fidgetProgressBar || !fidgetTimerText) return;
+        if (tickData.isAutoCycling) {
+          fidgetProgressBar.style.width = `${tickData.percent}%`;
+          fidgetTimerText.innerText = `${tickData.remainingSeconds}s`;
+          if (tickData.remainingSeconds <= 3) {
+            fidgetTimerText.style.color = '#ff0055';
+          } else if (tickData.remainingSeconds <= 10) {
+            fidgetTimerText.style.color = '#ffb703';
+          } else {
+            fidgetTimerText.style.color = '#00f3ff';
+          }
+        } else {
+          fidgetProgressBar.style.width = '0%';
+          fidgetTimerText.innerText = 'READY';
+          fidgetTimerText.style.color = '#00f3ff';
+        }
+
+        if (fidgetSnapStatus) {
+          const sec = tickData.elapsedSeconds % 10;
+          if (sec === 9 && tickData.isAutoCycling) {
+            fidgetSnapStatus.innerText = 'SNAP SPINNING!';
+            fidgetSnapStatus.style.color = '#ffb703';
+          } else {
+            fidgetSnapStatus.innerText = '9S SYNC';
+            fidgetSnapStatus.style.color = '#94a3b8';
+          }
+        }
+      }
+
+      // Wire Console Selector Buttons
+      if (btnConsoleStarfield) {
+        btnConsoleStarfield.addEventListener('click', () => {
+          if (window.NomadFidgetEngine) window.NomadFidgetEngine.setConsole('starfield');
+        });
+      }
+      if (btnConsoleUnderwater) {
+        btnConsoleUnderwater.addEventListener('click', () => {
+          if (window.NomadFidgetEngine) window.NomadFidgetEngine.setConsole('underwater');
+        });
+      }
+      if (btnConsoleSynthomatic) {
+        btnConsoleSynthomatic.addEventListener('click', () => {
+          if (window.NomadFidgetEngine) window.NomadFidgetEngine.setConsole('kitt');
+        });
+      }
+      if (btnConsoleStampede) {
+        btnConsoleStampede.addEventListener('click', () => {
+          if (window.NomadFidgetEngine) window.NomadFidgetEngine.setConsole('stampede');
+        });
+      }
+
+      // Wire Auto-Cycle Button
+      if (btnToggleAutocycle) {
+        btnToggleAutocycle.addEventListener('click', () => {
+          if (window.NomadFidgetEngine) {
+            window.NomadFidgetEngine.toggleAutoCycle();
+          }
+        });
+      }
+
+      // Wire Advance Scene (Auto-Cycle) Button
+      if (btnAdvanceAutocycle) {
+        btnAdvanceAutocycle.addEventListener('click', () => {
+          if (window.NomadFidgetEngine) {
+            const state = window.NomadFidgetEngine.getState();
+            if (!state.isAutoCycling) {
+              window.NomadFidgetEngine.startAutoCycle();
+            }
+            window.NomadFidgetEngine.advanceAutoCycle();
+          }
+        });
+      }
+
+      // Wire Snap Spin Test Button
+      if (btnSpinDieTest) {
+        btnSpinDieTest.addEventListener('click', () => {
+          if (window.NomadFidgetEngine) {
+            const nextFace = ((window.NomadFidgetEngine.getState().currentDieFace) % 6) + 1;
+            window.NomadFidgetEngine.triggerDieSnapSpin(nextFace);
+          }
+        });
+      }
+
+      // Wire Die Pod Touch & Long-Press Handler:
+      // - Single tap: cycles next console (Die stays crisp white face 5)
+      // - 700ms long-press: starts 60s auto-cycle (Die turns vibrant yellow 6 -> 1)
+      if (fidgetDiePod) {
+        let diePressTimer = null;
+        let isDieLongPress = false;
+        let isDieTouchHandled = false;
+
+        function startDieLongPress() {
+          isDieLongPress = false;
+          if (diePressTimer) clearTimeout(diePressTimer);
+          diePressTimer = setTimeout(() => {
+            isDieLongPress = true;
+            if (window.NomadFidgetEngine) {
+              const active = window.NomadFidgetEngine.toggleAutoCycle();
+              showFidgetToast(active ? 'AUTO-CYCLE ON (60s Countdown)' : 'AUTO-CYCLE PAUSED');
+            }
+          }, 700);
+        }
+
+        function cancelDieLongPress() {
+          if (diePressTimer) {
+            clearTimeout(diePressTimer);
+            diePressTimer = null;
+          }
+        }
+
+        fidgetDiePod.addEventListener('touchstart', (e) => {
+          isDieTouchHandled = true;
+          startDieLongPress();
+        }, { passive: true });
+
+        fidgetDiePod.addEventListener('touchend', (e) => {
+          cancelDieLongPress();
+          if (!isDieLongPress) {
+            if (e.cancelable) e.preventDefault();
+            e.stopPropagation();
+            if (window.NomadFidgetEngine) {
+              window.NomadFidgetEngine.nextConsole();
+            }
+          }
+          isDieLongPress = false;
+          setTimeout(() => { isDieTouchHandled = false; }, 350);
+        }, { passive: false });
+
+        fidgetDiePod.addEventListener('mousedown', (e) => {
+          if (isDieTouchHandled) return;
+          if (e.button !== 0) return;
+          startDieLongPress();
+        });
+
+        fidgetDiePod.addEventListener('mouseup', () => {
+          if (isDieTouchHandled) return;
+          cancelDieLongPress();
+          if (!isDieLongPress) {
+            if (window.NomadFidgetEngine) {
+              window.NomadFidgetEngine.nextConsole();
+            }
+          }
+          isDieLongPress = false;
+        });
+
+        fidgetDiePod.addEventListener('mouseleave', () => {
+          cancelDieLongPress();
+          isDieLongPress = false;
+        });
+      }
+
+      // Init Fidget Engine
+      function initFidgetEngine() {
+        if (!window.NomadFidgetEngine || !fidgetStage) return;
+        window.NomadFidgetEngine.init(fidgetStage);
+        window.NomadFidgetEngine.onConsoleChange(renderConsoleUI);
+        window.NomadFidgetEngine.onDieStateChange(renderDieUI);
+        window.NomadFidgetEngine.onCountdownTick(renderCountdownTick);
+
+        const initial = window.NomadFidgetEngine.getState();
+        renderConsoleUI(initial.console);
+        renderDieUI(initial);
+      }
+
+      // ====================================================================
+      // 8. TRIP COMPUTER & GPX FLIGHT RECORDER (ITEM 8)
+      // ====================================================================
+      const tripStatusBadge = document.getElementById('trip-status-badge');
+      const tripDistMiles = document.getElementById('trip-dist-miles');
+      const tripDistKm = document.getElementById('trip-dist-km');
+      const tripTimeElapsed = document.getElementById('trip-time-elapsed');
+      const tripTimeMoving = document.getElementById('trip-time-moving');
+      const tripTimeIdle = document.getElementById('trip-time-idle');
+      const tripSpeedCur = document.getElementById('trip-speed-cur');
+      const tripSpeedAvgMov = document.getElementById('trip-speed-avg-mov');
+      const tripSpeedAvgTot = document.getElementById('trip-speed-avg-tot');
+      const tripSpeedMax = document.getElementById('trip-speed-max');
+      const tripTrkptBadge = document.getElementById('trip-trkpt-badge');
+      const tripGpxLatestFix = document.getElementById('trip-gpx-latest-fix');
+      const tripPauseIcon = document.getElementById('trip-pause-icon');
+      const tripPauseLabel = document.getElementById('trip-pause-label');
+      const btnTripExport = document.getElementById('btn-trip-export');
+      const btnTripPause = document.getElementById('btn-trip-pause');
+      const btnTripReset = document.getElementById('btn-trip-reset');
+      const btnTripSimulate = document.getElementById('btn-trip-simulate');
+      const tripToast = document.getElementById('trip-toast');
+
+      let tripToastTimer = null;
+      function showTripToast(msg, duration = 2400) {
+        if (!tripToast) return;
+        tripToast.innerText = msg;
+        tripToast.classList.add('visible');
+        if (tripToastTimer) clearTimeout(tripToastTimer);
+        tripToastTimer = setTimeout(() => {
+          tripToast.classList.remove('visible');
+        }, duration);
+      }
+
+      function renderTripUI(state) {
+        if (!state) return;
+
+        if (tripStatusBadge) {
+          if (state.isPaused) {
+            tripStatusBadge.innerText = 'PAUSED';
+            tripStatusBadge.style.color = '#ffb703';
+            tripStatusBadge.style.borderColor = '#ffb703';
+          } else {
+            tripStatusBadge.innerText = state.isStationary ? 'STOPPED (IDLE)' : 'RECORDING';
+            tripStatusBadge.style.color = state.isStationary ? '#94a3b8' : '#30d158';
+            tripStatusBadge.style.borderColor = state.isStationary ? '#94a3b8' : '#30d158';
+          }
+        }
+
+        if (tripDistMiles) tripDistMiles.innerText = state.distanceMiles.toFixed(2);
+        if (tripDistKm) tripDistKm.innerText = `(${state.distanceKm.toFixed(2)} KM)`;
+
+        if (tripTimeElapsed) tripTimeElapsed.innerText = state.elapsedFormatted;
+        if (tripTimeMoving) tripTimeMoving.innerText = `${state.movingFormatted} MOV`;
+        if (tripTimeIdle) tripTimeIdle.innerText = `${state.idleFormatted} IDLE`;
+
+        if (tripSpeedCur) tripSpeedCur.innerHTML = `${state.currentSpeedMph} <span class="mon-unit">MPH</span>`;
+        if (tripSpeedAvgMov) tripSpeedAvgMov.innerHTML = `${state.avgMovingSpeedMph.toFixed(1)} <span class="mon-unit">MPH</span>`;
+        if (tripSpeedAvgTot) tripSpeedAvgTot.innerHTML = `${state.avgTotalSpeedMph.toFixed(1)} <span class="mon-unit">MPH</span>`;
+        if (tripSpeedMax) tripSpeedMax.innerHTML = `${state.maxSpeedMph} <span class="mon-unit">MPH</span>`;
+
+        if (tripTrkptBadge) {
+          tripTrkptBadge.innerText = `${state.trackpointCount} TRKPTS LOGGED`;
+        }
+
+        if (tripGpxLatestFix) {
+          if (state.lastFix) {
+            const roadStr = state.lastFix.roadName ? ` • ${state.lastFix.roadName}` : '';
+            tripGpxLatestFix.innerText = `${state.lastFix.lat.toFixed(4)}°, ${state.lastFix.lon.toFixed(4)}° • ${Math.round(state.lastFix.altMeters * 3.28084)}ft • ${state.lastFix.heading}°${roadStr}`;
+          } else {
+            tripGpxLatestFix.innerText = 'Lat: -- | Lon: -- | Alt: -- | Course: --';
+          }
+        }
+
+        if (tripPauseIcon && tripPauseLabel) {
+          if (state.isPaused) {
+            tripPauseIcon.innerText = '▶️';
+            tripPauseLabel.innerText = 'RESUME TRIP';
+          } else {
+            tripPauseIcon.innerText = '⏸️';
+            tripPauseLabel.innerText = 'PAUSE TRIP';
+          }
+        }
+      }
+
+      function initTripEngine() {
+        if (!window.NomadTripEngine) return;
+
+        window.NomadTripEngine.onUpdate(renderTripUI);
+
+        if (btnTripExport) {
+          btnTripExport.addEventListener('click', () => {
+            const res = window.NomadTripEngine.exportGPX();
+            if (res && res.success) {
+              showTripToast(`📍 GPX EXPORTED: ${res.filename} (${res.trackpointCount} trkpts)`);
+            } else {
+              showTripToast(`⚠️ ${res ? res.reason : 'No trackpoints recorded yet'}`);
+            }
+          });
+        }
+
+        if (btnTripPause) {
+          btnTripPause.addEventListener('click', () => {
+            const isNowPaused = window.NomadTripEngine.togglePauseTrip();
+            showTripToast(isNowPaused ? '⏸️ TRIP RECORDING PAUSED' : '▶️ TRIP RECORDING RESUMED');
+          });
+        }
+
+        if (btnTripReset) {
+          btnTripReset.addEventListener('click', () => {
+            window.NomadTripEngine.resetTrip();
+            showTripToast('🔄 TRIP ODOMETER RESET TO 0.00 MI');
+          });
+        }
+
+        if (btnTripSimulate) {
+          btnTripSimulate.addEventListener('click', () => {
+            const next = window.NomadTripEngine.simulateDriveStep(0.2, 58.0, 'I-95 South');
+            showTripToast(`🚗 SIMULATED +0.2 MI (${next.distanceMiles.toFixed(2)} MI TOTAL)`);
+          });
+        }
+
+        renderTripUI(window.NomadTripEngine.getState());
+      }
+
+      // ====================================================================
+      // 9. THE COCKPIT MODE SWITCHER & STARTUP MEMORY (ITEM 9)
+      // ====================================================================
+      const cockpitActiveBadge = document.getElementById('cockpit-active-badge');
+      const cockpitDefaultLabel = document.getElementById('cockpit-default-label');
+      const cardCockpitRoadtrip = document.getElementById('card-cockpit-roadtrip');
+      const cardCockpitHyperspace = document.getElementById('card-cockpit-hyperspace');
+      const cardCockpitDigit = document.getElementById('card-cockpit-digit');
+      const btnSetDefaultRoadtrip = document.getElementById('btn-set-default-roadtrip');
+      const btnSetDefaultHyperspace = document.getElementById('btn-set-default-hyperspace');
+      const btnSetDefaultDigit = document.getElementById('btn-set-default-digit');
+
+      function renderCockpitUI(state) {
+        if (!state) return;
+
+        const defaultNames = {
+          roadtrip: 'ROAD TRIP (v3)',
+          hyperspace: 'HYPERSPACE (v4)',
+          digit: 'DIGIT (CRT)'
+        };
+        if (cockpitDefaultLabel) {
+          cockpitDefaultLabel.innerText = defaultNames[state.defaultId] || 'HYPERSPACE (v4)';
+        }
+
+        if (btnSetDefaultRoadtrip) btnSetDefaultRoadtrip.classList.toggle('active', state.defaultId === 'roadtrip');
+        if (btnSetDefaultHyperspace) btnSetDefaultHyperspace.classList.toggle('active', state.defaultId === 'hyperspace');
+        if (btnSetDefaultDigit) btnSetDefaultDigit.classList.toggle('active', state.defaultId === 'digit');
+      }
+
+      function initCockpitEngine() {
+        if (!window.NomadCockpitEngine) return;
+
+        window.NomadCockpitEngine.onUpdate(renderCockpitUI);
+
+        if (btnSetDefaultRoadtrip) {
+          btnSetDefaultRoadtrip.addEventListener('click', () => {
+            window.NomadCockpitEngine.setDefaultCockpitId('roadtrip');
+            showTripToast('★ DEFAULT COCKPIT SET: ROAD TRIP');
+          });
+        }
+
+        if (btnSetDefaultHyperspace) {
+          btnSetDefaultHyperspace.addEventListener('click', () => {
+            window.NomadCockpitEngine.setDefaultCockpitId('hyperspace');
+            showTripToast('★ DEFAULT COCKPIT SET: HYPERSPACE');
+          });
+        }
+
+        if (btnSetDefaultDigit) {
+          btnSetDefaultDigit.addEventListener('click', () => {
+            window.NomadCockpitEngine.setDefaultCockpitId('digit');
+            showTripToast('★ DEFAULT COCKPIT SET: DIGIT');
+          });
+        }
+
+        renderCockpitUI(window.NomadCockpitEngine.getState());
+      }
+
+      // Kick off vector map init, fidget engine, trip engine, and cockpit engine
+      initVectorMap();
+      initFidgetEngine();
+      initTripEngine();
+      initCockpitEngine();
+    })();
+  </script>
+
+</body>
+</html>

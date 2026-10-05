@@ -11,20 +11,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <script>
-    // Smart Startup Cockpit Bootloader
-    try {
-      const defCockpit = localStorage.getItem('nomad_default_cockpit');
-      const params = new URLSearchParams(window.location.search);
-      if (!params.has('launcher') && !params.has('nohud')) {
-        if (defCockpit === 'roadtrip') {
-          window.location.replace('roadtrip.html');
-        } else if (defCockpit === 'digit') {
-          window.location.replace('digit.html');
-        }
-      }
-    } catch (_) {}
-  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="robots" content="noindex, nofollow" />
   <link rel="icon" type="image/png" href="icons/icon-192.png" />

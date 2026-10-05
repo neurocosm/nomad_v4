@@ -1445,6 +1445,92 @@
       cursor: pointer;
     }
 
+    .modal-version-banner {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 6px auto 12px auto;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(0, 212, 255, 0.12);
+      border: 1px solid rgba(0, 212, 255, 0.45);
+      color: #00d4ff;
+      font-size: 0.84rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      box-shadow: 0 0 14px rgba(0, 212, 255, 0.25);
+    }
+
+    .modal-cockpit-section {
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 10px 8px;
+      margin-bottom: 12px;
+    }
+    .modal-cockpit-header {
+      font-size: 0.68rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #94a3b8;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    .modal-cockpit-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+    }
+    .modal-cockpit-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 4px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      color: #f8fafc;
+      text-decoration: none;
+      font-size: 0.72rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      text-align: center;
+      line-height: 1.2;
+    }
+    .modal-cockpit-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #ffffff;
+    }
+    .modal-cockpit-btn.is-active {
+      background: rgba(0, 243, 255, 0.14);
+      border-color: #00f3ff;
+      color: #00f3ff;
+      box-shadow: 0 0 12px rgba(0, 243, 255, 0.35);
+    }
+    .modal-default-cockpit-wrap {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-default-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.68rem;
+      color: #cbd5e1;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+    }
+    .modal-default-toggle input {
+      accent-color: #00f3ff;
+      cursor: pointer;
+    }
+
     .modal-version-tag {
       margin-top: 10px;
       font-size: 0.72rem;
@@ -1790,15 +1876,47 @@
     <div class="modal-box" onclick="event.stopPropagation()">
       <a href="features.html" class="modal-title-link" onclick="window.location.replace('features.html'); return false;" title="View Features & Guide">
         <div class="modal-title">NOMAD: RoadTrip ↗</div>
-        <div class="modal-features-hint">Features &amp; User Guide</div>
+        <div class="modal-features-hint">Version 3 &bull; User Guide &amp; Features</div>
       </a>
       <div class="modal-author">by [merge_creator]</div>
-      <div class="modal-body">
+
+      <!-- Prominent System Version Banner -->
+      <div class="modal-version-banner">
+        <span style="opacity: 0.75; font-size: 0.75rem;">SYSTEM FIRMWARE</span>
+        <span class="nomad-version" id="nomad-modal-version-hero">v4.10052026.1037</span>
+      </div>
+
+      <div class="modal-body" style="margin-bottom: 12px;">
         Real-time telemetry, GPS tracking, and heads-up navigation dashboard.
+      </div>
+
+      <!-- Cockpit Switcher Section -->
+      <div class="modal-cockpit-section">
+        <div class="modal-cockpit-header">SWITCH COCKPIT</div>
+        <div class="modal-cockpit-grid">
+          <a href="roadtrip.html" class="modal-cockpit-btn is-active" style="border-color: #00f3ff; color: #00f3ff;">
+            🚗 ROAD TRIP
+          </a>
+          <a href="hyperspace.html" class="modal-cockpit-btn" onclick="window.location.href='hyperspace.html'; return false;">
+            🚀 HYPERSPACE
+          </a>
+          <a href="digit.html" class="modal-cockpit-btn" onclick="window.location.href='digit.html'; return false;">
+            📟 DIGIT
+          </a>
+        </div>
+        <div class="modal-default-cockpit-wrap">
+          <label class="modal-default-toggle">
+            <input type="checkbox" id="chk-default-cockpit" onchange="toggleDefaultCockpit('roadtrip')" />
+            <span>★ Set RoadTrip as Default Boot Cockpit</span>
+          </label>
+        </div>
       </div>
       
       <a href="visualizer.html" class="modal-vis-btn" onclick="window.location.replace('visualizer.html'); return false;">✨ VISUALIZER ARCADE ↗</a>
       <a href="geek-stats.html" class="modal-stats-btn" onclick="window.location.replace('geek-stats.html'); return false;">&gt; GEEK STATS (VT220) _</a>
+
+      <!-- ONE-CLICK FULL WORKSPACE BACKUP DOWNLOAD -->
+      <a href="/api/download-zip" download="nomad-roadtrip.zip" class="modal-purge-btn" style="background: #10b981; color: #000000; text-decoration: none; display: block; margin-bottom: 8px; font-weight: 700;">📦 DOWNLOAD ALL FILES (.ZIP)</a>
 
       <!-- SCOPED TOTAL RECALL PURGE BUTTON -->
       <button class="modal-purge-btn" onclick="executeTotalRecall()">⚠️ PURGE CACHE &amp; HARD RELOAD</button>
@@ -1806,7 +1924,7 @@
       <div style="margin-top: 4px;">
         <button class="modal-close-btn" onclick="closeAboutModal()">Close</button>
       </div>
-      <div class="modal-version-tag nomad-version" id="nomad-modal-version">v3.08302026.0722</div>
+      <div class="modal-version-tag nomad-version" id="nomad-modal-version">v4.10052026.1037</div>
     </div>
   </div>
 
@@ -3275,13 +3393,42 @@
 
     function openAboutModal() {
       const modal = document.getElementById('about-modal');
-      if (modal) modal.classList.add('active');
+      if (modal) {
+        syncDefaultCockpitUI('roadtrip');
+        if (typeof applyNomadRegistry === 'function') applyNomadRegistry();
+        const heroVer = document.getElementById('nomad-modal-version-hero');
+        if (heroVer && window.NOMAD_VERSION) heroVer.textContent = window.NOMAD_VERSION;
+        modal.classList.add('active');
+      }
     }
 
     function closeAboutModal(event) {
       if (event) event.stopPropagation();
       const modal = document.getElementById('about-modal');
       if (modal) modal.classList.remove('active');
+    }
+
+    function toggleDefaultCockpit(cockpitName) {
+      try {
+        const chk = document.getElementById('chk-default-cockpit');
+        if (chk && chk.checked) {
+          localStorage.setItem('nomad_default_cockpit', cockpitName);
+          if (typeof showToast === 'function') showToast(`Default Cockpit: ${cockpitName.toUpperCase()}`);
+        } else {
+          localStorage.removeItem('nomad_default_cockpit');
+          if (typeof showToast === 'function') showToast('Default Cockpit Cleared');
+        }
+      } catch (e) {}
+    }
+
+    function syncDefaultCockpitUI(cockpitName) {
+      try {
+        const chk = document.getElementById('chk-default-cockpit');
+        if (chk) {
+          const saved = localStorage.getItem('nomad_default_cockpit');
+          chk.checked = (saved === cockpitName);
+        }
+      } catch (e) {}
     }
 
     function renderWeatherModalPills() {
