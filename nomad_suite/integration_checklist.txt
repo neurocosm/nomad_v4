@@ -1,0 +1,317 @@
+# ====================================================================
+# NOMAD: SUITE — MASTER INTEGRATION CHECKLIST & ARCHITECTURE DIRECTIVE
+# Unified Multi-Cockpit Navigation Architecture: RoadTrip + Hyperspace + DIGIT
+# Creator & Visionary: BostonyFX (@neurocosm)
+# File: /nomad_suite/integration_checklist.txt
+# ====================================================================
+#
+# NON-NEGOTIABLE DIRECTIVE — THE GOLDEN LAW OF PRESERVATION:
+# "THREE PURE SOULS, ONE SENSORY CORE"
+#
+# Each of the three cockpits (RoadTrip, Hyperspace, and DIGIT) MUST
+# preserve 100% of its visual DNA, UI/UX, gestures, and settings behaviors.
+# - ZERO UI homogenization or lowest-common-denominator compromises.
+# - When the user is in RoadTrip, it MUST look, act, feel, and configure
+#   exactly like pristine RoadTrip (round dials, tactical cards, menus).
+# - When the user is in Hyperspace, it MUST look, act, feel, and configure
+#   exactly like pristine Hyperspace (edge-to-edge vector map, floating
+#   kinetic bubbles, bubble long-press physics modal, safe zone deflection).
+# - When the user is in DIGIT, it MUST look, act, feel, and configure
+#   exactly like pristine DIGIT (5 stacked rectangular blocks, block tap
+#   audio toggles, 4 themes including Relaxed 256-Gray and Apollo).
+#
+# The shared backend modules (telemetry, weather, etc.) are strictly
+# a SILENT SENSORY NERVOUS SYSTEM providing raw data streams.
+# How that data is presented, styled, and interacted with is 100%
+# faithful to each cockpit's individual soul and design identity.
+# ====================================================================
+
+[STATUS LEGEND]
+[ ] PENDING
+[>] IN PROGRESS
+[X] COMPLETED & VERIFIED
+
+----------------------------------------------------------------------
+MASTER SHARED ARCHITECTURE & INTEGRATION CHECKLIST
+----------------------------------------------------------------------
+
+1. FULL LOCATION TELEMETRY ENGINE & ROAD/HIGHWAY CORRECTION
+   Status: [X] COMPLETED & VERIFIED
+   Description:
+     The central positioning "Brain" combining the best of RoadTrip v3
+     and Hyperspace v4 into a single, high-precision avionics engine.
+   Sub-Steps & Key Specifications:
+     1.1 Multi-Stage GNSS Watcher: [X] COMPLETED & VERIFIED
+         - High-accuracy watchPosition with graceful fallback escalation.
+         - Immediate Wi-Fi/IP estimate on boot so the UI never displays
+           blank fields indoors, auto-superseded the millisecond satellite
+           lock is acquired.
+     1.2 Stationary Deadband Filter: [X] COMPLETED & VERIFIED
+         - Hard zero-clamp (< 1.8 MPH / 2.9 km/h) locking speed strictly to
+           0 MPH when stopped, eliminating indoor GPS multipath drift, phone
+           wobble in mounts, and stoplight jitter.
+     1.3 AASHTO Highway Corridor Grid Axis (getHighwayCorridorAxis): [X] COMPLETED & VERIFIED
+         - Constrains odd-numbered Interstates and designated North-South
+           state routes strictly to "North" or "South".
+         - Constrains even-numbered Interstates strictly to "East" or "West".
+         - ±15° directional hysteresis deadband preventing erroneous quadrant
+           flipping while driving through curves or circumferential highway loops
+           (e.g., I-95 circumferential arcs).
+     1.4 Reverse Geocoding Spatial Debounce: [X] COMPLETED & VERIFIED
+         - Spatial throttling (> 40 meters) and temporal debounce to protect
+           against API rate limits while in motion.
+         - 25-meter stoplight stationary anchor lock to prevent intersection hopping.
+         - Fallback chain: Nominatim / BigDataCloud / local reverse cache.
+     1.5 Concise Header Formatting & Dual Route Shielding: [X] COMPLETED & VERIFIED
+         - Primary route singularity (e.g., "I-95 South") in main text.
+         - State and street suffix standardization (St., Ave., Rd., Pkwy).
+         - Secondary concurrent routes detected and structured in snapshot.
+   Progress Notes:
+     - Created /nomad_suite/js/nomad-telemetry-engine.js as a decoupled UMD/ES
+       provider exposing window.NomadTelemetryEngine.
+     - Implemented buildTelemetrySnapshot() emitting standard data payload
+       (speedMph, headingDeg, cardinalWord, streetName, cityState, countyZip,
+       primaryRoute, highwayDirection, corridorAxis, latitude, longitude, altitude, accuracy).
+     - Verified on desktop browser and real mobile cell hardware in Waltham, MA.
+       Achieved green "SATELLITE GNSS" lock, clean 0 MPH stationary clamp,
+       and correct "Lincoln St. / Waltham, MA • Middlesex • 02451" formatting.
+
+
+2. ATMOSPHERIC & ENVIRONMENTAL SUBSYSTEM
+   Status: [X] COMPLETED & VERIFIED
+   Description:
+     Unified real-time weather and atmospheric readings feeding both
+     fixed HUD gauges (RoadTrip/DIGIT) and kinetic bubbles (Hyperspace).
+   Sub-Steps & Key Specifications:
+     2.1 Unified Weather Fetcher: [X] COMPLETED & VERIFIED
+         - Real-time lat/lon queries against Open-Meteo with fallback caching.
+         - Automatic triggering on significant movement (> 15 miles) or
+           elapsed time interval (30 minutes default).
+         - Fast startup from localStorage cache (zero delay on cold boot).
+     2.2 Atmospheric Telemetry Points: [X] COMPLETED & VERIFIED
+         - Temperature: Dual units (°F and °C) with 0.1° precision.
+         - Humidity: Relative percentage (%).
+         - Barometric Pressure: Dual units (inHg and hPa/mbar).
+         - UV Index: Precision decimal with 4 color-coded safety tiers
+           (Green 0-2 Low, Amber 3-5 Moderate, Orange 6-7 High, Red 8+ Very High).
+         - Condition Code: Full WMO weather code dictionary mapped to readable text
+           and scalable vector SVG icons.
+         - Digital Elevation: Open-Meteo terrain elevation fallback.
+     2.3 Settings & Silent Provider Architecture: [X] COMPLETED & VERIFIED
+         - Zero DOM manipulation inside engine (Golden Law compliant).
+         - Time interval controls: 10m, 20m, 30m, 60m.
+         - Distance interval controls: 15mi, 30mi, 50mi, Off.
+         - refreshNow() manual trigger.
+         - Emits updates via onUpdate(callback) and window event 'nomad-weather'.
+   Progress Notes:
+     - Created /nomad_suite/js/nomad-weather-engine.js as a decoupled UMD/ES
+       provider exposing window.NomadWeatherEngine.
+     - Automatically subscribes to window.NomadTelemetryEngine for lat/lon updates.
+     - Integrated live Atmospheric & Weather stream card into /nomad_suite/index.html.
+     - Verified live real-time query against Open-Meteo returning temperature,
+       WMO condition icon/text, humidity, pressure inHg, and UV tier.
+
+
+3. VEHICLE MARKER PERSONA & ACOUSTIC ENGINE
+   Status: [X] COMPLETED & VERIFIED
+   Description:
+     Universal vehicle representation, sound generator, and safe zone physics.
+   Sub-Steps & Key Specifications:
+     3.1 Cruise Chevron vs. Retro Galaga Fighter: [X] COMPLETED & VERIFIED
+         - Shared state across cockpits (persisted in localStorage).
+         - Dual-theme vector SVG generation:
+           * Cruise Chevron: Crisp blue/white directional vector marker.
+           * Dark Mode Galaga: Neon arcade multi-color fighter.
+           * Light Mode Galaga: F-117 Stealth Slate matte charcoal interceptor.
+     3.2 Acoustic Subsystem & Action Animations: [X] COMPLETED & VERIFIED
+         - Polyphonic Dixie horn dual-oscillator synthesizer for Chevron with guaranteed
+           Web Audio clock lookahead and async resume handling.
+         - 8-bit triple-salvo laser peashooter sound for Galaga Fighter.
+         - Pulsating orange/white General Lee [01] homage badge (direct RoadTrip squircle extraction).
+         - Glowing neon red "FIRE!" badge with rapid salvo pulse.
+         - Vehicle tap action routing:
+           * Tap Chevron -> Dixie Horn audio + vehicle orange pulse + [01] General Lee badge (exact 2.82s sync).
+           * Tap Fighter -> Galaga Laser salvo + fighter pulse + glowing FIRE! badge (exact 805ms sync).
+         - Explicit persona switcher button cleanly separating vehicle switching from action firing.
+         - Bluetooth A2DP Keep-Alive periodic sub-audible carrier heartbeat.
+     3.3 Safe Zone Bubble Definition: [X] COMPLETED & VERIFIED
+         - Dynamic vehicle boundary radius (used by Hyperspace for kinetic bubble
+           bounce deflection).
+   Progress Notes:
+     - Re-architected Web Audio timing in /nomad_suite/js/nomad-vehicle-engine.js:
+       * Handles asynchronous context resume gracefully.
+       * Adds a 40ms positive lookahead buffer ensuring zero dropped notes on mobile/desktop.
+       * Uses cancel-safe timeout tracking ensuring animations NEVER pulsate indefinitely.
+     - Built dual-pod test showcase in /nomad_suite/index.html:
+       * Left Pod: Hero Vehicle (Chevron / Galaga / Stealth).
+       * Right Pod: RoadTrip Telemetry Square (Heading Squircle -> [01] General Lee / FIRE!).
+       * Dedicated "SWITCH VEHICLE" and "PREVIEW THEME" buttons.
+     - Tested and verified: Tapping Chevron fires Dixie horn + [01]; Tapping Fighter fires Laser + FIRE!;
+       All animations cleanly terminate right on cue when audio completes.
+
+
+4. COMPASS, ELEVATION & KINEMATICS
+   Status: [X] COMPLETED & VERIFIED
+   Description:
+     Heading resolver, altimeter climb rates, and satellite fix fidelity.
+   Sub-Steps & Key Specifications:
+     4.1 Bearing & Cardinal Heading: [X] COMPLETED & VERIFIED
+         - 16-point cardinal compass resolver (N, NNE, NE, ENE, E, ESE, SE, SSE, S, SSW, SW, WSW, W, WNW, NW, NNW).
+         - Sensor fusion: Hardware Gyroscope/Magnetometer when stationary (< 3.2 MPH),
+           falling back strictly to GPS velocity track vector when driving (> 3.2 MPH)
+           to avoid phone-in-cradle orientation skewing.
+         - Adaptive typography helper getAdaptiveCardinalLabel() matching RoadTrip specifications.
+     4.2 Elevation & Altimeter: [X] COMPLETED & VERIFIED
+         - Dual units: Feet (ft) and Meters (m) with MSL altitude.
+         - Automatic fallback chain: GPS MSL altitude -> Digital Elevation Model (Open-Meteo).
+         - Vertical Climb Rate (VSI / Vertical Speed Indicator):
+           * Rolling altitude smoother over 5-second moving regression window.
+           * Feet per minute (ft/min) and meters per second (m/s).
+           * Three-state status indicator: LEVEL (within ±55 ft/min deadband),
+             CLIMBING (positive), and DESCENDING (negative).
+     4.3 GPS Signal Quality Indicator: [X] COMPLETED & VERIFIED
+         - Satellite accuracy radius in feet and meters (e.g., ±12 ft / ±3.7 m).
+         - 5-Tier signal fidelity resolver: PINPOINT / RTK (<= 3.5m), EXCELLENT (<= 8m),
+           GOOD (<= 20m), MODERATE (<= 40m), and DEGRADED (> 40m).
+     4.4 Telemetry Squircle Mode Controller: [X] COMPLETED & VERIFIED
+         - 4 Selectable HUD Squircle modes:
+           * Mode 0: HEADING & 16-PT CARDINAL (e.g. 245° WSW)
+           * Mode 1: ALTITUDE (e.g. 340 FT ALT)
+           * Mode 2: CLIMB RATE (e.g. +240 FT/MIN / LEVEL)
+           * Mode 3: GPS ACCURACY (e.g. ±14 FT GPS)
+         - Tapping squircle smoothly cycles through modes (with tactile vibration where supported).
+         - Segmented switcher buttons for instant 1-tap mode selection.
+         - Persisted in localStorage ('nomad_telemetry_mode').
+         - Seamless coordination with Vehicle actions: squircle temporarily pulses [01] General Lee
+           or FIRE! during horn/laser audio, then cleanly restores active telemetry mode.
+   Progress Notes:
+     - Built decoupled provider /nomad_suite/js/nomad-kinematics-engine.js exposing window.NomadKinematicsEngine.
+     - Auto-subscribes to window.NomadTelemetryEngine and window.NomadWeatherEngine.
+     - Added comprehensive Compass, Elevation & Kinematics monitor card and segmented squircle controller
+       to /nomad_suite/index.html.
+     - Verified live in dev test bed: 16-point cardinal compass, altimeter MSL, VSI climb rate, and signal tiers.
+
+
+5. SCREEN WAKE LOCK & APP LIFECYCLE GUARD
+   Status: [X] COMPLETED & VERIFIED
+   Description:
+     Persistent power management and seamless background-to-foreground recovery.
+   Sub-Steps & Key Specifications:
+     5.1 Continuous Screen Wake Lock: [X] COMPLETED & VERIFIED
+         - navigator.wakeLock integration to keep phone displays awake while
+           mounted on car dashboard during road trips.
+         - 15-second heartbeat watchdog ensuring persistent keep-awake.
+         - Touch/click event unlockers for mobile browsers enforcing user activation policies.
+     5.2 Visibility & Focus Recovery: [X] COMPLETED & VERIFIED
+         - Auto-reacquires the screen wake lock when returning from background,
+           phone calls, navigation splits, or the Notes app.
+         - Handles visibilitychange, window focus, and bfcache pageshow events.
+         - Dispatches 'nomad-wake-resume' event and calls registered callbacks to
+           re-anchor map viewports and restart animation loops without screen blanking.
+   Progress Notes:
+     - Created decoupled provider /nomad_suite/js/nomad-lifecycle-engine.js exposing window.NomadLifecycleEngine.
+     - Built Item 5 monitor card in /nomad_suite/index.html showing real-time wake lock status,
+       visibility state, watchdog heartbeat, and total lifecycle resumption counter.
+     - Added manual toggle button to verify lock acquisition and release on demand.
+
+
+6. DUAL VECTOR MAP THEMES & WEBGL PIPELINE (RoadTrip & Hyperspace)
+   Status: [X] COMPLETED & VERIFIED
+   Description:
+     Unified vector map rendering with high performance and zero memory leaks.
+   Sub-Steps & Key Specifications:
+     6.1 Natural Dark Navigation & Natural Light Navigation stylesheets: [X] COMPLETED & VERIFIED
+         - Natural Dark: Midnight background (#070b14), luminous electric cyan waterways (#00d4ff),
+           deep pine emerald green parks (#073b22), glowing white road outline casings (#f8fafc),
+           and dark charcoal road fills (#0f172a).
+         - Natural Light: Clean slate background (#f1f5f9), vibrant sky-blue waterways (#38bdf8),
+           lush mint green parks (#bbf7d0), and crisp white pavement (#ffffff).
+     6.2 Zero-Reload Switching: [X] COMPLETED & VERIFIED
+         - Toggling themes swaps styles with map.setStyle(styleObj, { diff: true }) without tearing
+           down MapLibre GL canvas or flushing cached tiles from GPU memory.
+         - In-memory cached style objects eliminate redundant network fetches.
+     6.3 Map Route Shield System: [X] COMPLETED & VERIFIED
+         - Authentic MUTCD Interstate Shield SVG with directional indicator dots (North, South, East, West).
+         - Authentic MUTCD State / US Route Shield SVG with rounded square plate and hairline border.
+         - Automatic 4-second dual-route multiplex flipper (e.g., I-95 & Route 128).
+     6.4 Compass Rosette & 3-Perspective Camera Engine: [X] COMPLETED & VERIFIED
+         - Dedicated Tactical Compass Rosette pod (30° chronometer ticks, cardinal points, dual-taper needle).
+         - Tapping compass pod cycles through all 3 authentic perspectives:
+           * 1. 3D Perspective Drive: 58° pitch, track-up bearing, vehicle marker in lower third tilted
+                along the road plane (perspective(600px) rotateX(42deg) rotate(0deg)), needle points to North.
+           * 2. 2D Overview Track: 0° pitch, track-up bearing, vehicle marker flat (rotateX(0deg)),
+                needle points to North.
+           * 3. 2D North-Up Locked: 0° pitch, north-up bearing (0°), vehicle marker flat and rotates
+                to show direction of travel (rotate(${h}deg)), needle points straight up (0°).
+         - Ephemeral toast confirmation and synced control button.
+   Progress Notes:
+     - Created decoupled provider /nomad_suite/js/nomad-map-engine.js exposing window.NomadMapEngine.
+     - Embedded live interactive MapLibre GL 4.7.1 vector canvas in /nomad_suite/index.html (Card 6).
+     - Verified live zero-reload theme switching between Natural Dark and Natural Light.
+     - Verified authentic MUTCD Interstate and Route Shields updating live from telemetry.
+     - Verified Tactical Compass Rosette pod with dual-taper needle, haptic bump, and touchshielded cycling
+       across all 3 RoadTrip perspectives: 3D Drive (58° pitch, 42° vehicle tilt), 2D Track-Up (0° pitch, 0° tilt),
+       and 2D North-Up Locked (0° pitch, vehicle rotates with heading, needle straight up).
+
+
+7. SENSORY VISUALIZERS & KINETIC SCREENSAVER CONSOLES ("THE FIDGET ARCADE")
+   Status: [ ] PENDING
+   Description:
+     Shared interactive screensaver consoles and automated countdown die.
+   Sub-Steps & Key Specifications:
+     7.1 Interactive Consoles:
+         - Starfield Warp Drive.
+         - Underwater Ocean.
+         - Stampede.
+         - Synthomatic PCB Circuit Board (Hero DSP 8800 chip, 16 MHz Quartz Crystal,
+           Sound ROM, and regenerative braking discharge).
+     7.2 Interactive Countdown Die:
+         - Crisp white face 5 during manual browsing.
+         - 700ms long-press turns yellow and engages the 60-second countdown
+           (6 -> 5 -> 4 -> 3 -> 2 -> 1 with 9th-second snap spin) auto-cycling
+           through the consoles.
+   Progress Notes:
+     - (Notes will be added here as we begin implementation)
+
+
+8. TRIP COMPUTER & GPX FLIGHT RECORDER
+   Status: [ ] PENDING
+   Description:
+     Live trip telemetry tracking and standardized GIS file export.
+   Sub-Steps & Key Specifications:
+     8.1 Odometer & Trip Stats:
+         - Elapsed drive time, trip distance, average speed, top speed.
+     8.2 GPX 1.1 Logger:
+         - High-fidelity logging of <trkpt>, <ele>, <time>, <speed>, and <course>
+           with one-click export for Strava, Google Earth, and GIS analysis.
+   Progress Notes:
+     - (Notes will be added here as we begin implementation)
+
+
+9. THE COCKPIT MODE SWITCHER & STARTUP MEMORY
+   Status: [ ] PENDING
+   Description:
+     The master user selector allowing seamless switching across all 3 cockpits.
+   Sub-Steps & Key Specifications:
+     9.1 Instant Switching:
+         - Switch between RoadTrip (v3), Hyperspace (v4), and DIGIT on the fly
+           without reloading the page and without dropping satellite lock.
+     9.2 Startup Memory:
+         - "Remember my choice" setting saved in localStorage.
+   Progress Notes:
+     - (Notes will be added here as we begin implementation)
+
+
+10. CENTRAL VERSION & CREATOR REGISTRY (version.js)
+    Status: [ ] PENDING
+    Description:
+      Single source of truth for versioning and creator metadata.
+    Sub-Steps & Key Specifications:
+      10.1 BostonyFX (@neurocosm on Instagram) credits.
+      10.2 US Eastern Time (ET) version numbering engine: v4.[MMDDYYYY].[HHMM].
+    Progress Notes:
+      - (Notes will be added here as we begin implementation)
+
+======================================================================
+END OF MASTER INTEGRATION CHECKLIST
+======================================================================
