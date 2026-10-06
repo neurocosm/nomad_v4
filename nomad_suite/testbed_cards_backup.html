@@ -1485,13 +1485,13 @@
 
     <!-- Shared Utilities Bar -->
     <div class="vehicle-controls-bar" style="margin-top: 8px;">
-      <a href="../visualizer.html" class="vehicle-ctrl-btn" style="border-color: #ff007f; color: #ffffff; text-decoration: none; text-align: center; line-height: 2.2;">
+      <a href="../visualizer.html?from=suite" class="vehicle-ctrl-btn" style="border-color: #ff007f; color: #ffffff; text-decoration: none; text-align: center; line-height: 2.2;">
         ✨ <span>ARCADE</span>
       </a>
-      <a href="../geek-stats.html" class="vehicle-ctrl-btn" style="border-color: #ffb000; color: #ffb000; text-decoration: none; text-align: center; line-height: 2.2;">
+      <a href="../geek-stats.html?from=suite" class="vehicle-ctrl-btn" style="border-color: #ffb000; color: #ffb000; text-decoration: none; text-align: center; line-height: 2.2;">
         &gt; <span>GEEK STATS</span>
       </a>
-      <a href="../features.html" class="vehicle-ctrl-btn" style="border-color: #38bdf8; color: #38bdf8; text-decoration: none; text-align: center; line-height: 2.2;">
+      <a href="../features.html?from=suite" class="vehicle-ctrl-btn" style="border-color: #38bdf8; color: #38bdf8; text-decoration: none; text-align: center; line-height: 2.2;">
         📖 <span>MANUAL</span>
       </a>
       <a href="/api/download-zip" download="nomad-roadtrip.zip" class="vehicle-ctrl-btn" style="border-color: #10b981; color: #10b981; text-decoration: none; text-align: center; line-height: 2.2;">
@@ -2969,6 +2969,24 @@
       initFidgetEngine();
       initTripEngine();
       initCockpitEngine();
+
+      // Screen Wake Lock ("Stay Awake") Engine
+      let wakeLock = null;
+      async function requestWakeLock() {
+        try {
+          if (typeof navigator !== 'undefined' && 'wakeLock' in navigator && document.visibilityState === 'visible' && (wakeLock === null || wakeLock.released)) {
+            wakeLock = await navigator.wakeLock.request('screen');
+          }
+        } catch (_) {}
+      }
+
+      requestWakeLock();
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') requestWakeLock();
+      });
+      ['touchstart', 'pointerdown', 'click'].forEach(evt => {
+        window.addEventListener(evt, () => requestWakeLock(), { passive: true });
+      });
     })();
   </script>
 

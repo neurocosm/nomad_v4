@@ -945,19 +945,19 @@
     <div class="utilities-grid">
 
       <!-- A: VISUALIZER ARCADE -->
-      <a href="../visualizer.html" class="util-tile util-arcade">
+      <a href="../visualizer.html?from=launcher" class="util-tile util-arcade">
         <div class="util-tile-title">✨ A: ARCADE ↗</div>
         <div class="util-tile-sub">Starfield, Ocean, Synthomatic DSP &amp; Stampede</div>
       </a>
 
       <!-- B: GEEK STATS (VT220) -->
-      <a href="../geek-stats.html" class="util-tile util-stats">
+      <a href="../geek-stats.html?from=launcher" class="util-tile util-stats">
         <div class="util-tile-title">&gt; B: GEEK STATS _</div>
         <div class="util-tile-sub">VT220 CRT Telemetry Dumps &amp; Black Box</div>
       </a>
 
       <!-- C: USER GUIDE -->
-      <a href="../features.html" class="util-tile util-guide">
+      <a href="../features.html?from=launcher" class="util-tile util-guide">
         <div class="util-tile-title">📖 C: USER GUIDE ↗</div>
         <div class="util-tile-sub">Cockpit Controls, Gestures &amp; Perspectives</div>
       </a>
@@ -1017,9 +1017,9 @@
       </div>
 
       <div class="modal-action-stack">
-        <a href="../visualizer.html" class="modal-vis-btn">✨ VISUALIZER ARCADE ↗</a>
-        <a href="../geek-stats.html" class="modal-stats-btn">&gt; GEEK STATS (VT220) _</a>
-        <a href="../features.html" class="modal-stats-btn" style="border-color: #38bdf8; color: #38bdf8; background: rgba(56, 189, 248, 0.10);">📖 USER GUIDE &amp; FEATURES ↗</a>
+        <a href="../visualizer.html?from=launcher" class="modal-vis-btn">✨ VISUALIZER ARCADE ↗</a>
+        <a href="../geek-stats.html?from=launcher" class="modal-stats-btn">&gt; GEEK STATS (VT220) _</a>
+        <a href="../features.html?from=launcher" class="modal-stats-btn" style="border-color: #38bdf8; color: #38bdf8; background: rgba(56, 189, 248, 0.10);">📖 USER GUIDE &amp; FEATURES ↗</a>
         <a href="/api/download-zip" download="nomad-roadtrip.zip" class="modal-download-btn">📦 DOWNLOAD ALL FILES (.ZIP)</a>
         <button class="modal-purge-btn" onclick="handleDeepPurge()">⚠️ PURGE CACHE &amp; HARD RELOAD</button>
       </div>
@@ -1035,6 +1035,7 @@
 
   <!-- Engines & Logic -->
   <script src="../version.js"></script>
+  <script src="./js/nomad-return.js"></script>
   <script src="./js/nomad-telemetry-engine.js"></script>
   <script src="./js/nomad-cockpit-engine.js"></script>
 
@@ -1149,6 +1150,24 @@
                            localStorage.getItem('nomad_default_cockpit') ||
                            'hyperspace';
       updateBootUI(savedDefault);
+
+      // --- Screen Wake Lock ("Stay Awake") Engine ---
+      let wakeLock = null;
+      async function requestWakeLock() {
+        try {
+          if (typeof navigator !== 'undefined' && 'wakeLock' in navigator && document.visibilityState === 'visible' && (wakeLock === null || wakeLock.released)) {
+            wakeLock = await navigator.wakeLock.request('screen');
+          }
+        } catch (_) {}
+      }
+
+      requestWakeLock();
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') requestWakeLock();
+      });
+      ['touchstart', 'pointerdown', 'click'].forEach(evt => {
+        window.addEventListener(evt, () => requestWakeLock(), { passive: true });
+      });
     })();
   </script>
 

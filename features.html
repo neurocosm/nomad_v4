@@ -562,7 +562,8 @@
       </div>
 
       <nav class="header-nav-btns">
-        <a href="nomad_suite/" class="nav-btn nav-btn-dash">🚀 START HUD ↗</a>
+        <a href="javascript:void(0)" class="nav-btn nav-btn-dash" id="btn-return-nav" data-nomad-return-btn onclick="returnToActiveHUD(); return false;">&lt; RETURN TO COCKPIT</a>
+        <a href="nomad_suite/" class="nav-btn" style="color: var(--accent-green); border-color: rgba(48, 209, 88, 0.35);">🚀 START HUD ↗</a>
         <a href="geek-stats.html" class="nav-btn nav-btn-stats">&gt;_ VT220</a>
         <a href="visualizer.html" class="nav-btn nav-btn-arcade">✨ ARCADE</a>
         <a href="gps-setup.html" class="nav-btn" style="color: var(--accent-cyan); border-color: rgba(0, 243, 255, 0.35);">🛰️ GPS GUIDE</a>
@@ -1171,20 +1172,63 @@
         });
       };
 
-      // 4. Initial Hash Handler
+      // 4. Initial Hash & Origin Tab Handler
       function handleInitialHash() {
         const hash = (window.location.hash || '').replace('#', '').toLowerCase();
         if (['universal', 'hyperspace', 'roadtrip', 'digit', 'all'].includes(hash)) {
           switchGuideTab(hash);
-        } else {
-          switchGuideTab('universal');
+          return;
         }
+
+        // Check URL parameter (?from= or ?hud=)
+        const params = new URLSearchParams(window.location.search);
+        const fromParam = (params.get('from') || params.get('hud') || '').toLowerCase();
+        if (fromParam.includes('roadtrip')) {
+          switchGuideTab('roadtrip');
+          return;
+        } else if (fromParam.includes('digit')) {
+          switchGuideTab('digit');
+          return;
+        } else if (fromParam.includes('hyperspace')) {
+          switchGuideTab('hyperspace');
+          return;
+        }
+
+        // Check sessionStorage origin
+        try {
+          const storedHud = sessionStorage.getItem('nomad_active_hud');
+          if (storedHud) {
+            if (storedHud.includes('roadtrip')) { switchGuideTab('roadtrip'); return; }
+            if (storedHud.includes('digit')) { switchGuideTab('digit'); return; }
+            if (storedHud.includes('hyperspace')) { switchGuideTab('hyperspace'); return; }
+          }
+        } catch (_) {}
+
+        switchGuideTab('universal');
       }
 
       window.addEventListener('hashchange', handleInitialHash);
       handleInitialHash();
+
+      // 5. Screen Wake Lock ("Stay Awake") Engine
+      let wakeLock = null;
+      async function requestWakeLock() {
+        try {
+          if (typeof navigator !== 'undefined' && 'wakeLock' in navigator && document.visibilityState === 'visible' && (wakeLock === null || wakeLock.released)) {
+            wakeLock = await navigator.wakeLock.request('screen');
+          }
+        } catch (_) {}
+      }
+
+      requestWakeLock();
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') requestWakeLock();
+      });
+      ['touchstart', 'pointerdown', 'click'].forEach(evt => {
+        window.addEventListener(evt, () => requestWakeLock(), { passive: true });
+      });
     })();
   </script>
-
+  <script src="js/nomad-return.js"></script>
 </body>
 </html>
