@@ -6,6 +6,13 @@
   <title>NOMAD: Launch Control // Mission Control</title>
   <meta name="description" content="NOMAD Launch Control - Central Multi-Cockpit HUD Launcher & Mission Control by BostonyFX (@tony_bostony)" />
   <meta name="theme-color" content="#050811" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="NOMAD" />
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -432,13 +439,13 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 10px 12px;
+      padding: 12px 14px;
       border-radius: 10px;
       text-decoration: none;
       transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
       cursor: pointer;
       text-align: left;
-      min-height: 58px;
+      min-height: 46px;
     }
 
     .util-tile:hover {
@@ -454,17 +461,10 @@
       font-weight: 800;
       font-family: 'JetBrains Mono', monospace;
       letter-spacing: 0.03em;
-      margin-bottom: 2px;
+      margin-bottom: 0;
       display: flex;
       align-items: center;
       gap: 6px;
-    }
-
-    .util-tile-sub {
-      font-size: 0.62rem;
-      color: var(--text-dim);
-      font-family: 'Space Grotesk', sans-serif;
-      line-height: 1.2;
     }
 
     /* Utility Color Identities Matching Screenshot */
@@ -863,22 +863,20 @@
 
     <div class="cockpits-stack">
 
-      <!-- 1. DIGIT -->
-      <a href="../digit.html" class="cockpit-hero-card card-digit" id="card-hud-digit">
+      <!-- 1. HYPERSPACE -->
+      <a href="../hyperspace.html" class="cockpit-hero-card card-hyperspace" id="card-hud-hyperspace">
         <div class="cockpit-left">
-          <div class="cockpit-avatar" style="border-color: rgba(48, 209, 88, 0.4); color: #30d158;">📟</div>
+          <div class="cockpit-avatar" style="border-color: rgba(255, 0, 85, 0.4); color: #ff0055;">🚀</div>
           <div class="cockpit-meta">
             <div class="cockpit-title-row">
-              <span class="cockpit-name">DIGIT</span>
-              <span class="cockpit-tier-badge" style="color: #30d158;">TACTICAL CRT</span>
+              <span class="cockpit-name">HYPERSPACE</span>
             </div>
-            <div class="cockpit-desc">Military monospace ASCII matrix &amp; high-density telemetry</div>
-            <div class="cockpit-tags">ASCII Matrix • 256-Gray • Zen Philosophy Terminal</div>
+            <div class="cockpit-desc">Kinetic vector canvas with floating telemetry</div>
           </div>
         </div>
         <div class="cockpit-launch-action">
           <span class="launch-btn-pill">LAUNCH ↗</span>
-          <button type="button" class="boot-radio-btn" id="radio-btn-digit" onclick="setBootDefaultFromCard(event, 'digit')" title="Set DIGIT as Default Boot Cockpit">
+          <button type="button" class="boot-radio-btn" id="radio-btn-hyperspace" onclick="setBootDefaultFromCard(event, 'hyperspace')" title="Set HYPERSPACE as Default Boot Cockpit">
             <span class="radio-circle"><span class="radio-dot"></span></span>
             <span class="radio-label">SET DEFAULT</span>
           </button>
@@ -892,10 +890,8 @@
           <div class="cockpit-meta">
             <div class="cockpit-title-row">
               <span class="cockpit-name">ROAD TRIP</span>
-              <span class="cockpit-tier-badge" style="color: #00f3ff;">v3 CLASSIC</span>
             </div>
-            <div class="cockpit-desc">High-contrast highway navigation with MUTCD speed signs</div>
-            <div class="cockpit-tags">Interstate Shields • Tactical Rosette Compass • Weather Cockpit</div>
+            <div class="cockpit-desc">High-contrast street level mapping accuracy</div>
           </div>
         </div>
         <div class="cockpit-launch-action">
@@ -907,22 +903,20 @@
         </div>
       </a>
 
-      <!-- 3. HYPERSPACE -->
-      <a href="../hyperspace.html" class="cockpit-hero-card card-hyperspace" id="card-hud-hyperspace">
+      <!-- 3. DIGIT -->
+      <a href="../digit.html" class="cockpit-hero-card card-digit" id="card-hud-digit">
         <div class="cockpit-left">
-          <div class="cockpit-avatar" style="border-color: rgba(255, 0, 85, 0.4); color: #ff0055;">🚀</div>
+          <div class="cockpit-avatar" style="border-color: rgba(48, 209, 88, 0.4); color: #30d158;">📟</div>
           <div class="cockpit-meta">
             <div class="cockpit-title-row">
-              <span class="cockpit-name">HYPERSPACE</span>
-              <span class="cockpit-tier-badge" style="color: #ff0055;">v4 KINETIC</span>
+              <span class="cockpit-name">DIGIT</span>
             </div>
-            <div class="cockpit-desc">Kinetic vector canvas with floating Newtonian telemetry bubbles</div>
-            <div class="cockpit-tags">3D Road Pitch (58°) • Galaga Interceptor • Shape Physics</div>
+            <div class="cockpit-desc">Military monospace ASCII matrix</div>
           </div>
         </div>
         <div class="cockpit-launch-action">
           <span class="launch-btn-pill">LAUNCH ↗</span>
-          <button type="button" class="boot-radio-btn" id="radio-btn-hyperspace" onclick="setBootDefaultFromCard(event, 'hyperspace')" title="Set HYPERSPACE as Default Boot Cockpit">
+          <button type="button" class="boot-radio-btn" id="radio-btn-digit" onclick="setBootDefaultFromCard(event, 'digit')" title="Set DIGIT as Default Boot Cockpit">
             <span class="radio-circle"><span class="radio-dot"></span></span>
             <span class="radio-label">SET DEFAULT</span>
           </button>
@@ -942,75 +936,44 @@
       <!-- A: VISUALIZER ARCADE -->
       <a href="../visualizer.html?from=launcher" class="util-tile util-arcade">
         <div class="util-tile-title">✨ A: ARCADE ↗</div>
-        <div class="util-tile-sub">Starfield, Ocean, Synthomatic DSP &amp; Stampede</div>
       </a>
 
       <!-- B: GEEK STATS (VT220) -->
       <a href="../geek-stats.html?from=launcher" class="util-tile util-stats">
         <div class="util-tile-title">&gt; B: GEEK STATS _</div>
-        <div class="util-tile-sub">VT220 CRT Telemetry Dumps &amp; Black Box</div>
       </a>
 
       <!-- C: USER GUIDE -->
       <a href="../features.html?from=launcher" class="util-tile util-guide">
         <div class="util-tile-title">📖 C: USER GUIDE ↗</div>
-        <div class="util-tile-sub">Cockpit Controls, Gestures &amp; Perspectives</div>
       </a>
 
       <!-- D: DOWNLOAD ALL FILES (.ZIP) -->
-      <a href="/api/download-zip" download="nomad-roadtrip.zip" class="util-tile util-download">
+      <a href="/api/download-zip" download="nomad_suite.zip" class="util-tile util-download">
         <div class="util-tile-title">📦 D: DOWNLOAD ZIP</div>
-        <div class="util-tile-sub">Instant Full Project Offline Backup Archive</div>
       </a>
 
       <!-- E: PURGE CACHE AND HARD RELOAD -->
       <div class="util-tile util-purge" onclick="handleDeepPurge()">
         <div class="util-tile-title">⚠️ E: PURGE CACHE</div>
-        <div class="util-tile-sub">Hardware Deep Reset &amp; Worker Unregister</div>
       </div>
 
       <!-- F: CREDITS & ABOUT -->
       <div class="util-tile util-about" onclick="openAboutModal()">
         <div class="util-tile-title">ℹ️ F: CREDITS</div>
-        <div class="util-tile-sub">BostonyFX <span class="nomad-creator-handle">(@tony_bostony)</span> • System Registry</div>
       </div>
 
     </div>
 
     <footer>
-      <div>NOMAD Avionics Architecture &bull; <span class="nomad-version" id="footer-firmware-val">v4.10062026.2020</span></div>
+      <div>NOMAD Avionics Architecture &bull; <span class="nomad-version" id="footer-firmware-val">v4.10072026.1335</span></div>
       <div>Crafted by <a href="https://www.instagram.com/tony_bostony/" class="nomad-creator-link" target="_blank">BostonyFX</a></div>
     </footer>
 
   </div>
 
-  <!-- BRANDING ABOUT / INFO MODAL OVERLAY (ROAD TRIP SPEC) -->
-  <div class="modal-overlay" id="about-modal" onclick="closeAboutModal(event)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <a href="../features.html" class="modal-title-link" title="View Features &amp; Guide">
-        <div class="modal-title">NOMAD: MISSION CONTROL ↗</div>
-        <div class="modal-features-hint">Unified Cockpits &bull; Architecture &amp; Guide</div>
-      </a>
-      <div class="modal-author">by <a href="https://www.instagram.com/tony_bostony/" class="nomad-creator-link" target="_blank" rel="noopener noreferrer">BostonyFX</a></div>
-
-      <div class="modal-body">
-        Unified real-time vehicular navigation avionics, sensory telemetry engines, and high-performance HUD matrix architecture.
-      </div>
-
-      <div class="modal-action-stack">
-        <a href="../visualizer.html?from=launcher" class="modal-vis-btn">✨ VISUALIZER ARCADE ↗</a>
-        <a href="../geek-stats.html?from=launcher" class="modal-stats-btn">&gt; GEEK STATS (VT220) _</a>
-        <a href="../features.html?from=launcher" class="modal-stats-btn" style="border-color: #38bdf8; color: #38bdf8; background: rgba(56, 189, 248, 0.10);">📖 USER GUIDE &amp; FEATURES ↗</a>
-        <a href="/api/download-zip" download="nomad-roadtrip.zip" class="modal-download-btn">📦 DOWNLOAD ALL FILES (.ZIP)</a>
-        <button class="modal-purge-btn" onclick="handleDeepPurge()">⚠️ PURGE CACHE &amp; HARD RELOAD</button>
-      </div>
-
-      <div>
-        <button class="modal-close-btn" onclick="closeAboutModal()">Close</button>
-      </div>
-      <div class="modal-version-tag nomad-version" id="nomad-modal-version">v4.10062026.2057</div>
-    </div>
-  </div>
+  <!-- Unified About / Settings Modal Container (rendered dynamically by /js/nomad-menu.js) -->
+  <div class="modal-overlay" id="about-modal"></div>
 
   <!-- Ephemeral Feedback Toast -->
   <div class="launch-toast" id="launch-toast">Notification</div>
@@ -1135,9 +1098,9 @@
         updateBootUI(cockpitId);
 
         const names = {
-          digit: 'DIGIT (Tactical CRT)',
-          roadtrip: 'ROAD TRIP (v3 Classic)',
-          hyperspace: 'HYPERSPACE (v4 Kinetic)'
+          hyperspace: 'HYPERSPACE',
+          roadtrip: 'ROAD TRIP',
+          digit: 'DIGIT'
         };
         showToast(`★ ${names[cockpitId] || cockpitId.toUpperCase()} SET AS DEFAULT`);
       };
@@ -1150,8 +1113,10 @@
         if (window.NomadCockpitEngine) {
           window.NomadCockpitEngine.purgeCacheAndReload();
         } else {
+          const savedBlackbox = localStorage.getItem('nomad_blackbox_log');
           localStorage.clear();
           sessionStorage.clear();
+          if (savedBlackbox) localStorage.setItem('nomad_blackbox_log', savedBlackbox);
           window.location.reload(true);
         }
       };
@@ -1184,6 +1149,14 @@
       ['touchstart', 'pointerdown', 'click'].forEach(evt => {
         window.addEventListener(evt, () => requestWakeLock(), { passive: true });
       });
+
+      // Service Worker Registration for PWA Installability
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js', { scope: '/' })
+            .catch(err => console.warn('Service worker registration failed:', err));
+        });
+      }
     })();
   </script>
 

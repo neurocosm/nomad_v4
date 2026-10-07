@@ -1,42 +1,42 @@
 {
-  "id": "./",
-  "name": "NOMAD: Hyperspace",
+  "id": "/",
+  "name": "NOMAD: Avionics Suite",
   "short_name": "NOMAD",
-  "description": "Real-time Heads-Up GPS Navigation, Telemetry Dashboard, and Visualizer Arcade.",
-  "start_url": "./index.html",
-  "scope": "./",
+  "description": "NOMAD Unified Multi-Cockpit Navigation Architecture, Telemetry Avionics, and Visualizer Arcade.",
+  "start_url": "/nomad_suite/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#050811",
+  "theme_color": "#050811",
   "orientation": "portrait",
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "icons/icon-192.png",
+      "src": "/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-maskable-192.png",
+      "src": "/icons/icon-maskable-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "icons/icon-maskable-512.png",
+      "src": "/icons/icon-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "icons/apple-touch-icon.png",
+      "src": "/icons/apple-touch-icon.png",
       "sizes": "180x180",
       "type": "image/png"
     }

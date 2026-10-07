@@ -52,8 +52,8 @@ app.get(['/api/download-zip', '/download-zip', '/download'], (req, res) => {
     const zipPythonCmd = `
 import os, zipfile
 exclude_dirs = {'.git', 'node_modules', '.cache', '.npm'}
-exclude_files = {'nomad-roadtrip.zip'}
-with zipfile.ZipFile('nomad-roadtrip.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
+exclude_files = {'nomad_suite.zip', 'nomad-roadtrip.zip'}
+with zipfile.ZipFile('nomad_suite.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
     for root, dirs, files in os.walk('.'):
         dirs[:] = [d for d in dirs if d not in exclude_dirs]
         for file in files:
@@ -64,12 +64,19 @@ with zipfile.ZipFile('nomad-roadtrip.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
             zipf.write(path, arcname)
 `;
     execSync(`python3 -c "${zipPythonCmd.replace(/"/g, '\\"')}"`, { cwd: __dirname });
-    const zipPath = path.join(__dirname, 'nomad-roadtrip.zip');
-    res.download(zipPath, 'nomad-roadtrip.zip');
+    const zipPath = path.join(__dirname, 'nomad_suite.zip');
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', 'attachment; filename="nomad_suite.zip"');
+    res.download(zipPath, 'nomad_suite.zip');
   } catch (err) {
     console.error('Failed to create zip:', err);
     res.status(500).send('Error creating zip archive');
   }
+});
+
+// Canonical redirect for legacy nomad_digit path
+app.get(['/nomad_digit', '/nomad_digit.html'], (req, res) => {
+  res.redirect(301, '/digit.html');
 });
 
 // Serve static assets with html extension support

@@ -132,13 +132,15 @@
         }
       }
 
-      // 3. Clear transient storage keys (preserve default cockpit preference)
+      // 3. Clear transient storage keys (preserve default cockpit preference & flight/collision logs)
       if (typeof localStorage !== 'undefined') {
         const savedDefault = localStorage.getItem(STORAGE_KEY_DEFAULT);
         const savedVersion = localStorage.getItem('nomad_remote_version');
+        const savedBlackbox = localStorage.getItem('nomad_blackbox_log');
         localStorage.clear();
         if (savedDefault) localStorage.setItem(STORAGE_KEY_DEFAULT, savedDefault);
         if (savedVersion) localStorage.setItem('nomad_remote_version', savedVersion);
+        if (savedBlackbox) localStorage.setItem('nomad_blackbox_log', savedBlackbox);
       }
 
       if (typeof sessionStorage !== 'undefined') {

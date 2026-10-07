@@ -14,10 +14,20 @@
 
   // Determine current cockpit context from URL path or body dataset
   function getCockpitContext() {
-    const path = window.location.pathname.toLowerCase();
-    if (path.includes('digit')) return 'digit';
-    if (path.includes('roadtrip')) return 'roadtrip';
-    if (path.includes('hyperspace')) return 'hyperspace';
+    if (document.body && document.body.dataset && document.body.dataset.cockpit) {
+      return document.body.dataset.cockpit;
+    }
+    const path = (window.location.pathname || '').toLowerCase();
+    const search = (window.location.search || '').toLowerCase();
+    if (path.includes('digit') || search.includes('digit') || document.querySelector('.digit-layout, #block-philosophy, #clock-time, #digit-app')) {
+      return 'digit';
+    }
+    if (path.includes('roadtrip') || search.includes('roadtrip')) {
+      return 'roadtrip';
+    }
+    if (path.includes('hyperspace') || search.includes('hyperspace')) {
+      return 'hyperspace';
+    }
     if (path.includes('nomad_suite') || path.endsWith('/') || path.endsWith('index.html')) {
       // Check if root index is acting as hyperspace or launcher
       if (document.getElementById('speed-bubble') || document.getElementById('map-card')) {
@@ -29,33 +39,33 @@
   }
 
   const COCKPIT_META = {
-    digit: {
-      name: 'NOMAD: DIGIT',
-      badge: 'Tactical Monospace Telemetry Matrix',
-      guideAnchor: '/features.html#digit',
-      accentColor: '#30d158',
-      desc: 'High-density kinetic telemetry, navigation avionics & text HUD for mobilization.'
+    hyperspace: {
+      name: 'NOMAD: Hyperspace',
+      badge: 'Version 4 • User Guide & Features',
+      guideAnchor: '/features.html#hyperspace',
+      accentColor: '#ff0055',
+      desc: 'Kinetic vector canvas with floating telemetry.'
     },
     roadtrip: {
       name: 'NOMAD: RoadTrip',
       badge: 'Version 3 • User Guide & Features',
       guideAnchor: '/features.html#roadtrip',
       accentColor: '#00f3ff',
-      desc: 'Real-time telemetry, GPS tracking, and heads-up navigation dashboard.'
+      desc: 'High-contrast street level mapping accuracy.'
     },
-    hyperspace: {
-      name: 'NOMAD: Hyperspace',
-      badge: 'Version 4 • User Guide & Features',
-      guideAnchor: '/features.html#hyperspace',
-      accentColor: '#ff0055',
-      desc: 'Real-time heads-up GPS telemetry, kinetic data bubbles, and sensory visualizer arcade.'
+    digit: {
+      name: 'NOMAD: DIGIT',
+      badge: 'Tactical Monospace Telemetry Matrix',
+      guideAnchor: '/features.html#digit',
+      accentColor: '#30d158',
+      desc: 'Military monospace ASCII matrix &amp; high-density telemetry.'
     },
     launcher: {
-      name: 'NOMAD: MISSION CONTROL',
-      badge: 'Unified Cockpits • Architecture & Guide',
+      name: 'NOMAD: Avionics Suite',
+      badge: 'Launch Control Home',
       guideAnchor: '/features.html',
       accentColor: '#00f3ff',
-      desc: 'Unified real-time vehicular navigation avionics, sensory telemetry engines, and high-performance HUD matrix architecture.'
+      desc: 'Central mission control for the 3 distinct NOMAD cockpits and shared sensory visualizers.'
     }
   };
 
@@ -213,6 +223,31 @@
         color: #30d158;
         box-shadow: 0 0 12px rgba(48, 209, 88, 0.30);
       }
+      #about-modal .modal-home-launcher-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        width: 100%;
+        padding: 8px 10px;
+        background: linear-gradient(90deg, rgba(0, 243, 255, 0.10), rgba(255, 183, 3, 0.10));
+        border: 1px solid rgba(0, 243, 255, 0.35);
+        border-radius: 8px;
+        color: #f8fafc;
+        font-size: 0.72rem;
+        font-weight: 700;
+        font-family: 'JetBrains Mono', monospace;
+        letter-spacing: 0.04em;
+        text-decoration: none;
+        transition: all 0.15s ease;
+        box-sizing: border-box;
+      }
+      #about-modal .modal-home-launcher-btn:hover {
+        background: linear-gradient(90deg, rgba(0, 243, 255, 0.22), rgba(255, 183, 3, 0.22));
+        border-color: #00f3ff;
+        color: #ffffff;
+        box-shadow: 0 0 12px rgba(0, 243, 255, 0.25);
+      }
       #about-modal .modal-default-toggle {
         display: flex;
         align-items: center;
@@ -333,23 +368,43 @@
     if (isCockpit) {
       switcherHTML = `
         <div class="modal-cockpit-section">
-          <div class="modal-cockpit-header">SWITCH COCKPIT</div>
+          <div class="modal-cockpit-header">COCKPITS &amp; LAUNCH CONTROL</div>
           <div class="modal-cockpit-grid">
-            <a href="/roadtrip.html" class="modal-cockpit-btn btn-roadtrip ${context === 'roadtrip' ? 'is-active' : ''}">
-              🚗 ROAD TRIP
-            </a>
             <a href="/hyperspace.html" class="modal-cockpit-btn btn-hyperspace ${context === 'hyperspace' ? 'is-active' : ''}">
               🚀 HYPERSPACE
+            </a>
+            <a href="/roadtrip.html" class="modal-cockpit-btn btn-roadtrip ${context === 'roadtrip' ? 'is-active' : ''}">
+              🚗 ROAD TRIP
             </a>
             <a href="/digit.html" class="modal-cockpit-btn btn-digit ${context === 'digit' ? 'is-active' : ''}">
               📟 DIGIT
             </a>
           </div>
+          <a href="/nomad_suite/" class="modal-home-launcher-btn" title="Return to Launch Control Home">
+            <span>🛰️ LAUNCH CONTROL (HOME) ↗</span>
+          </a>
           <div class="modal-default-cockpit-wrap">
             <label class="modal-default-toggle">
               <input type="checkbox" id="chk-default-cockpit" ${isDefault ? 'checked' : ''} onchange="window.toggleUnifiedDefaultBoot('${context}')" />
               <span>★ Set ${meta.name.replace('NOMAD: ', '')} as Default Boot Cockpit</span>
             </label>
+          </div>
+        </div>
+      `;
+    } else {
+      switcherHTML = `
+        <div class="modal-cockpit-section">
+          <div class="modal-cockpit-header">SELECT COCKPIT TO LAUNCH</div>
+          <div class="modal-cockpit-grid">
+            <a href="/hyperspace.html" class="modal-cockpit-btn btn-hyperspace">
+              🚀 HYPERSPACE
+            </a>
+            <a href="/roadtrip.html" class="modal-cockpit-btn btn-roadtrip">
+              🚗 ROAD TRIP
+            </a>
+            <a href="/digit.html" class="modal-cockpit-btn btn-digit">
+              📟 DIGIT
+            </a>
           </div>
         </div>
       `;
@@ -402,7 +457,7 @@
           <a href="/visualizer.html?from=${context}" class="modal-btn-row modal-vis-btn">✨ VISUALIZER ARCADE ↗</a>
           <a href="/geek-stats.html?from=${context}" class="modal-btn-row modal-stats-btn">&gt; GEEK STATS (VT220) _</a>
           ${guideBtnHTML}
-          <a href="/api/download-zip" download="nomad-roadtrip.zip" class="modal-btn-row modal-download-btn">📦 DOWNLOAD ALL FILES (.ZIP)</a>
+          <a href="/api/download-zip" download="nomad_suite.zip" class="modal-btn-row modal-download-btn">📦 DOWNLOAD ALL FILES (.ZIP)</a>
           <button type="button" class="modal-btn-row modal-purge-btn" onclick="window.executeUnifiedPurge()">⚠️ PURGE CACHE &amp; HARD RELOAD</button>
         </div>
 
@@ -468,8 +523,13 @@
           const keys = await caches.keys();
           await Promise.all(keys.map(k => caches.delete(k)));
         }
+        // Preserve critical flight and collision detection telemetry database
+        const savedBlackbox = localStorage.getItem('nomad_blackbox_log');
         localStorage.clear();
         sessionStorage.clear();
+        if (savedBlackbox) {
+          localStorage.setItem('nomad_blackbox_log', savedBlackbox);
+        }
       } catch (err) {
         console.warn('Purge notice:', err);
       }

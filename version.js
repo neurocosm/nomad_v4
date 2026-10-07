@@ -10,7 +10,7 @@
 
 // NOMAD Central Version Registry
 // Edit this single line at the end of a session to update the version across all pages and modals.
-window.NOMAD_VERSION = "v4.10062026.2135";
+window.NOMAD_VERSION = "v4.10072026.1335";
 
 // NOMAD Creator & Visionary Registry (SINGLE FILE OF REFERENCE FOR ALL BRANDING)
 // Edit `handle` and `url` here to update your Instagram link across all HUDs, modals, and guides.

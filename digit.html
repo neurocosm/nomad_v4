@@ -331,7 +331,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: env(safe-area-inset-top, 6px) 6px env(safe-area-inset-bottom, 6px);
+      padding: env(safe-area-inset-top, 6px) 6px max(6px, env(safe-area-inset-bottom, 8px));
     }
 
     .font-mono {
@@ -765,14 +765,21 @@
     }
 
     .footer-bar {
-      height: 16px;
+      height: 18px;
       flex-shrink: 0;
-      font-size: 0.6rem;
+      width: 100%;
+      max-width: 480px;
+      font-size: clamp(0.50rem, 2.3vw, 0.60rem);
       color: var(--text-dim);
       font-family: 'JetBrains Mono', monospace;
       font-weight: 450;
       text-align: center;
-      line-height: 16px;
+      line-height: 18px;
+      padding: 0 4px;
+      box-sizing: border-box;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .footer-bar .footer-brand {
@@ -980,7 +987,7 @@
     }
   </style>
 </head>
-<body>
+<body data-cockpit="digit">
   <script>
     try {
       var savedTheme = localStorage.getItem('nomad_color_theme') || localStorage.getItem('nomad_color_mode');
@@ -1173,68 +1180,12 @@
 
   </div>
 
-  <!-- BRANDING ABOUT MODAL OVERLAY -->
-  <div class="modal-overlay" id="about-modal" onclick="closeAboutModal(event)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <a href="features.html#digit" class="modal-title-link" onclick="window.location.href='features.html#digit'; return false;" title="View Features & Guide">
-        <div class="modal-title">NOMAD: DIGIT ↗</div>
-        <div class="modal-features-hint">Tactical Monospace Telemetry Matrix</div>
-      </a>
-      <div class="modal-author">by [merge_creator]</div>
-
-      <div class="modal-body">
-        High-density kinetic telemetry, navigation avionics &amp; text HUD for mobilization.
-      </div>
-
-      <!-- Cockpit Switcher Section -->
-      <div class="modal-cockpit-section">
-        <div class="modal-cockpit-header">SWITCH COCKPIT</div>
-        <div class="modal-cockpit-grid">
-          <a href="roadtrip.html" class="modal-cockpit-btn" onclick="window.location.href='roadtrip.html'; return false;">
-            🚗 ROAD TRIP
-          </a>
-          <a href="hyperspace.html" class="modal-cockpit-btn" onclick="window.location.href='hyperspace.html'; return false;">
-            🚀 HYPERSPACE
-          </a>
-          <a href="digit.html" class="modal-cockpit-btn is-active">
-            📟 DIGIT
-          </a>
-        </div>
-        <div class="modal-default-cockpit-wrap">
-          <label class="modal-default-toggle">
-            <input type="checkbox" id="chk-default-cockpit" onchange="toggleDefaultCockpit('digit')" />
-            <span>★ Set DIGIT as Default Boot Cockpit</span>
-          </label>
-        </div>
-      </div>
-      
-      <!-- Cockpit Audio Toggle -->
-      <div style="margin-bottom: 8px;">
-        <button id="btn-audio" class="modal-vis-btn active" style="margin-bottom: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; border-color: #00f3ff; background: rgba(0, 243, 255, 0.08);" title="Tap: Audio On/Off • Hold 1s: Deep Flush App Cache">
-          <span>🔊 AVIONICS AUDIO</span>
-          <span id="audio-status-label" style="font-weight: 800; color: #00f3ff;">ON</span>
-        </button>
-      </div>
-
-      <a href="visualizer.html?from=digit" class="modal-vis-btn" onclick="window.location.href='visualizer.html?from=digit'; return false;">✨ VISUALIZER ARCADE ↗</a>
-      <a href="geek-stats.html?from=digit" class="modal-stats-btn" onclick="window.location.href='geek-stats.html?from=digit'; return false;">&gt; GEEK STATS (VT220) _</a>
-
-      <!-- ONE-CLICK FULL WORKSPACE BACKUP DOWNLOAD -->
-      <a href="/api/download-zip" download="nomad-roadtrip.zip" class="modal-purge-btn" style="background: #10b981; color: #000000; text-decoration: none; display: block; margin-bottom: 8px; font-weight: 700;">📦 DOWNLOAD ALL FILES (.ZIP)</a>
-
-      <!-- SCOPED TOTAL RECALL PURGE BUTTON -->
-      <button class="modal-purge-btn" onclick="executeTotalRecall()">⚠️ PURGE CACHE &amp; HARD RELOAD</button>
-
-      <div style="margin-top: 4px;">
-        <button class="modal-close-btn" onclick="closeAboutModal()">Close</button>
-      </div>
-      <div class="modal-version-tag nomad-version" id="nomad-modal-version">v4.10062026.2045</div>
-    </div>
-  </div>
+  <!-- Unified About / Settings Modal Container (rendered dynamically by /js/nomad-menu.js) -->
+  <div class="modal-overlay" id="about-modal"></div>
 
   <!-- Footer Credits -->
   <footer class="footer-bar">
-    NOMAD: DIGIT • Telemetry HUD • <span class="nomad-version">v4.10062026.2045</span> • Crafted by <a href="https://www.instagram.com/tony_bostony/" target="_blank" rel="noopener noreferrer" class="nomad-creator-link footer-brand">BostonyFX</a>
+    NOMAD: DIGIT &bull; <span class="nomad-version">v4.10072026.1335</span> &bull; Crafted by <a href="https://www.instagram.com/tony_bostony/" target="_blank" rel="noopener noreferrer" class="nomad-creator-link footer-brand">BostonyFX</a>
   </footer>
 
   <div id="toast-pill" class="toast-pill">COPIED TO CLIPBOARD</div>
@@ -2758,17 +2709,25 @@
 
     // About Modal & Cockpit Switcher
     function openAboutModal() {
+      if (window.NomadMenuEngine && typeof window.NomadMenuEngine.open === 'function') {
+        window.NomadMenuEngine.open();
+        return;
+      }
+      if (typeof window.openUnifiedAboutModal === 'function') {
+        window.openUnifiedAboutModal();
+        return;
+      }
       const modal = document.getElementById('about-modal');
       if (modal) {
-        syncDefaultCockpitUI('digit');
-        if (typeof applyNomadRegistry === 'function') applyNomadRegistry();
-        const heroVer = document.getElementById('nomad-modal-version-hero');
-        if (heroVer && window.NOMAD_VERSION) heroVer.textContent = window.NOMAD_VERSION;
         modal.classList.add('active');
       }
     }
 
     function closeAboutModal(event) {
+      if (window.NomadMenuEngine && typeof window.NomadMenuEngine.close === 'function') {
+        window.NomadMenuEngine.close(event);
+        return;
+      }
       if (event) event.stopPropagation();
       const modal = document.getElementById('about-modal');
       if (modal) modal.classList.remove('active');

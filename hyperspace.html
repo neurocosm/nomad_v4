@@ -27,8 +27,8 @@
   <meta name="apple-mobile-web-app-title" content="NOMAD" />
   <meta name="theme-color" content="#000000" />
   
-  <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
 
   <!-- MapLibre GL CSS -->
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
@@ -2911,56 +2911,8 @@
     </div>
   </div>
 
-  <!-- BRANDING ABOUT MODAL OVERLAY -->
-  <div class="modal-overlay" id="about-modal" onclick="closeAboutModal(event)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <a href="features.html#hyperspace" class="modal-title-link" onclick="window.location.href='features.html#hyperspace'; return false;" title="View Features & Guide">
-        <div class="modal-title">NOMAD: Hyperspace ↗</div>
-        <div class="modal-features-hint">Version 4 &bull; User Guide &amp; Features</div>
-      </a>
-      <div class="modal-author">by [merge_creator]</div>
-
-      <div class="modal-body" style="margin-bottom: 12px;">
-        Real-time heads-up GPS telemetry, kinetic data bubbles, and sensory visualizer arcade.
-      </div>
-
-      <!-- Cockpit Switcher Section -->
-      <div class="modal-cockpit-section">
-        <div class="modal-cockpit-header">SWITCH COCKPIT</div>
-        <div class="modal-cockpit-grid">
-          <a href="roadtrip.html" class="modal-cockpit-btn" onclick="window.location.href='roadtrip.html'; return false;">
-            🚗 ROAD TRIP
-          </a>
-          <a href="hyperspace.html" class="modal-cockpit-btn is-active" style="border-color: #ff0055; color: #ff0055;">
-            🚀 HYPERSPACE
-          </a>
-          <a href="digit.html" class="modal-cockpit-btn" onclick="window.location.href='digit.html'; return false;">
-            📟 DIGIT
-          </a>
-        </div>
-        <div class="modal-default-cockpit-wrap">
-          <label class="modal-default-toggle">
-            <input type="checkbox" id="chk-default-cockpit" onchange="toggleDefaultCockpit('hyperspace')" />
-            <span>★ Set Hyperspace as Default Boot Cockpit</span>
-          </label>
-        </div>
-      </div>
-      
-      <a href="visualizer.html?from=hyperspace" class="modal-vis-btn" onclick="window.location.href='visualizer.html?from=hyperspace'; return false;">✨ VISUALIZER ARCADE ↗</a>
-      <a href="geek-stats.html?from=hyperspace" class="modal-stats-btn" onclick="window.location.href='geek-stats.html?from=hyperspace'; return false;">&gt; GEEK STATS (VT220) _</a>
-
-      <!-- ONE-CLICK FULL WORKSPACE BACKUP DOWNLOAD -->
-      <a href="/api/download-zip" download="nomad-roadtrip.zip" class="modal-purge-btn" style="background: #10b981; color: #000000; text-decoration: none; display: block; margin-bottom: 8px; font-weight: 700;">📦 DOWNLOAD ALL FILES (.ZIP)</a>
-
-      <!-- SCOPED TOTAL RECALL PURGE BUTTON -->
-      <button class="modal-purge-btn" onclick="executeTotalRecall()">⚠️ PURGE CACHE &amp; HARD RELOAD</button>
-
-      <div style="margin-top: 4px;">
-        <button class="modal-close-btn" onclick="closeAboutModal()">Close</button>
-      </div>
-      <div class="modal-version-tag nomad-version" id="nomad-modal-version">v4.09162026.1953</div>
-    </div>
-  </div>
+  <!-- Unified About / Settings Modal Container (rendered dynamically by /js/nomad-menu.js) -->
+  <div class="modal-overlay" id="about-modal"></div>
 
   <!-- WEATHER REFRESH CONFIG MODAL OVERLAY -->
   <div class="modal-overlay" id="weather-modal" onclick="closeWeatherModal(event)">
@@ -5200,6 +5152,10 @@
     }
 
     function openAboutModal() {
+      if (window.NomadMenuEngine && typeof window.NomadMenuEngine.open === 'function') {
+        window.NomadMenuEngine.open();
+        return;
+      }
       const modal = document.getElementById('about-modal');
       if (modal) {
         syncDefaultCockpitUI('hyperspace');

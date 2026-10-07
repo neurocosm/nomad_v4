@@ -1,37 +1,48 @@
-const CACHE_NAME = 'nomad-hyperspace-v4-09182026-1440';
+const CACHE_NAME = 'nomad-avionics-suite-v4-10072026-1335';
 
 const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
-  './features.html',
-  './gps-setup.html',
-  './visualizer.html',
-  './disco.html',
-  './festival.html',
-  './slamdance.html',
-  './seasons.html',
-  './geek-stats.html',
-  './manifest.json',
-  './version.js',
-  './kinetic-console.js',
-  './js/vehicle-safezone.js',
-  './js/location-bar.js',
-  './js/modals.js',
-  './js/kinetic-bubbles.js',
-  './icons/apple-touch-icon.png',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-  './icons/icon-maskable-192.png',
-  './icons/icon-maskable-512.png',
+  '/',
+  '/nomad_suite/',
+  '/nomad_suite/index.html',
+  '/digit.html',
+  '/roadtrip.html',
+  '/hyperspace.html',
+  '/features.html',
+  '/geek-stats.html',
+  '/visualizer.html',
+  '/manifest.json',
+  '/version.js',
+  '/js/nomad-menu.js',
+  '/js/nomad-return.js',
+  '/js/kinetic-bubbles.js',
+  '/js/vehicle-safezone.js',
+  '/js/location-bar.js',
+  '/js/modals.js',
+  '/icons/apple-touch-icon.png',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
+  '/icons/icon-maskable-192.png',
+  '/icons/icon-maskable-512.png',
   'https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css',
   'https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js'
 ];
+
+// Message Event: Allow force purge from unified menu
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'FORCE_PURGE') {
+    caches.keys().then((keys) => {
+      return Promise.all(keys.map(k => caches.delete(k)));
+    });
+  }
+});
 
 // Install Event: Cache Core App Shell & Assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
+      return cache.addAll(ASSETS_TO_CACHE).catch(err => {
+        console.warn('Some non-critical assets skipped during precache:', err);
+      });
     }).then(() => self.skipWaiting())
   );
 });
