@@ -8,7 +8,7 @@
  * 2. 🚀 Hyperspace (v4): Modern kinetic vector canvas with Newtonian data bubbles
  * 3. 📟 DIGIT: Military-grade tactical monospace CRT telemetry matrix
  * 
- * Visionary & Creator: BostonyFX (@neurocosm)
+ * Visionary & Creator: BostonyFX (@tony_bostony)
  * Architecture: Pure Decoupled Event-Driven Provider ("Avionics Core")
  * File: /nomad_suite/js/nomad-cockpit-engine.js
  * ====================================================================

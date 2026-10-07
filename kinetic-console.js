@@ -3,7 +3,7 @@
  * NOMAD HUD & Telemetry Navigation System
  * 
  * Proprietary & Created by BostonyFX
- * Instagram: https://instagram.com/neurocosm
+ * Instagram: https://www.instagram.com/tony_bostony/
  * All rights reserved.
  * ====================================================================
  * 

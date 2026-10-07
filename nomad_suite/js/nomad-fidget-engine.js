@@ -16,7 +16,7 @@
  * - 9th-second snap spin: rotates 180° with elastic bounce, morphs pips at 420ms
  * - Second 60: switches to next console, resets die to 6, repeats
  * 
- * Visionary & Creator: BostonyFX (@neurocosm)
+ * Visionary & Creator: BostonyFX (@tony_bostony)
  * Architecture: Pure Decoupled Event-Driven Provider ("Sensory Core")
  * File: /nomad_suite/js/nomad-fidget-engine.js
  * ====================================================================

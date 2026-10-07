@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>NOMAD: Launch Control // Mission Control</title>
-  <meta name="description" content="NOMAD Launch Control - Central Multi-Cockpit HUD Launcher & Mission Control by BostonyFX (@neurocosm)" />
+  <meta name="description" content="NOMAD Launch Control - Central Multi-Cockpit HUD Launcher & Mission Control by BostonyFX (@tony_bostony)" />
   <meta name="theme-color" content="#050811" />
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -356,70 +356,69 @@
       box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
     }
 
-    .default-star-badge {
-      font-size: 0.62rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 700;
-      color: var(--accent-amber);
-      display: none;
-      align-items: center;
-      gap: 3px;
-    }
-
-    .cockpit-hero-card.is-default .default-star-badge {
+    /* Interactive Default Boot Radio Selector on Card */
+    .boot-radio-btn {
       display: inline-flex;
-    }
-
-    /* Startup Preference Control Card */
-    .startup-pref-card {
-      background: rgba(11, 19, 37, 0.60);
-      border: 1px solid var(--border-subtle);
-      border-radius: 12px;
-      padding: 10px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .startup-pref-row {
-      display: flex;
-      justify-content: space-between;
       align-items: center;
-      font-size: 0.70rem;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--text-muted);
-    }
-
-    .startup-pref-segmented {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 6px;
-    }
-
-    .pref-btn {
-      padding: 6px 8px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border-subtle);
-      border-radius: 8px;
-      color: var(--text-muted);
-      font-size: 0.68rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 700;
+      gap: 5px;
+      padding: 3px 6px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--text-dim);
       transition: all 0.15s ease;
-      text-align: center;
+      user-select: none;
+      margin-top: 2px;
     }
 
-    .pref-btn:hover {
-      background: rgba(255, 255, 255, 0.10);
-      color: #ffffff;
+    .boot-radio-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      border-color: rgba(255, 255, 255, 0.20);
     }
 
-    .pref-btn.active {
-      background: rgba(0, 243, 255, 0.14);
-      border-color: var(--accent-cyan);
-      color: var(--accent-cyan);
-      box-shadow: 0 0 10px rgba(0, 243, 255, 0.25);
+    .radio-circle {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(148, 163, 184, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .radio-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: transparent;
+      transition: all 0.15s ease;
+    }
+
+    /* Active Default Radio State */
+    .cockpit-hero-card.is-default .boot-radio-btn {
+      background: rgba(255, 183, 3, 0.10);
+      border-color: rgba(255, 183, 3, 0.35);
+      color: var(--accent-amber);
+    }
+
+    .cockpit-hero-card.is-default .radio-circle {
+      border-color: var(--accent-amber);
+      box-shadow: 0 0 8px rgba(255, 183, 3, 0.5);
+    }
+
+    .cockpit-hero-card.is-default .radio-dot {
+      background: var(--accent-amber);
+    }
+
+    .cockpit-hero-card.is-default .radio-label {
+      font-weight: 800;
+      color: var(--accent-amber);
     }
 
     /* 6 Shared Utilities Deck */
@@ -797,6 +796,14 @@
       color: #ffffff;
     }
 
+    .modal-version-tag {
+      font-size: 0.65rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent-cyan);
+      margin-top: 8px;
+      letter-spacing: 0.05em;
+    }
+
     /* Interactive Toast */
     .launch-toast {
       position: fixed;
@@ -832,18 +839,10 @@
     <div class="header-zone">
       <div class="brand-pill">
         <span class="brand-dot"></span>
-        <span>NOMAD // MISSION CONTROL</span>
+        <span>★ NOMAD AVIONICS SUITE</span>
       </div>
-      <h1 class="main-title">START HUD</h1>
-      <p class="subtitle">Unified Vehicular Navigation Avionics &amp; Telemetry</p>
-      <div class="creator-tag">
-        Crafted by <a href="https://instagram.com/neurocosm" target="_blank" rel="noopener noreferrer">BostonyFX</a> (@neurocosm)
-      </div>
-      
-      <div class="firmware-banner">
-        <span>SYSTEM FIRMWARE</span>
-        <span class="nomad-version" id="sys-firmware-val">v4.10052026.1628</span>
-      </div>
+      <h1 class="main-title">LAUNCH CONTROL</h1>
+      <p class="subtitle">Select Cockpit to Begin Experience</p>
     </div>
 
     <!-- Live Telemetry Heartbeat -->
@@ -879,7 +878,10 @@
         </div>
         <div class="cockpit-launch-action">
           <span class="launch-btn-pill">LAUNCH ↗</span>
-          <span class="default-star-badge">★ DEFAULT</span>
+          <button type="button" class="boot-radio-btn" id="radio-btn-digit" onclick="setBootDefaultFromCard(event, 'digit')" title="Set DIGIT as Default Boot Cockpit">
+            <span class="radio-circle"><span class="radio-dot"></span></span>
+            <span class="radio-label">SET DEFAULT</span>
+          </button>
         </div>
       </a>
 
@@ -898,7 +900,10 @@
         </div>
         <div class="cockpit-launch-action">
           <span class="launch-btn-pill">LAUNCH ↗</span>
-          <span class="default-star-badge">★ DEFAULT</span>
+          <button type="button" class="boot-radio-btn" id="radio-btn-roadtrip" onclick="setBootDefaultFromCard(event, 'roadtrip')" title="Set ROAD TRIP as Default Boot Cockpit">
+            <span class="radio-circle"><span class="radio-dot"></span></span>
+            <span class="radio-label">SET DEFAULT</span>
+          </button>
         </div>
       </a>
 
@@ -917,23 +922,13 @@
         </div>
         <div class="cockpit-launch-action">
           <span class="launch-btn-pill">LAUNCH ↗</span>
-          <span class="default-star-badge">★ DEFAULT</span>
+          <button type="button" class="boot-radio-btn" id="radio-btn-hyperspace" onclick="setBootDefaultFromCard(event, 'hyperspace')" title="Set HYPERSPACE as Default Boot Cockpit">
+            <span class="radio-circle"><span class="radio-dot"></span></span>
+            <span class="radio-label">SET DEFAULT</span>
+          </button>
         </div>
       </a>
 
-    </div>
-
-    <!-- Default Boot Preference Card -->
-    <div class="startup-pref-card">
-      <div class="startup-pref-row">
-        <span>★ REMEMBER DEFAULT BOOT COCKPIT</span>
-        <span id="active-boot-label" style="color: #ffffff; font-weight: 700;">HYPERSPACE</span>
-      </div>
-      <div class="startup-pref-segmented">
-        <button class="pref-btn" id="btn-pref-digit" onclick="setBootPreference('digit')">📟 DIGIT</button>
-        <button class="pref-btn" id="btn-pref-roadtrip" onclick="setBootPreference('roadtrip')">🚗 ROAD TRIP</button>
-        <button class="pref-btn active" id="btn-pref-hyperspace" onclick="setBootPreference('hyperspace')">🚀 HYPERSPACE</button>
-      </div>
     </div>
 
     <!-- The 6 Shared Utilities -->
@@ -977,22 +972,14 @@
       <!-- F: CREDITS & ABOUT -->
       <div class="util-tile util-about" onclick="openAboutModal()">
         <div class="util-tile-title">ℹ️ F: CREDITS</div>
-        <div class="util-tile-sub">BostonyFX (@neurocosm) • System Registry</div>
+        <div class="util-tile-sub">BostonyFX <span class="nomad-creator-handle">(@tony_bostony)</span> • System Registry</div>
       </div>
 
     </div>
 
-    <!-- Link to Full Diagnostic Test Bed Backup -->
-    <div class="diagnostic-link-wrap">
-      <a href="testbed_backup.html" class="diagnostic-link">
-        <span>🔬 OPEN 9-CARD AVIONICS TEST SUITE (ITEMS 1-9) ↗</span>
-        <span class="diagnostic-sub">Preserved Master Ground-Truth Test Bed for Items 1–9 Verification</span>
-      </a>
-    </div>
-
     <footer>
-      NOMAD HUD // Multi-Cockpit Navigation Architecture<br/>
-      Crafted with precision by <a href="https://instagram.com/neurocosm" target="_blank">BostonyFX</a>
+      <div>NOMAD Avionics Architecture &bull; <span class="nomad-version" id="footer-firmware-val">v4.10062026.2020</span></div>
+      <div>Crafted by <a href="https://www.instagram.com/tony_bostony/" class="nomad-creator-link" target="_blank">BostonyFX</a></div>
     </footer>
 
   </div>
@@ -1004,13 +991,7 @@
         <div class="modal-title">NOMAD: MISSION CONTROL ↗</div>
         <div class="modal-features-hint">Unified Cockpits &bull; Architecture &amp; Guide</div>
       </a>
-      <div class="modal-author">by <a href="https://instagram.com/neurocosm" target="_blank" rel="noopener noreferrer">BostonyFX</a> (@neurocosm)</div>
-
-      <!-- Prominent System Version Banner -->
-      <div class="modal-version-banner">
-        <span style="opacity: 0.75; font-size: 0.72rem;">SYSTEM FIRMWARE</span>
-        <span class="nomad-version" id="nomad-modal-version-val">v4.10052026.1649</span>
-      </div>
+      <div class="modal-author">by <a href="https://www.instagram.com/tony_bostony/" class="nomad-creator-link" target="_blank" rel="noopener noreferrer">BostonyFX</a></div>
 
       <div class="modal-body">
         Unified real-time vehicular navigation avionics, sensory telemetry engines, and high-performance HUD matrix architecture.
@@ -1027,6 +1008,7 @@
       <div>
         <button class="modal-close-btn" onclick="closeAboutModal()">Close</button>
       </div>
+      <div class="modal-version-tag nomad-version" id="nomad-modal-version">v4.10062026.2057</div>
     </div>
   </div>
 
@@ -1035,6 +1017,7 @@
 
   <!-- Engines & Logic -->
   <script src="../version.js"></script>
+  <script src="/js/nomad-menu.js"></script>
   <script src="./js/nomad-return.js"></script>
   <script src="./js/nomad-telemetry-engine.js"></script>
   <script src="./js/nomad-cockpit-engine.js"></script>
@@ -1055,14 +1038,21 @@
       }
       window.showToast = showToast;
 
-      // Modal open/close
+      // Modal open/close via Unified NomadMenuEngine
       window.openAboutModal = function() {
+        if (window.NomadMenuEngine && typeof window.NomadMenuEngine.open === 'function') {
+          window.NomadMenuEngine.open();
+          return;
+        }
         const modal = document.getElementById('about-modal');
         if (modal) modal.classList.add('active');
       };
 
       window.closeAboutModal = function(e) {
-        if (e && e.target && e.target !== e.currentTarget && !e.target.classList.contains('modal-close-btn')) return;
+        if (window.NomadMenuEngine && typeof window.NomadMenuEngine.close === 'function') {
+          window.NomadMenuEngine.close(e);
+          return;
+        }
         const modal = document.getElementById('about-modal');
         if (modal) modal.classList.remove('active');
       };
@@ -1071,12 +1061,22 @@
         openAboutModal();
       };
 
-      // Update version tag from version.js
+      // Update version and creator tags from version.js
       if (window.NOMAD_VERSION) {
-        const vEl = document.getElementById('sys-firmware-val');
-        if (vEl) vEl.innerText = window.NOMAD_VERSION;
+        const vFooterEl = document.getElementById('footer-firmware-val');
+        if (vFooterEl) vFooterEl.innerText = window.NOMAD_VERSION;
         const vModalEl = document.getElementById('nomad-modal-version-val');
         if (vModalEl) vModalEl.innerText = window.NOMAD_VERSION;
+      }
+      if (window.NOMAD_CREATOR) {
+        const creator = window.NOMAD_CREATOR;
+        document.querySelectorAll('.nomad-creator-link').forEach(el => {
+          el.href = creator.url;
+          el.innerText = creator.name;
+        });
+        document.querySelectorAll('.nomad-creator-handle').forEach(el => {
+          el.innerText = `(${creator.handle})`;
+        });
       }
 
       // Live Telemetry Hook
@@ -1097,37 +1097,52 @@
         });
       }
 
-      // Startup Boot Preference Management
+      // Startup Boot Preference Management (Card Radio Selectors)
       function updateBootUI(cockpitId) {
-        const activeLabel = document.getElementById('active-boot-label');
-        const names = {
-          digit: 'DIGIT (CRT)',
-          roadtrip: 'ROAD TRIP (v3)',
-          hyperspace: 'HYPERSPACE (v4)'
-        };
+        const cockpits = ['digit', 'roadtrip', 'hyperspace'];
+        cockpits.forEach(id => {
+          const card = document.getElementById(`card-hud-${id}`);
+          const radioBtn = document.getElementById(`radio-btn-${id}`);
+          const isSelected = (id === cockpitId);
 
-        if (activeLabel) activeLabel.innerText = names[cockpitId] || 'HYPERSPACE (v4)';
+          if (card) {
+            if (isSelected) {
+              card.classList.add('is-default');
+            } else {
+              card.classList.remove('is-default');
+            }
+          }
 
-        // Update segmented buttons
-        document.querySelectorAll('.pref-btn').forEach(btn => btn.classList.remove('active'));
-        const activeBtn = document.getElementById(`btn-pref-${cockpitId}`);
-        if (activeBtn) activeBtn.classList.add('active');
-
-        // Update hero cards visual default star badge
-        document.querySelectorAll('.cockpit-hero-card').forEach(card => card.classList.remove('is-default'));
-        const activeCard = document.getElementById(`card-hud-${cockpitId}`);
-        if (activeCard) activeCard.classList.add('is-default');
+          if (radioBtn) {
+            const label = radioBtn.querySelector('.radio-label');
+            if (label) {
+              label.innerText = isSelected ? '★ DEFAULT' : 'SET DEFAULT';
+            }
+          }
+        });
       }
 
-      window.setBootPreference = function(cockpitId) {
+      window.setBootDefaultFromCard = function(e, cockpitId) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
         if (window.NomadCockpitEngine) {
           window.NomadCockpitEngine.setDefaultCockpitId(cockpitId);
         } else {
           localStorage.setItem('nomad_default_cockpit', cockpitId);
         }
         updateBootUI(cockpitId);
-        showToast(`★ DEFAULT BOOT SET: ${cockpitId.toUpperCase()}`);
+
+        const names = {
+          digit: 'DIGIT (Tactical CRT)',
+          roadtrip: 'ROAD TRIP (v3 Classic)',
+          hyperspace: 'HYPERSPACE (v4 Kinetic)'
+        };
+        showToast(`★ ${names[cockpitId] || cockpitId.toUpperCase()} SET AS DEFAULT`);
       };
+
+      window.setBootPreference = window.setBootDefaultFromCard;
 
       // Deep purge execution
       window.handleDeepPurge = function() {
@@ -1142,7 +1157,8 @@
       };
 
       window.showAboutToast = function() {
-        showToast(`NOMAD ${window.NOMAD_VERSION || 'v4'} by BostonyFX (@neurocosm)`);
+        const handle = window.NOMAD_CREATOR ? window.NOMAD_CREATOR.handle : '@tony_bostony';
+        showToast(`NOMAD ${window.NOMAD_VERSION || 'v4'} by BostonyFX (${handle})`);
       };
 
       // Initial state sync

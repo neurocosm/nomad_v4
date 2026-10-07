@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Nomad DIGIT</title>
-  <meta name="description" content="Nomad DIGIT - Kinetic Telemetry, Navigation Avionics & Text HUD for Mobilization by BostonyFX (@neurocosm)" />
+  <meta name="description" content="Nomad DIGIT - Kinetic Telemetry, Navigation Avionics & Text HUD for Mobilization by BostonyFX (@tony_bostony)" />
   <meta name="application-name" content="Nomad DIGIT" />
   <meta name="apple-mobile-web-app-title" content="Nomad DIGIT" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -1011,15 +1011,9 @@
 
   <!-- Top Controls -->
   <div class="top-header">
-    <div id="btn-brand-mode" class="app-title nomad-brand" title="Tap: Toggle Theme (Vivid / 256-Gray / Apollo / Arizona)">
+    <div id="btn-brand-mode" class="app-title" title="Tap: Cycle Theme (Vivid / 256-Gray / Apollo / Arizona) • Hold: Menu &amp; Settings">
       <span class="dot"></span>
       <span>NOMAD: DIGIT</span>
-    </div>
-    <div class="version-tag" id="hud-version" onclick="openAboutModal()" style="cursor: pointer;" title="System Menu & Version • Tap to Open">v4.10052026.1037</div>
-    <div class="top-controls">
-      <button id="btn-menu-cockpit" class="btn-ctrl" onclick="openAboutModal()" style="border-color: #00f3ff; color: #00f3ff;" title="Cockpit Switcher & Menu">MENU</button>
-      <button id="btn-install-pwa" class="btn-ctrl" style="display: none; border-color: var(--accent-cyan); color: var(--accent-cyan);" title="Install Nomad DIGIT to your device">INSTALL</button>
-      <button id="btn-audio" class="btn-ctrl active" title="Tap: Audio On/Off • Hold 1s: Deep Flush App Cache">AUDIO: ON</button>
     </div>
   </div>
 
@@ -1188,12 +1182,6 @@
       </a>
       <div class="modal-author">by [merge_creator]</div>
 
-      <!-- Prominent System Version Banner -->
-      <div class="modal-version-banner">
-        <span style="opacity: 0.75; font-size: 0.70rem;">SYSTEM FIRMWARE</span>
-        <span class="nomad-version" id="nomad-modal-version-hero">v4.10052026.1037</span>
-      </div>
-
       <div class="modal-body">
         High-density kinetic telemetry, navigation avionics &amp; text HUD for mobilization.
       </div>
@@ -1220,6 +1208,14 @@
         </div>
       </div>
       
+      <!-- Cockpit Audio Toggle -->
+      <div style="margin-bottom: 8px;">
+        <button id="btn-audio" class="modal-vis-btn active" style="margin-bottom: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; border-color: #00f3ff; background: rgba(0, 243, 255, 0.08);" title="Tap: Audio On/Off • Hold 1s: Deep Flush App Cache">
+          <span>🔊 AVIONICS AUDIO</span>
+          <span id="audio-status-label" style="font-weight: 800; color: #00f3ff;">ON</span>
+        </button>
+      </div>
+
       <a href="visualizer.html?from=digit" class="modal-vis-btn" onclick="window.location.href='visualizer.html?from=digit'; return false;">✨ VISUALIZER ARCADE ↗</a>
       <a href="geek-stats.html?from=digit" class="modal-stats-btn" onclick="window.location.href='geek-stats.html?from=digit'; return false;">&gt; GEEK STATS (VT220) _</a>
 
@@ -1232,18 +1228,19 @@
       <div style="margin-top: 4px;">
         <button class="modal-close-btn" onclick="closeAboutModal()">Close</button>
       </div>
-      <div class="modal-version-tag nomad-version" id="nomad-modal-version">v4.10052026.1037</div>
+      <div class="modal-version-tag nomad-version" id="nomad-modal-version">v4.10062026.2045</div>
     </div>
   </div>
 
   <!-- Footer Credits -->
-  <footer class="footer-bar nomad-footer">
-    NOMAD: DIGIT • Telemetry HUD • Crafted by <span class="footer-brand">BostonyFX</span>
+  <footer class="footer-bar">
+    NOMAD: DIGIT • Telemetry HUD • <span class="nomad-version">v4.10062026.2045</span> • Crafted by <a href="https://www.instagram.com/tony_bostony/" target="_blank" rel="noopener noreferrer" class="nomad-creator-link footer-brand">BostonyFX</a>
   </footer>
 
   <div id="toast-pill" class="toast-pill">COPIED TO CLIPBOARD</div>
 
   <script src="version.js"></script>
+  <script src="/js/nomad-menu.js"></script>
   <script>
     // State lookup table for US states
     const US_STATES = {
@@ -2423,8 +2420,42 @@
     }
 
     const brandBtn = document.getElementById('btn-brand-mode');
+    let brandPressTimer = null;
+    let isBrandLongPress = false;
+
+    function startBrandPress(e) {
+      isBrandLongPress = false;
+      if (brandBtn) brandBtn.classList.add('pressing');
+      clearTimeout(brandPressTimer);
+      brandPressTimer = setTimeout(() => {
+        isBrandLongPress = true;
+        if (brandBtn) brandBtn.classList.remove('pressing');
+        try {
+          if ('vibrate' in navigator) navigator.vibrate(60);
+        } catch (_) {}
+        playTone(1600);
+        openAboutModal();
+      }, 550); // 550ms threshold for menu reveal
+    }
+
+    function cancelBrandPress() {
+      clearTimeout(brandPressTimer);
+      if (brandBtn) brandBtn.classList.remove('pressing');
+    }
+
     if (brandBtn) {
-      brandBtn.addEventListener('click', () => {
+      brandBtn.addEventListener('pointerdown', startBrandPress);
+      brandBtn.addEventListener('pointerup', cancelBrandPress);
+      brandBtn.addEventListener('pointercancel', cancelBrandPress);
+      brandBtn.addEventListener('pointerleave', cancelBrandPress);
+
+      brandBtn.addEventListener('click', (e) => {
+        if (isBrandLongPress) {
+          e.preventDefault();
+          e.stopPropagation();
+          isBrandLongPress = false;
+          return;
+        }
         const currentIndex = NOMAD_THEMES.findIndex(t => t.id === state.colorTheme);
         const nextIndex = (currentIndex + 1) % NOMAD_THEMES.length;
         const nextTheme = NOMAD_THEMES[nextIndex];
@@ -2516,9 +2547,16 @@
         return;
       }
       state.soundEnabled = !state.soundEnabled;
-      audioBtn.textContent = state.soundEnabled ? 'AUDIO: ON' : 'AUDIO: OFF';
-      audioBtn.className = 'btn-ctrl ' + (state.soundEnabled ? 'active' : '');
+      const statusLabel = document.getElementById('audio-status-label');
+      if (statusLabel) {
+        statusLabel.textContent = state.soundEnabled ? 'ON' : 'OFF';
+        statusLabel.style.color = state.soundEnabled ? '#00f3ff' : '#64748b';
+      }
+      if (audioBtn) {
+        audioBtn.classList.toggle('active', state.soundEnabled);
+      }
       if (state.soundEnabled) playTone(1200);
+      showToast(state.soundEnabled ? 'AVIONICS AUDIO: ON' : 'AVIONICS AUDIO: OFF');
     }
 
     if (audioBtn) {

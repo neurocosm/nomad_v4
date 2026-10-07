@@ -3,7 +3,7 @@
  * NOMAD: SMART CONTEXT-AWARE NAVIGATION & RETURN ROUTER
  * Remembers calling cockpit and returns seamlessly across the suite
  * 
- * Visionary & Creator: BostonyFX (@neurocosm)
+ * Visionary & Creator: BostonyFX (@tony_bostony)
  * File: /js/nomad-return.js
  * ====================================================================
  */

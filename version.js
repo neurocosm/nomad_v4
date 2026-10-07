@@ -3,28 +3,29 @@
  * NOMAD HUD & Telemetry Navigation System
  * 
  * Proprietary & Created by BostonyFX
- * Instagram: https://instagram.com/neurocosm
+ * Instagram: https://www.instagram.com/tony_bostony/
  * All rights reserved.
  * ====================================================================
  */
 
 // NOMAD Central Version Registry
 // Edit this single line at the end of a session to update the version across all pages and modals.
-window.NOMAD_VERSION = "v4.10062026.1328";
+window.NOMAD_VERSION = "v4.10062026.2135";
 
-// NOMAD Creator & Visionary Registry
+// NOMAD Creator & Visionary Registry (SINGLE FILE OF REFERENCE FOR ALL BRANDING)
+// Edit `handle` and `url` here to update your Instagram link across all HUDs, modals, and guides.
 window.NOMAD_CREATOR = {
   name: "BostonyFX",
-  handle: "@neurocosm",
-  url: "https://instagram.com/neurocosm",
+  handle: "@tony_bostony",
+  url: "https://www.instagram.com/tony_bostony/",
   get brandHTML() {
-    return `NOMAD: Hyperspace by <a href="${this.url}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">BostonyFX</a>`;
+    return `NOMAD by <a href="${this.url}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">${this.name}</a>`;
   },
   get authorLinkHTML() {
-    return `<a href="${this.url}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">BostonyFX</a>`;
+    return `<a href="${this.url}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">${this.name}</a>`;
   },
   get fullFooterHTML() {
-    return `NOMAD: Hyperspace Navigation Dashboard &bull; Crafted by <a href="${this.url}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">BostonyFX</a>`;
+    return `NOMAD Navigation Architecture &bull; Crafted by <a href="${this.url}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">${this.name}</a>`;
   }
 };
 
@@ -71,15 +72,34 @@ window.injectNomadAboutModal = function() {
 };
 
 window.openNomadAboutModal = function() {
+  if (window.NomadMenuEngine && typeof window.NomadMenuEngine.open === 'function') {
+    window.NomadMenuEngine.open();
+    return;
+  }
   window.injectNomadAboutModal();
   const modal = document.getElementById('nomad-about-modal');
   if (modal) modal.style.display = 'flex';
 };
 
 window.closeNomadAboutModal = function() {
+  if (window.NomadMenuEngine && typeof window.NomadMenuEngine.close === 'function') {
+    window.NomadMenuEngine.close();
+    return;
+  }
   const modal = document.getElementById('nomad-about-modal');
   if (modal) modal.style.display = 'none';
 };
+
+// Automatically load unified menu engine across all pages
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  if (!document.getElementById('nomad-menu-engine-script')) {
+    const menuScript = document.createElement('script');
+    menuScript.id = 'nomad-menu-engine-script';
+    menuScript.src = '/js/nomad-menu.js';
+    menuScript.async = true;
+    document.head.appendChild(menuScript);
+  }
+}
 
 /**
  * Applies versions, creator branding, and replaces standard merge tags
@@ -97,6 +117,12 @@ function applyNomadRegistry() {
   const modalVersion = document.getElementById('nomad-modal-version');
   if (modalVersion) modalVersion.textContent = version;
 
+  const heroModalVer = document.getElementById('nomad-modal-version-hero');
+  if (heroModalVer) heroModalVer.textContent = version;
+
+  const hudVersion = document.getElementById('hud-version');
+  if (hudVersion) hudVersion.textContent = version;
+
   const geekFirmware = document.getElementById('geek-system-firmware');
   if (geekFirmware) {
     geekFirmware.textContent = `SYSTEM FIRMWARE: ${version} // VT220-CRT`;
@@ -105,20 +131,20 @@ function applyNomadRegistry() {
   const featuresVersion = document.getElementById('features-version');
   if (featuresVersion) featuresVersion.textContent = version;
 
-  // 2. Class / Attribute selector branding hooks
-  document.querySelectorAll('.nomad-brand, [data-nomad-brand]').forEach((el) => {
-    el.innerHTML = creator.brandHTML;
-  });
-
-  document.querySelectorAll('.nomad-creator, .nomad-author, [data-nomad-creator]').forEach((el) => {
+  // 2. Class / Attribute selector creator branding hooks
+  document.querySelectorAll('.footer-brand, .nomad-creator, .nomad-author, [data-nomad-creator]').forEach((el) => {
     el.innerHTML = creator.authorLinkHTML;
   });
 
-  document.querySelectorAll('.nomad-footer, [data-nomad-footer]').forEach((el) => {
-    el.innerHTML = creator.fullFooterHTML;
+  // 3. Dynamic Instagram link & handle synchronization across all pages
+  document.querySelectorAll('a[href*="instagram.com"], a.nomad-creator-link').forEach((a) => {
+    a.href = creator.url;
+    if (a.textContent.includes('@')) {
+      a.textContent = a.textContent.replace(/@\w+/g, creator.handle);
+    }
   });
 
-  // 3. Scan DOM Text Nodes for Merge Tags:
+  // 4. Scan DOM Text Nodes for Merge Tags and creator handles
   // [merge_visionary], [merge_creator], [merge_author], [merge_version], [merge_footer]
   if (document.body) {
     const walker = document.createTreeWalker(

@@ -4,7 +4,7 @@
  Universal User Guide & Avionics Field Manual
  
  Proprietary & Created by BostonyFX
- Instagram: https://instagram.com/neurocosm
+ Instagram: https://www.instagram.com/tony_bostony/
  All rights reserved.
  ====================================================================
 -->
@@ -15,7 +15,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="robots" content="noindex, nofollow" />
   <title>NOMAD: Universal User Guide &amp; Avionics Manual</title>
-  <meta name="description" content="NOMAD Universal User Guide - Complete documentation and field manuals for Hyperspace, RoadTrip, DIGIT, and Shared Sensory Avionics by BostonyFX (@neurocosm)" />
+  <meta name="description" content="NOMAD Universal User Guide - Complete documentation and field manuals for Hyperspace, RoadTrip, DIGIT, and Shared Sensory Avionics by BostonyFX (@tony_bostony)" />
   <meta name="theme-color" content="#050811" />
 
   <!-- Fonts & Single Source of Truth Version Registry -->
@@ -574,7 +574,7 @@
     <div class="firmware-banner">
       <div>
         <span>CENTRAL SYSTEM REGISTRY // CRAFTED BY </span>
-        <a href="https://instagram.com/neurocosm" target="_blank" rel="noopener noreferrer" style="color: var(--accent-amber); font-weight: 700; text-decoration: none;">BostonyFX (@neurocosm)</a>
+        <a href="https://www.instagram.com/tony_bostony/" class="nomad-creator-link" target="_blank" rel="noopener noreferrer" style="color: var(--accent-amber); font-weight: 700; text-decoration: none;">BostonyFX <span class="nomad-creator-handle">(@tony_bostony)</span></a>
       </div>
       <div class="firmware-right">
         <span>FIRMWARE</span>
@@ -1079,7 +1079,7 @@
 
     <!-- Footer -->
     <footer>
-      <div>NOMAD // Central Vehicular Navigation Architecture &bull; Crafted by <a href="https://instagram.com/neurocosm" target="_blank">BostonyFX</a></div>
+      <div>NOMAD // Central Vehicular Navigation Architecture &bull; Crafted by <a href="https://www.instagram.com/tony_bostony/" class="nomad-creator-link" target="_blank">BostonyFX</a></div>
       <div>Unified User Guide &amp; Avionics Field Manual &bull; All Rights Reserved</div>
     </footer>
 
@@ -1088,10 +1088,17 @@
   <!-- Interactive Scripts: Tabs, Search, Hash Sync, Version -->
   <script>
     (function() {
-      // 1. Version Sync
+      // 1. Version & Creator Sync from version.js
       if (window.NOMAD_VERSION) {
         const vEl = document.getElementById('ug-firmware-val');
         if (vEl) vEl.innerText = window.NOMAD_VERSION;
+      }
+      if (window.NOMAD_CREATOR) {
+        const creator = window.NOMAD_CREATOR;
+        document.querySelectorAll('.nomad-creator-link').forEach(el => {
+          el.href = creator.url;
+          el.innerText = el.innerText.includes('(') ? `${creator.name} (${creator.handle})` : creator.name;
+        });
       }
 
       // 2. Tab Navigation

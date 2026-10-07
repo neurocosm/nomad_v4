@@ -13,7 +13,7 @@
  * 5. One-Click Instant File Export (.gpx) with formatted timestamped filenames
  * 6. LocalStorage Recovery: Preserves active trip odometer across page refreshes
  * 
- * Visionary & Creator: BostonyFX (@neurocosm)
+ * Visionary & Creator: BostonyFX (@tony_bostony)
  * Architecture: Pure Decoupled Event-Driven Provider ("Sensory Core")
  * File: /nomad_suite/js/nomad-trip-engine.js
  * ====================================================================
@@ -302,13 +302,18 @@
     gpx += `  xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">\n`;
     
     // Metadata Header
+    const creator = window.NOMAD_CREATOR || {
+      name: "BostonyFX",
+      handle: "@tony_bostony",
+      url: "https://www.instagram.com/tony_bostony/"
+    };
     gpx += `  <metadata>\n`;
     gpx += `    <name>NOMAD Flight Log - ${now.toLocaleDateString()}</name>\n`;
     gpx += `    <desc>Vehicular road trip telemetry recorded with NOMAD HUD. Total Distance: ${state.distanceMiles} mi, Max Speed: ${state.maxSpeedMph} mph, Avg Speed: ${state.avgMovingSpeedMph} mph.</desc>\n`;
     gpx += `    <author>\n`;
-    gpx += `      <name>BostonyFX (@neurocosm)</name>\n`;
-    gpx += `      <link href="https://instagram.com/neurocosm">\n`;
-    gpx += `        <text>BostonyFX Instagram</text>\n`;
+    gpx += `      <name>${creator.name} (${creator.handle})</name>\n`;
+    gpx += `      <link href="${creator.url}">\n`;
+    gpx += `        <text>${creator.name} Instagram</text>\n`;
     gpx += `      </link>\n`;
     gpx += `    </author>\n`;
     gpx += `    <time>${nowISO}</time>\n`;

@@ -3,7 +3,7 @@
  * NOMAD: SUITE — UNIFIED VEHICLE PERSONA & ACOUSTIC ENGINE
  * Shared Between RoadTrip & Hyperspace (+ Tactile Audio for DIGIT)
  * 
- * Visionary & Creator: BostonyFX (@neurocosm)
+ * Visionary & Creator: BostonyFX (@tony_bostony)
  * Features: Cruise Chevron, Neon Galaga Fighter, F-117 Stealth Slate,
  * Dixie Horn Synthesizer, 8-Bit Laser Peashooter, Bluetooth Keep-Alive
  * File: /nomad_suite/js/nomad-vehicle-engine.js
