@@ -3,7 +3,7 @@
  * NOMAD Avionics Suite — Autonomous Server
  * Single-folder autonomous server for standalone deployments & GitHub
  * 
- * Visionary & Creator: BostonyFX (@tony_bostony)
+ * Visionary & Creator: BostonyFX
  * File: /nomad_suite/server.js
  * ====================================================================
  */

@@ -1,6 +1,6 @@
 # NOMAD: Hyperspace (Version 4) & NOMAD: RoadTrip
 > **Kinetic Telemetry, Navigation Avionics & Geospatial Data Architecture**  
-> **Visionary & Creator:** BostonyFX ([@tony_bostony](https://www.instagram.com/tony_bostony/))
+> **Visionary & Creator:** BostonyFX 
 
 ---
 
@@ -174,7 +174,7 @@ NOMAD includes a built-in telemetry logger for post-drive spatial analysis, perf
 All branding, version numbers, and creator links are maintained centrally in `/version.js` as the single source of truth across the entire application:
 
 * **Active Brand Identity**: `NOMAD: Hyperspace` (Version 4) & `NOMAD: RoadTrip` (Version 3 Legacy).
-* **Creator / Visionary Credits**: BostonyFX ([@tony_bostony](https://www.instagram.com/tony_bostony/)).
+* **Creator / Visionary Credits**: BostonyFX .
 * **Version Registry Timezone Rule (US Eastern Time / ET)**:
   * Build timestamps strictly follow 24-hour US Eastern Time (ET: EDT/EST, UTC-4/UTC-5): `v4.[MMDDYYYY].[HHMM]`.
 * **Automated Merge Tag Engine**:

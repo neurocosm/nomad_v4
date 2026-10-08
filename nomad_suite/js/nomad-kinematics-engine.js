@@ -4,7 +4,7 @@
  * 16-Point Cardinal Resolver, Sensor Fusion (Gyro/Compass + GPS Track),
  * Rolling Altitude Smoother, Vertical Climb Rate (VSI) & Signal Fidelity
  * 
- * Visionary & Creator: BostonyFX (@tony_bostony)
+ * Visionary & Creator: BostonyFX
  * Architecture: Pure Decoupled Event-Driven Provider ("Sensory Core")
  * File: /nomad_suite/js/nomad-kinematics-engine.js
  * ====================================================================

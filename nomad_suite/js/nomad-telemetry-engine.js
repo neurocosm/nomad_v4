@@ -4,7 +4,7 @@
  * Avionics Core: GNSS Watcher, Noise Clamping, AASHTO Corridor Grid,
  * Reverse Geocoding & Stationary Intersection Lock
  * 
- * Visionary & Creator: BostonyFX (@tony_bostony)
+ * Visionary & Creator: BostonyFX
  * Architecture: Pure Decoupled Event-Driven Provider
  * File: /nomad_suite/js/nomad-telemetry-engine.js
  * ====================================================================

@@ -4,7 +4,7 @@
  * Continuous In-Vehicle Screen Keep-Awake, Mobile Battery Policy Handler,
  * Foreground Recovery, Viewport Re-anchor & Animation Loop Guard
  * 
- * Visionary & Creator: BostonyFX (@tony_bostony)
+ * Visionary & Creator: BostonyFX
  * Architecture: Pure Decoupled Event-Driven Provider ("Sensory Core")
  * File: /nomad_suite/js/nomad-lifecycle-engine.js
  * ====================================================================

@@ -5,7 +5,7 @@
  * Zero-Reload Style Diffing, GPU Memory Tile Preservation &
  * AASHTO/MUTCD Highway Route Shield Engine
  * 
- * Visionary & Creator: BostonyFX (@tony_bostony)
+ * Visionary & Creator: BostonyFX
  * Architecture: Pure Decoupled Event-Driven Provider ("Sensory Core")
  * File: /nomad_suite/js/nomad-map-engine.js
  * ====================================================================

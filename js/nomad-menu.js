@@ -4,7 +4,6 @@
  * Single Source of Truth for About, Switch Cockpit, Utilities & Credits
  * 
  * Proprietary & Created by BostonyFX
- * Instagram: https://www.instagram.com/tony_bostony/
  * File: /js/nomad-menu.js
  * ====================================================================
  */
@@ -41,14 +40,14 @@
   const COCKPIT_META = {
     hyperspace: {
       name: 'NOMAD: Hyperspace',
-      badge: 'Version 4 • User Guide & Features',
+      badge: 'Kinetic Telemetry • User Guide & Features',
       guideAnchor: 'features.html#hyperspace',
       accentColor: '#ff0055',
       desc: 'Kinetic vector canvas with floating telemetry.'
     },
     roadtrip: {
       name: 'NOMAD: RoadTrip',
-      badge: 'Version 3 • User Guide & Features',
+      badge: 'Highway Panoramic • User Guide & Features',
       guideAnchor: 'features.html#roadtrip',
       accentColor: '#00f3ff',
       desc: 'High-contrast street level mapping accuracy.'
@@ -343,10 +342,9 @@
     const meta = COCKPIT_META[context] || COCKPIT_META.launcher;
     const creator = window.NOMAD_CREATOR || {
       name: 'BostonyFX',
-      handle: '@tony_bostony',
       url: 'https://www.instagram.com/tony_bostony/'
     };
-    const version = window.NOMAD_VERSION || 'v4.10062026.2115';
+    const version = window.NOMAD_VERSION || 'v4.10072026.2006';
 
     let overlay = document.getElementById('about-modal');
     if (!overlay) {
@@ -438,9 +436,9 @@
           <div class="modal-features-hint">${meta.badge}</div>
         </a>
 
-        <!-- Unified Creator Credit (No extra handle noise) -->
+        <!-- Unified Creator Credit -->
         <div class="modal-author">
-          by <a href="${creator.url}" target="_blank" rel="noopener noreferrer">${creator.name}</a>
+          by <a href="${creator.url || 'https://www.instagram.com/tony_bostony/'}" target="_blank" rel="noopener noreferrer" style="color: #f59e0b; font-weight: 700; text-decoration: none;">${creator.name}</a>
         </div>
 
         <!-- Cockpit Description -->

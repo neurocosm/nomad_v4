@@ -54,24 +54,41 @@
       letter-spacing: 1.5px;
     }
 
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
     .btn-back {
       background: #1f2937;
       color: #4cd964;
       border: 1px solid #374151;
-      padding: 8px 16px;
+      padding: 7px 14px;
       border-radius: 20px;
-      font-size: 0.9rem;
+      font-size: 0.82rem;
       font-weight: 800;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: background 0.15s ease, transform 0.1s ease;
+      transition: background 0.15s ease, transform 0.1s ease, border-color 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-back:hover {
+      background: #283548;
     }
 
     .btn-back:active {
       transform: scale(0.94);
       background: #374151;
+    }
+
+    .btn-back-launch {
+      color: #00d4ff;
+      border-color: rgba(0, 212, 255, 0.4);
     }
 
     /* Notice Box */
@@ -181,15 +198,23 @@
     <!-- Header -->
     <div class="header">
       <div>
-        <div class="header-title">NOMAD: Hyperspace</div>
+        <div class="header-title">NOMAD Avionics</div>
         <div class="header-tagline">GPS Permission Guide</div>
       </div>
-      <a href="javascript:void(0)" class="btn-back" onclick="returnToActiveHUD(); return false;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4cd964" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 12H5M12 19l-7-7 7-7"/>
-        </svg>
-        RETURN
-      </a>
+      <div class="header-actions">
+        <a href="features.html" class="btn-back btn-back-guide" title="Return to User Guide">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4cd964" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          USER GUIDE
+        </a>
+        <a href="index.html" class="btn-back btn-back-launch" title="Back to Launch Control">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h6v6M10 14L21 3M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+          </svg>
+          BACK TO LAUNCH
+        </a>
+      </div>
     </div>
 
     <div class="notice-box">

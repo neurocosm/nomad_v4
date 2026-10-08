@@ -1,6 +1,6 @@
 # NOMAD UNIFIED COCKPIT SUITE: MASTER BLUEPRINT & MIGRATION DIRECTIVE
 > **Consolidation of NOMAD RoadTrip (v3), NOMAD Hyperspace (v4), and NOMAD DIGIT**  
-> **Visionary & Creator:** BostonyFX ([@tony_bostony](https://www.instagram.com/tony_bostony/))  
+> **Visionary & Creator:** BostonyFX   
 > **Status:** Architecture Plan & Ground-Truth Directive  
 
 ---
@@ -189,7 +189,7 @@ When the new project is started, follow these exact phases in order:
 ## 7. Branding & Version Registry Directives
 
 * **Central Registry**: Maintained in `/version.js`.
-* **Creator Credits**: BostonyFX ([@tony_bostony](https://www.instagram.com/tony_bostony/)).
+* **Creator Credits**: BostonyFX .
 * **Timezone Rule**: Build timestamps strictly follow 24-hour **US Eastern Time** (ET: UTC-4/UTC-5): `v[X].[MMDDYYYY].[HHMM]`.
 * **DOM Merge Tags**: Support `[merge_visionary]`, `[merge_creator]`, `[merge_footer]`, and `[merge_version]`.
 

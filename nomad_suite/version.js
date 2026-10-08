@@ -3,7 +3,6 @@
  * NOMAD HUD & Telemetry Navigation System
  * 
  * Proprietary & Created by BostonyFX
- * Instagram: https://www.instagram.com/tony_bostony/
  * All rights reserved.
  * ====================================================================
  */
@@ -13,10 +12,9 @@
 window.NOMAD_VERSION = "v4.10072026.2006";
 
 // NOMAD Creator & Visionary Registry (SINGLE FILE OF REFERENCE FOR ALL BRANDING)
-// Edit `handle` and `url` here to update your Instagram link across all HUDs, modals, and guides.
 window.NOMAD_CREATOR = {
   name: "BostonyFX",
-  handle: "@tony_bostony",
+  handle: "",
   url: "https://www.instagram.com/tony_bostony/",
   get brandHTML() {
     return `NOMAD by <a href="${this.url}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">${this.name}</a>`;
@@ -50,8 +48,8 @@ window.injectNomadAboutModal = function() {
   modalOverlay.innerHTML = `
     <div style="background: #11141a; border: 1px solid #222b38; border-radius: 16px; max-width: 380px; width: 100%; padding: 24px; text-align: center; color: #e0e6ed; box-shadow: 0 20px 40px rgba(0,0,0,0.8); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
       <a href="features.html" style="text-decoration: none; color: inherit; display: block;">
-        <div style="font-size: 1.3rem; font-weight: 800; letter-spacing: 0.5px; color: #38bdf8; margin-bottom: 2px;">NOMAD: Hyperspace ↗</div>
-        <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 12px;">Version 4 &bull; User Guide &amp; Features</div>
+        <div style="font-size: 1.3rem; font-weight: 800; letter-spacing: 0.5px; color: #38bdf8; margin-bottom: 2px;">NOMAD: Avionics Suite ↗</div>
+        <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 12px;">Multi-Personality Avionics &bull; User Guide</div>
       </a>
       <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 16px;">
         by <a href="${window.NOMAD_CREATOR.url}" target="_blank" rel="noopener noreferrer" style="color: #f59e0b; text-decoration: none; font-weight: 600;">${window.NOMAD_CREATOR.name}</a>
@@ -95,7 +93,7 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
   if (!document.getElementById('nomad-menu-engine-script')) {
     const menuScript = document.createElement('script');
     menuScript.id = 'nomad-menu-engine-script';
-    menuScript.src = '/js/nomad-menu.js';
+    menuScript.src = (window.location.pathname.includes('/nomad_suite')) ? 'js/nomad-menu.js' : '/js/nomad-menu.js';
     menuScript.async = true;
     document.head.appendChild(menuScript);
   }
@@ -103,10 +101,9 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
 
 /**
  * Applies versions, creator branding, and replaces standard merge tags
- * such as [merge_visionary], [merge_creator], [merge_author], [merge_version], [merge_footer]
  */
 function applyNomadRegistry() {
-  const version = window.NOMAD_VERSION || "v3.0";
+  const version = window.NOMAD_VERSION;
   const creator = window.NOMAD_CREATOR;
 
   // 1. Update version elements
@@ -132,20 +129,16 @@ function applyNomadRegistry() {
   if (featuresVersion) featuresVersion.textContent = version;
 
   // 2. Class / Attribute selector creator branding hooks
-  document.querySelectorAll('.footer-brand, .nomad-creator, .nomad-author, [data-nomad-creator]').forEach((el) => {
+  document.querySelectorAll('.footer-brand, .nomad-creator, .nomad-author, .nomad-creator-link, [data-nomad-creator]').forEach((el) => {
     el.innerHTML = creator.authorLinkHTML;
   });
 
-  // 3. Dynamic Instagram link & handle synchronization across all pages
-  document.querySelectorAll('a[href*="instagram.com"], a.nomad-creator-link').forEach((a) => {
-    a.href = creator.url;
-    if (a.textContent.includes('@')) {
-      a.textContent = a.textContent.replace(/@\w+/g, creator.handle);
-    }
+  // 3. Remove all handle elements and references
+  document.querySelectorAll('.nomad-creator-handle').forEach((el) => {
+    el.remove();
   });
 
   // 4. Scan DOM Text Nodes for Merge Tags and creator handles
-  // [merge_visionary], [merge_creator], [merge_author], [merge_version], [merge_footer]
   if (document.body) {
     const walker = document.createTreeWalker(
       document.body,

@@ -4,7 +4,7 @@
  * Silent Sensory Nervous System: Open-Meteo REST Client, Caching,
  * UV Safety Tiers, Barometric Conversions, WMO Vector Dictionary
  * 
- * Visionary & Creator: BostonyFX (@tony_bostony)
+ * Visionary & Creator: BostonyFX
  * Architecture: Pure Decoupled Event-Driven Provider (ZERO UI Manipulation)
  * File: /nomad_suite/js/nomad-weather-engine.js
  * ====================================================================

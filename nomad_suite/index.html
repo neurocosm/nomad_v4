@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>NOMAD: Launch Control // Mission Control</title>
-  <meta name="description" content="NOMAD Launch Control - Central Multi-Cockpit HUD Launcher & Mission Control by BostonyFX (@tony_bostony)" />
+  <meta name="description" content="NOMAD Launch Control - Central Multi-Cockpit HUD Launcher & Mission Control by BostonyFX" />
   <meta name="theme-color" content="#050811" />
   <link rel="manifest" href="./manifest.json" />
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
@@ -980,8 +980,8 @@
     </div>
 
     <footer>
-      <div>NOMAD Avionics Architecture &bull; <span class="nomad-version" id="footer-firmware-val">v4.10072026.1335</span></div>
-      <div>Crafted by <a href="https://www.instagram.com/tony_bostony/" class="nomad-creator-link" target="_blank">BostonyFX</a></div>
+      <div>NOMAD Avionics Architecture &bull; <span class="nomad-version" id="footer-firmware-val">v4.10072026.2006</span></div>
+      <div>Crafted by <a href="https://www.instagram.com/tony_bostony/" class="nomad-creator-link" target="_blank" rel="noopener noreferrer">BostonyFX</a></div>
     </footer>
 
   </div>
@@ -1136,8 +1136,8 @@
       };
 
       window.showAboutToast = function() {
-        const handle = window.NOMAD_CREATOR ? window.NOMAD_CREATOR.handle : '@tony_bostony';
-        showToast(`NOMAD ${window.NOMAD_VERSION || 'v4'} by BostonyFX (${handle})`);
+        const creatorName = (window.NOMAD_CREATOR && window.NOMAD_CREATOR.name) || 'BostonyFX';
+        showToast(`NOMAD ${window.NOMAD_VERSION || 'v4'} by ${creatorName}`);
       };
 
       // Initial state sync

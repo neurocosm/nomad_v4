@@ -1,7 +1,7 @@
 # ====================================================================
 # NOMAD: SUITE — MASTER INTEGRATION CHECKLIST & ARCHITECTURE DIRECTIVE
 # Unified Multi-Cockpit Navigation Architecture: RoadTrip + Hyperspace + DIGIT
-# Creator & Visionary: BostonyFX (@tony_bostony)
+# Creator & Visionary: BostonyFX
 # File: /nomad_suite/integration_checklist.txt
 # ====================================================================
 #
@@ -300,7 +300,7 @@ MASTER SHARED ARCHITECTURE & INTEGRATION CHECKLIST
      8.2 GPX 1.1 Logger: [X] COMPLETED & VERIFIED
          - High-fidelity logging of <trkpt>, <ele>, <time>, <speed> (m/s), <course>, and road name
            with one-click instant export (.gpx) for Strava, Google Earth, Garmin BaseCamp, and QGIS analysis.
-         - Standardized GPX 1.1 XML generation with BostonyFX (@tony_bostony) creator metadata.
+         - Standardized GPX 1.1 XML generation with BostonyFX creator metadata.
          - Dynamic trip controls: Export GPX, Pause/Resume Trip, Reset Odometer, and Simulate Drive Step.
    Progress Notes:
      - Built and verified decoupled provider /nomad_suite/js/nomad-trip-engine.js exposing window.NomadTripEngine.
@@ -345,7 +345,7 @@ MASTER SHARED ARCHITECTURE & INTEGRATION CHECKLIST
     Description:
       Single source of truth for versioning and creator metadata.
     Sub-Steps & Key Specifications:
-      10.1 BostonyFX (@tony_bostony on Instagram) credits.
+      10.1 BostonyFX (@ on Instagram) credits.
       10.2 US Eastern Time (ET) version numbering engine: v4.[MMDDYYYY].[HHMM].
     Progress Notes:
       - (Notes will be added here as we begin implementation)
