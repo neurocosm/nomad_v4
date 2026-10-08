@@ -1,10 +1,10 @@
 /**
  * ====================================================================
- * NOMAD HUD & Telemetry Navigation System
+ * NOMAD Avionics Suite — Autonomous Server
+ * Single-folder autonomous server for standalone deployments & GitHub
  * 
- * Proprietary & Created by BostonyFX
- * Instagram: https://www.instagram.com/tony_bostony/
- * All rights reserved.
+ * Visionary & Creator: BostonyFX (@tony_bostony)
+ * File: /nomad_suite/server.js
  * ====================================================================
  */
 
@@ -17,15 +17,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-// API health endpoint
+// Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', app: 'NOMAD: Hyperspace' });
+  res.json({ status: 'ok', app: 'NOMAD: Avionics Suite' });
 });
 
 // Atmospheric & Weather Telemetry Proxy Endpoint
-// Proxies Open-Meteo requests to bypass client ad-blockers, tracking prevention, and iframe restrictions
 app.get('/api/weather', async (req, res) => {
   try {
     const lat = parseFloat(req.query.lat) || 42.3765;
@@ -41,26 +40,26 @@ app.get('/api/weather', async (req, res) => {
     const data = await response.json();
     res.json(data);
   } catch (err) {
-    console.warn('Server weather proxy warning:', err.message);
+    console.warn('Weather proxy warning:', err.message);
     res.status(502).json({ error: 'Failed to fetch atmospheric telemetry', message: err.message });
   }
 });
 
-// Dynamic Project Backup Endpoint: Generates and serves a clean .ZIP archive of the entire project
+// Dynamic Project Backup Endpoint: Generates and serves a clean .ZIP archive of this suite
 app.get(['/api/download-zip', '/download-zip', '/download'], (req, res) => {
   try {
     const zipPythonCmd = `
 import os, zipfile
 exclude_dirs = {'.git', 'node_modules', '.cache', '.npm'}
-exclude_files = {'nomad_suite.zip', 'nomad-roadtrip.zip'}
+exclude_files = {'nomad_suite.zip'}
 with zipfile.ZipFile('nomad_suite.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
-    for root, dirs, files in os.walk('nomad_suite'):
+    for root, dirs, files in os.walk('.'):
         dirs[:] = [d for d in dirs if d not in exclude_dirs]
         for file in files:
             if file in exclude_files:
                 continue
             path = os.path.join(root, file)
-            arcname = os.path.relpath(path, 'nomad_suite')
+            arcname = os.path.relpath(path, '.')
             zipf.write(path, arcname)
 `;
     execSync(`python3 -c "${zipPythonCmd.replace(/"/g, '\\"')}"`, { cwd: __dirname });
@@ -84,7 +83,7 @@ app.use(express.static(__dirname, {
   extensions: ['html']
 }));
 
-// Root fallback to index.html
+// Root fallback to index.html (Launch Control)
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -99,5 +98,5 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`NOMAD: Hyperspace server running on http://0.0.0.0:${PORT}`);
+  console.log(`NOMAD Avionics Suite running on http://0.0.0.0:${PORT}`);
 });

@@ -13,7 +13,7 @@
   // 1. Record current cockpit if this page is a cockpit or launcher
   try {
     if (typeof window !== 'undefined' && typeof sessionStorage !== 'undefined') {
-      const path = window.location.pathname.toLowerCase();
+      const path = (window.location.pathname || '').toLowerCase();
       if (path.includes('roadtrip.html') || path.endsWith('/roadtrip')) {
         sessionStorage.setItem('nomad_active_hud', 'roadtrip.html');
         sessionStorage.setItem('nomad_active_hud_name', 'ROAD TRIP');
@@ -23,9 +23,9 @@
       } else if (path.includes('hyperspace.html') || path.endsWith('/hyperspace')) {
         sessionStorage.setItem('nomad_active_hud', 'hyperspace.html');
         sessionStorage.setItem('nomad_active_hud_name', 'HYPERSPACE');
-      } else if (path.includes('nomad_suite')) {
-        sessionStorage.setItem('nomad_active_hud', 'nomad_suite/');
-        sessionStorage.setItem('nomad_active_hud_name', 'START HUD');
+      } else if (path.includes('index.html') || path.endsWith('/nomad_suite/') || path.endsWith('/nomad_suite') || path.endsWith('/')) {
+        sessionStorage.setItem('nomad_active_hud', 'index.html');
+        sessionStorage.setItem('nomad_active_hud_name', 'LAUNCH CONTROL');
       }
     }
   } catch (_) {}
@@ -40,14 +40,26 @@
           if (fromParam.includes('roadtrip')) return { target: 'roadtrip.html', name: 'ROAD TRIP' };
           if (fromParam.includes('digit')) return { target: 'digit.html', name: 'DIGIT' };
           if (fromParam.includes('hyperspace')) return { target: 'hyperspace.html', name: 'HYPERSPACE' };
-          if (fromParam.includes('launcher') || fromParam.includes('suite')) return { target: 'nomad_suite/', name: 'START HUD' };
+          if (fromParam.includes('launcher') || fromParam.includes('suite') || fromParam.includes('home')) {
+            return { target: 'index.html', name: 'LAUNCH CONTROL' };
+          }
         }
 
         if (typeof sessionStorage !== 'undefined') {
-          const storedHud = sessionStorage.getItem('nomad_active_hud');
-          const storedName = sessionStorage.getItem('nomad_active_hud_name');
+          let storedHud = sessionStorage.getItem('nomad_active_hud');
+          let storedName = sessionStorage.getItem('nomad_active_hud_name');
+
+          // Scrub any legacy 'nomad_suite/' or 'START HUD'
           if (storedHud) {
-            return { target: storedHud, name: storedName || 'COCKPIT' };
+            if (storedHud.includes('nomad_suite') || storedHud === 'nomad_suite/' || storedHud === 'nomad_suite') {
+              storedHud = 'index.html';
+              sessionStorage.setItem('nomad_active_hud', 'index.html');
+            }
+            if (storedName === 'START HUD' || !storedName || storedName.includes('nomad_suite')) {
+              storedName = (storedHud === 'index.html') ? 'LAUNCH CONTROL' : 'COCKPIT';
+              sessionStorage.setItem('nomad_active_hud_name', storedName);
+            }
+            return { target: storedHud, name: storedName };
           }
         }
 
@@ -63,12 +75,12 @@
           if (ref.includes('roadtrip.html')) return { target: 'roadtrip.html', name: 'ROAD TRIP' };
           if (ref.includes('digit.html')) return { target: 'digit.html', name: 'DIGIT' };
           if (ref.includes('hyperspace.html')) return { target: 'hyperspace.html', name: 'HYPERSPACE' };
-          if (ref.includes('nomad_suite')) return { target: 'nomad_suite/', name: 'START HUD' };
+          if (ref.includes('index.html') || ref.includes('nomad_suite')) return { target: 'index.html', name: 'LAUNCH CONTROL' };
         }
       }
     } catch (_) {}
 
-    return { target: 'hyperspace.html', name: 'NAV' };
+    return { target: 'index.html', name: 'LAUNCH CONTROL' };
   }
 
   function returnToActiveHUD() {

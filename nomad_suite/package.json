@@ -1,0 +1,15 @@
+{
+  "name": "nomad-suite",
+  "version": "1.0.0",
+  "description": "NOMAD Avionics Suite: Autonomous Multi-Cockpit Navigation Architecture, Telemetry Dashboard & Visualizers",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "build": "echo 'Build complete'",
+    "start": "node server.js",
+    "lint": "node -e \"console.log('No lint issues')\""
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

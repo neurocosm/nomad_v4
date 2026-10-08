@@ -42,28 +42,28 @@
     hyperspace: {
       name: 'NOMAD: Hyperspace',
       badge: 'Version 4 • User Guide & Features',
-      guideAnchor: '/features.html#hyperspace',
+      guideAnchor: 'features.html#hyperspace',
       accentColor: '#ff0055',
       desc: 'Kinetic vector canvas with floating telemetry.'
     },
     roadtrip: {
       name: 'NOMAD: RoadTrip',
       badge: 'Version 3 • User Guide & Features',
-      guideAnchor: '/features.html#roadtrip',
+      guideAnchor: 'features.html#roadtrip',
       accentColor: '#00f3ff',
       desc: 'High-contrast street level mapping accuracy.'
     },
     digit: {
       name: 'NOMAD: DIGIT',
       badge: 'Tactical Monospace Telemetry Matrix',
-      guideAnchor: '/features.html#digit',
+      guideAnchor: 'features.html#digit',
       accentColor: '#30d158',
       desc: 'Military monospace ASCII matrix &amp; high-density telemetry.'
     },
     launcher: {
       name: 'NOMAD: Avionics Suite',
       badge: 'Launch Control Home',
-      guideAnchor: '/features.html',
+      guideAnchor: 'features.html',
       accentColor: '#00f3ff',
       desc: 'Central mission control for the 3 distinct NOMAD cockpits and shared sensory visualizers.'
     }
@@ -370,17 +370,17 @@
         <div class="modal-cockpit-section">
           <div class="modal-cockpit-header">COCKPITS &amp; LAUNCH CONTROL</div>
           <div class="modal-cockpit-grid">
-            <a href="/hyperspace.html" class="modal-cockpit-btn btn-hyperspace ${context === 'hyperspace' ? 'is-active' : ''}">
+            <a href="hyperspace.html" class="modal-cockpit-btn btn-hyperspace ${context === 'hyperspace' ? 'is-active' : ''}">
               🚀 HYPERSPACE
             </a>
-            <a href="/roadtrip.html" class="modal-cockpit-btn btn-roadtrip ${context === 'roadtrip' ? 'is-active' : ''}">
+            <a href="roadtrip.html" class="modal-cockpit-btn btn-roadtrip ${context === 'roadtrip' ? 'is-active' : ''}">
               🚗 ROAD TRIP
             </a>
-            <a href="/digit.html" class="modal-cockpit-btn btn-digit ${context === 'digit' ? 'is-active' : ''}">
+            <a href="digit.html" class="modal-cockpit-btn btn-digit ${context === 'digit' ? 'is-active' : ''}">
               📟 DIGIT
             </a>
           </div>
-          <a href="/nomad_suite/" class="modal-home-launcher-btn" title="Return to Launch Control Home">
+          <a href="index.html" class="modal-home-launcher-btn" title="Return to Launch Control Home">
             <span>🛰️ LAUNCH CONTROL (HOME) ↗</span>
           </a>
           <div class="modal-default-cockpit-wrap">
@@ -396,13 +396,13 @@
         <div class="modal-cockpit-section">
           <div class="modal-cockpit-header">SELECT COCKPIT TO LAUNCH</div>
           <div class="modal-cockpit-grid">
-            <a href="/hyperspace.html" class="modal-cockpit-btn btn-hyperspace">
+            <a href="hyperspace.html" class="modal-cockpit-btn btn-hyperspace">
               🚀 HYPERSPACE
             </a>
-            <a href="/roadtrip.html" class="modal-cockpit-btn btn-roadtrip">
+            <a href="roadtrip.html" class="modal-cockpit-btn btn-roadtrip">
               🚗 ROAD TRIP
             </a>
-            <a href="/digit.html" class="modal-cockpit-btn btn-digit">
+            <a href="digit.html" class="modal-cockpit-btn btn-digit">
               📟 DIGIT
             </a>
           </div>
@@ -426,7 +426,7 @@
     let guideBtnHTML = '';
     if (!isCockpit) {
       guideBtnHTML = `
-        <a href="/features.html" class="modal-btn-row modal-guide-btn">📖 USER GUIDE &amp; FEATURES ↗</a>
+        <a href="features.html" class="modal-btn-row modal-guide-btn">📖 USER GUIDE &amp; FEATURES ↗</a>
       `;
     }
 
@@ -454,8 +454,8 @@
         <!-- Action Buttons Stack -->
         <div class="modal-action-stack">
           ${audioHTML}
-          <a href="/visualizer.html?from=${context}" class="modal-btn-row modal-vis-btn">✨ VISUALIZER ARCADE ↗</a>
-          <a href="/geek-stats.html?from=${context}" class="modal-btn-row modal-stats-btn">&gt; GEEK STATS (VT220) _</a>
+          <a href="visualizer.html?from=${context}" class="modal-btn-row modal-vis-btn">✨ VISUALIZER ARCADE ↗</a>
+          <a href="geek-stats.html?from=${context}" class="modal-btn-row modal-stats-btn">&gt; GEEK STATS (VT220) _</a>
           ${guideBtnHTML}
           <a href="/api/download-zip" download="nomad_suite.zip" class="modal-btn-row modal-download-btn">📦 DOWNLOAD ALL FILES (.ZIP)</a>
           <button type="button" class="modal-btn-row modal-purge-btn" onclick="window.executeUnifiedPurge()">⚠️ PURGE CACHE &amp; HARD RELOAD</button>

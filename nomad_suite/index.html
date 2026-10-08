@@ -6,9 +6,9 @@
   <title>NOMAD: Launch Control // Mission Control</title>
   <meta name="description" content="NOMAD Launch Control - Central Multi-Cockpit HUD Launcher & Mission Control by BostonyFX (@tony_bostony)" />
   <meta name="theme-color" content="#050811" />
-  <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
-  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -878,7 +878,7 @@
     <div class="cockpits-stack">
 
       <!-- 1. HYPERSPACE -->
-      <a href="../hyperspace.html" class="cockpit-hero-card card-hyperspace" id="card-hud-hyperspace">
+      <a href="./hyperspace.html" class="cockpit-hero-card card-hyperspace" id="card-hud-hyperspace">
         <div class="cockpit-left">
           <div class="cockpit-avatar" style="border-color: rgba(255, 0, 85, 0.4); color: #ff0055;">🚀</div>
           <div class="cockpit-meta">
@@ -898,7 +898,7 @@
       </a>
 
       <!-- 2. ROAD TRIP -->
-      <a href="../roadtrip.html" class="cockpit-hero-card card-roadtrip" id="card-hud-roadtrip">
+      <a href="./roadtrip.html" class="cockpit-hero-card card-roadtrip" id="card-hud-roadtrip">
         <div class="cockpit-left">
           <div class="cockpit-avatar" style="border-color: rgba(0, 243, 255, 0.4); color: #00f3ff;">🚗</div>
           <div class="cockpit-meta">
@@ -918,7 +918,7 @@
       </a>
 
       <!-- 3. DIGIT -->
-      <a href="../digit.html" class="cockpit-hero-card card-digit" id="card-hud-digit">
+      <a href="./digit.html" class="cockpit-hero-card card-digit" id="card-hud-digit">
         <div class="cockpit-left">
           <div class="cockpit-avatar" style="border-color: rgba(48, 209, 88, 0.4); color: #30d158;">📟</div>
           <div class="cockpit-meta">
@@ -948,17 +948,17 @@
     <div class="utilities-grid">
 
       <!-- A: VISUALIZER ARCADE -->
-      <a href="../visualizer.html?from=launcher" class="util-tile util-arcade">
+      <a href="./visualizer.html?from=launcher" class="util-tile util-arcade">
         <div class="util-tile-title">✨ A: ARCADE ↗</div>
       </a>
 
       <!-- B: GEEK STATS (VT220) -->
-      <a href="../geek-stats.html?from=launcher" class="util-tile util-stats">
+      <a href="./geek-stats.html?from=launcher" class="util-tile util-stats">
         <div class="util-tile-title">&gt; B: GEEK STATS _</div>
       </a>
 
       <!-- C: USER GUIDE -->
-      <a href="../features.html?from=launcher" class="util-tile util-guide">
+      <a href="./features.html?from=launcher" class="util-tile util-guide">
         <div class="util-tile-title">📖 C: USER GUIDE ↗</div>
       </a>
 
@@ -993,8 +993,8 @@
   <div class="launch-toast" id="launch-toast">Notification</div>
 
   <!-- Engines & Logic -->
-  <script src="../version.js"></script>
-  <script src="/js/nomad-menu.js"></script>
+  <script src="./version.js"></script>
+  <script src="./js/nomad-menu.js"></script>
   <script src="./js/nomad-return.js"></script>
   <script src="./js/nomad-telemetry-engine.js"></script>
   <script src="./js/nomad-cockpit-engine.js"></script>
@@ -1167,7 +1167,7 @@
       // Service Worker Registration for PWA Installability
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          navigator.serviceWorker.register('./sw.js')
             .catch(err => console.warn('Service worker registration failed:', err));
         });
       }
