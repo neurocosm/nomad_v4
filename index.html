@@ -365,6 +365,17 @@
       transition: opacity 0.25s ease;
     }
 
+    .kinetic-bubble-value,
+    .kinetic-bubble-title,
+    .atmo-ticker-hero,
+    .atmo-ticker-value,
+    .atmo-ticker-label,
+    .atmo-metric-stack,
+    .atmo-metric-row,
+    .coords-line {
+      color: inherit;
+    }
+
     /* NOMAD Anti-Glow Rule: All data bubbles, tickers & HUD telemetry text are razor-sharp with ZERO text-shadow glows */
     .kinetic-bubble,
     .kinetic-bubble *,
@@ -806,6 +817,35 @@
       border-color: #00d4ff !important;
       font-weight: 700;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Sleek, Unbolded Map-Wide Light Mode Text Contrast Pill */
+    .bubble-contrast-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #94a3b8;
+      border-radius: 9999px;
+      padding: 3px 10px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.18s ease;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .bubble-contrast-pill:hover {
+      background: rgba(255, 255, 255, 0.10);
+      color: #e2e8f0;
+      border-color: rgba(255, 255, 255, 0.28);
+    }
+    .bubble-contrast-pill.is-active {
+      background: rgba(0, 212, 255, 0.15);
+      border-color: #00d4ff;
+      color: #00d4ff;
     }
 
     /* 3-Column Grid for Atmospheric Triad */
@@ -3336,6 +3376,14 @@
         <div class="bubble-color-swatch" data-color="#000000" style="background: #000000;" onclick="setBubbleColor('#000000')" title="Stealth Black"></div>
       </div>
 
+      <!-- Light Mode Text Contrast Pill: Compact, Unbolded, Map-Wide Toggle -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding: 2px 0;">
+        <span style="font-size: 0.72rem; color: #94a3b8; font-weight: 400; letter-spacing: 0.01em;">Light Map Contrast</span>
+        <button type="button" class="bubble-contrast-pill is-active" id="bubble-black-text-pill" onclick="toggleBlackTextMode()" title="Toggle black text contrast on Light Navigation map">
+          Apply Black Text
+        </button>
+      </div>
+
       <!-- Transparency Slider -->
       <div class="slider-config-container" style="margin-top: 14px;">
         <div class="slider-header-row">
@@ -3811,6 +3859,17 @@
         currentThemeIndex = savedTheme;
       }
     } catch(e) {}
+    window.currentThemeIndex = currentThemeIndex;
+
+    // Immediately reflect light theme classes synchronously if light theme is active
+    if (currentThemeIndex === 1) {
+      const mapCard = document.getElementById('map-card');
+      if (mapCard) mapCard.classList.add('theme-light-active');
+      const dash = document.getElementById('main-dashboard');
+      if (dash) dash.classList.add('theme-light-active');
+      const loc = document.getElementById('location-card');
+      if (loc) loc.classList.add('theme-light-active');
+    }
     let cachedDarkMatterStyle = null;
     let cachedPositronStyle = null;
 
@@ -6142,6 +6201,7 @@
     async function applyThemeByIndex(targetIndex, showToast = true) {
       if (targetIndex < 0 || targetIndex >= mapThemes.length) targetIndex = 0;
       currentThemeIndex = targetIndex;
+      window.currentThemeIndex = targetIndex;
       
       const theme = mapThemes[currentThemeIndex];
       if (theme.type !== 'kinetic-starfield') {
@@ -6240,9 +6300,13 @@
         }
       }
 
-      // Synchronize kinetic telemetry bubble transparent glass tint with the active map theme
+      // Synchronize kinetic telemetry bubble transparent glass tint & text contrast with the active map theme across all bubbles
       if (typeof applyBubbleConfigUI === 'function') {
-        applyBubbleConfigUI();
+        if (window.nomadBubbles && window.BUBBLE_KEYS) {
+          window.BUBBLE_KEYS.forEach(key => applyBubbleConfigUI(key));
+        } else {
+          applyBubbleConfigUI();
+        }
       }
 
       const speedSignBox = document.getElementById('speed-sign-box');

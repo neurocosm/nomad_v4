@@ -365,6 +365,17 @@
       transition: opacity 0.25s ease;
     }
 
+    .kinetic-bubble-value,
+    .kinetic-bubble-title,
+    .atmo-ticker-hero,
+    .atmo-ticker-value,
+    .atmo-ticker-label,
+    .atmo-metric-stack,
+    .atmo-metric-row,
+    .coords-line {
+      color: inherit;
+    }
+
     /* NOMAD Anti-Glow Rule: All data bubbles, tickers & HUD telemetry text are razor-sharp with ZERO text-shadow glows */
     .kinetic-bubble,
     .kinetic-bubble *,
@@ -700,13 +711,73 @@
       cursor: pointer;
       border: 1.5px solid rgba(255, 255, 255, 0.22);
       box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-      transition: transform 0.15s ease, border-color 0.15s ease;
+      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
       box-sizing: border-box;
+    }
+    .bubble-color-swatch[data-color="#000000"] {
+      border: 1.5px solid rgba(255, 255, 255, 0.42);
+    }
+    .bubble-color-swatch[data-color="#ffffff"] {
+      border: 1.5px solid rgba(255, 255, 255, 0.75);
+    }
+    .bubble-color-swatch:hover {
+      transform: scale(1.15);
     }
     .bubble-color-swatch.is-selected {
       transform: scale(1.22);
-      border-color: #ffffff !important;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      border-color: #00d4ff !important;
+      box-shadow: 0 0 8px rgba(0, 212, 255, 0.75), 0 2px 6px rgba(0,0,0,0.5);
+    }
+
+    /* Custom Spectrum Color Button & Live Hex Badge */
+    .bubble-color-hex-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: #00d4ff;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 3px 8px;
+      border-radius: 8px;
+      letter-spacing: 0.05em;
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+    .bubble-color-custom-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 10px;
+      color: #e2e8f0;
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+    .bubble-color-custom-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.35);
+      color: #ffffff;
+    }
+    .bubble-color-custom-btn.is-active-custom {
+      background: rgba(0, 212, 255, 0.16);
+      border-color: #00d4ff;
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+    }
+    .bubble-color-custom-preview {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255, 255, 255, 0.65);
+      display: inline-block;
+      flex-shrink: 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.5);
     }
 
     .bubble-mode-toggle-group {
@@ -746,6 +817,35 @@
       border-color: #00d4ff !important;
       font-weight: 700;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Sleek, Unbolded Map-Wide Light Mode Text Contrast Pill */
+    .bubble-contrast-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #94a3b8;
+      border-radius: 9999px;
+      padding: 3px 10px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.18s ease;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .bubble-contrast-pill:hover {
+      background: rgba(255, 255, 255, 0.10);
+      color: #e2e8f0;
+      border-color: rgba(255, 255, 255, 0.28);
+    }
+    .bubble-contrast-pill.is-active {
+      background: rgba(0, 212, 255, 0.15);
+      border-color: #00d4ff;
+      color: #00d4ff;
     }
 
     /* 3-Column Grid for Atmospheric Triad */
@@ -3244,23 +3344,59 @@
         </button>
       </div>
 
-      <!-- Color Theme Swatches -->
-      <div class="config-section-label" style="margin-top: 14px;">Border &amp; Glow Color</div>
+      <!-- Color Theme Swatches: Primaries, Secondaries, Cockpit Neons & Monochromes + Native Custom Spectrum Picker -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; margin-bottom: 6px;">
+        <span class="config-section-label" style="margin: 0;">Border &amp; Glow Color</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="bubble-color-hex-pill" id="bubble-color-hex-display">#00D4FF</span>
+          <label class="bubble-color-custom-btn" id="bubble-custom-color-label" title="Custom Spectrum &amp; Hex Color Picker">
+            <input type="color" id="bubble-custom-color-input" value="#00d4ff" oninput="setBubbleColor(this.value)" onchange="setBubbleColor(this.value)" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;" />
+            <span style="font-size: 0.85rem; line-height: 1;">🌈</span>
+            <span>Custom</span>
+            <span class="bubble-color-custom-preview" id="bubble-custom-preview-dot" style="background: #00d4ff;"></span>
+          </label>
+        </div>
+      </div>
       <div class="bubble-color-row" id="bubble-color-picker">
-        <div class="bubble-color-swatch is-selected" data-color="#00d4ff" style="background: #00d4ff;" onclick="setBubbleColor('#00d4ff')"></div>
-        <div class="bubble-color-swatch" data-color="#ffb703" style="background: #ffb703;" onclick="setBubbleColor('#ffb703')"></div>
-        <div class="bubble-color-swatch" data-color="#ff0055" style="background: #ff0055;" onclick="setBubbleColor('#ff0055')"></div>
-        <div class="bubble-color-swatch" data-color="#30d158" style="background: #30d158;" onclick="setBubbleColor('#30d158')"></div>
-        <div class="bubble-color-swatch" data-color="#bf5af2" style="background: #bf5af2;" onclick="setBubbleColor('#bf5af2')"></div>
-        <div class="bubble-color-swatch" data-color="#ffffff" style="background: #ffffff;" onclick="setBubbleColor('#ffffff')"></div>
-        <div class="bubble-color-swatch" data-color="#ff7700" style="background: #ff7700;" onclick="setBubbleColor('#ff7700')"></div>
+        <!-- Primary Colors -->
+        <div class="bubble-color-swatch" data-color="#ff2a2a" style="background: #ff2a2a;" onclick="setBubbleColor('#ff2a2a')" title="Primary Red"></div>
+        <div class="bubble-color-swatch" data-color="#ffe600" style="background: #ffe600;" onclick="setBubbleColor('#ffe600')" title="Primary Yellow"></div>
+        <div class="bubble-color-swatch" data-color="#0066ff" style="background: #0066ff;" onclick="setBubbleColor('#0066ff')" title="Primary Blue"></div>
+
+        <!-- Secondary Colors -->
+        <div class="bubble-color-swatch" data-color="#ff7700" style="background: #ff7700;" onclick="setBubbleColor('#ff7700')" title="Secondary Orange"></div>
+        <div class="bubble-color-swatch" data-color="#30d158" style="background: #30d158;" onclick="setBubbleColor('#30d158')" title="Secondary Green"></div>
+        <div class="bubble-color-swatch" data-color="#bf5af2" style="background: #bf5af2;" onclick="setBubbleColor('#bf5af2')" title="Secondary Purple"></div>
+
+        <!-- Cockpit Neons & Monochromes -->
+        <div class="bubble-color-swatch is-selected" data-color="#00d4ff" style="background: #00d4ff;" onclick="setBubbleColor('#00d4ff')" title="Electric Cyan"></div>
+        <div class="bubble-color-swatch" data-color="#ff0055" style="background: #ff0055;" onclick="setBubbleColor('#ff0055')" title="Hot Pink"></div>
+        <div class="bubble-color-swatch" data-color="#ffb703" style="background: #ffb703;" onclick="setBubbleColor('#ffb703')" title="Amber Gold"></div>
+        <div class="bubble-color-swatch" data-color="#ffffff" style="background: #ffffff;" onclick="setBubbleColor('#ffffff')" title="Pure White"></div>
+        <div class="bubble-color-swatch" data-color="#000000" style="background: #000000;" onclick="setBubbleColor('#000000')" title="Stealth Black"></div>
+      </div>
+
+      <!-- Light Mode Text Contrast Pill: Compact, Unbolded, Map-Wide Toggle -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding: 2px 0;">
+        <span style="font-size: 0.72rem; color: #94a3b8; font-weight: 400; letter-spacing: 0.01em;">Light Map Contrast</span>
+        <div style="display: inline-flex; align-items: center; gap: 6px;">
+          <button type="button" class="bubble-contrast-pill is-active" id="bubble-black-text-pill" onclick="toggleBlackTextMode()" title="Light map uses high-contrast black text • Tap to toggle">
+            Apply Black Text
+          </button>
+          <button type="button" class="bubble-contrast-pill" id="bubble-match-border-pill" onclick="revertToMatchBorder()" title="Revert text to match bubble border color across all themes">
+            Match Border
+          </button>
+        </div>
       </div>
 
       <!-- Transparency Slider -->
       <div class="slider-config-container" style="margin-top: 14px;">
         <div class="slider-header-row">
           <span class="config-section-label" style="margin:0;">Glass Transparency</span>
-          <span class="slider-val-badge" id="bubble-opacity-val-label">18% Sheer Glass</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" class="bubble-apply-all-btn" onclick="applyOpacityToAll()" title="Apply this glass transparency level to all active bubbles">Apply All</button>
+            <span class="slider-val-badge" id="bubble-opacity-val-label">18% Sheer Glass</span>
+          </div>
         </div>
         <div class="slider-track-wrap">
           <input type="range" min="0" max="80" step="5" id="bubble-opacity-slider" class="hud-range-slider" oninput="onBubbleOpacitySliderChange(this.value)">
@@ -3277,7 +3413,10 @@
       <div class="slider-config-container" style="margin-top: 14px;" id="bubble-speed-slider-wrap">
         <div class="slider-header-row">
           <span class="config-section-label" style="margin:0;">Float Speed</span>
-          <span class="slider-val-badge" id="bubble-speed-val-label">Cruising Drift</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" class="bubble-apply-all-btn" onclick="applyFloatSpeedToAll()" title="Apply this float speed drift to all active bubbles">Apply All</button>
+            <span class="slider-val-badge" id="bubble-speed-val-label">Cruising Drift</span>
+          </div>
         </div>
         <div class="slider-track-wrap">
           <input type="range" min="1" max="5" step="1" id="bubble-speed-slider" class="hud-range-slider" oninput="onBubbleSpeedSliderChange(this.value)">
@@ -3403,14 +3542,17 @@
         <!-- Satellite Moon Color Palette -->
         <div class="config-section-label" style="margin-top: 14px;">Satellite Indicator Color</div>
         <div class="bubble-color-row" id="vehicle-satellite-swatches">
-          <div class="bubble-color-swatch" data-color="#ff2a2a" style="background: #ff2a2a;" onclick="setVehicleSatelliteColor('#ff2a2a')" title="Ruby Red (North)"></div>
+          <div class="bubble-color-swatch" data-color="#ff2a2a" style="background: #ff2a2a;" onclick="setVehicleSatelliteColor('#ff2a2a')" title="Primary Red"></div>
+          <div class="bubble-color-swatch" data-color="#ffe600" style="background: #ffe600;" onclick="setVehicleSatelliteColor('#ffe600')" title="Primary Yellow"></div>
+          <div class="bubble-color-swatch" data-color="#0066ff" style="background: #0066ff;" onclick="setVehicleSatelliteColor('#0066ff')" title="Primary Blue"></div>
+          <div class="bubble-color-swatch" data-color="#ff7700" style="background: #ff7700;" onclick="setVehicleSatelliteColor('#ff7700')" title="Secondary Orange"></div>
+          <div class="bubble-color-swatch" data-color="#30d158" style="background: #30d158;" onclick="setVehicleSatelliteColor('#30d158')" title="Secondary Green"></div>
+          <div class="bubble-color-swatch" data-color="#bf5af2" style="background: #bf5af2;" onclick="setVehicleSatelliteColor('#bf5af2')" title="Secondary Purple"></div>
           <div class="bubble-color-swatch" data-color="#00d4ff" style="background: #00d4ff;" onclick="setVehicleSatelliteColor('#00d4ff')" title="Cyan"></div>
           <div class="bubble-color-swatch" data-color="#ffb703" style="background: #ffb703;" onclick="setVehicleSatelliteColor('#ffb703')" title="Gold"></div>
           <div class="bubble-color-swatch" data-color="#ff0055" style="background: #ff0055;" onclick="setVehicleSatelliteColor('#ff0055')" title="Hot Pink"></div>
-          <div class="bubble-color-swatch" data-color="#30d158" style="background: #30d158;" onclick="setVehicleSatelliteColor('#30d158')" title="Neon Green"></div>
-          <div class="bubble-color-swatch" data-color="#bf5af2" style="background: #bf5af2;" onclick="setVehicleSatelliteColor('#bf5af2')" title="Violet"></div>
           <div class="bubble-color-swatch" data-color="#ffffff" style="background: #ffffff;" onclick="setVehicleSatelliteColor('#ffffff')" title="Ice White"></div>
-          <div class="bubble-color-swatch" data-color="#ff7700" style="background: #ff7700;" onclick="setVehicleSatelliteColor('#ff7700')" title="Sunset Orange"></div>
+          <div class="bubble-color-swatch" data-color="#000000" style="background: #000000;" onclick="setVehicleSatelliteColor('#000000')" title="Stealth Black"></div>
         </div>
 
         <!-- Satellite Moon Dot Dimension -->
@@ -3728,6 +3870,17 @@
         currentThemeIndex = savedTheme;
       }
     } catch(e) {}
+    window.currentThemeIndex = currentThemeIndex;
+
+    // Immediately reflect light theme classes synchronously if light theme is active
+    if (currentThemeIndex === 1) {
+      const mapCard = document.getElementById('map-card');
+      if (mapCard) mapCard.classList.add('theme-light-active');
+      const dash = document.getElementById('main-dashboard');
+      if (dash) dash.classList.add('theme-light-active');
+      const loc = document.getElementById('location-card');
+      if (loc) loc.classList.add('theme-light-active');
+    }
     let cachedDarkMatterStyle = null;
     let cachedPositronStyle = null;
 
@@ -6059,6 +6212,7 @@
     async function applyThemeByIndex(targetIndex, showToast = true) {
       if (targetIndex < 0 || targetIndex >= mapThemes.length) targetIndex = 0;
       currentThemeIndex = targetIndex;
+      window.currentThemeIndex = targetIndex;
       
       const theme = mapThemes[currentThemeIndex];
       if (theme.type !== 'kinetic-starfield') {
@@ -6157,9 +6311,15 @@
         }
       }
 
-      // Synchronize kinetic telemetry bubble transparent glass tint with the active map theme
-      if (typeof applyBubbleConfigUI === 'function') {
-        applyBubbleConfigUI();
+      // Synchronize kinetic telemetry bubble transparent glass tint, dual-theme memory & text contrast
+      if (typeof window.syncBubbleThemeMemory === 'function') {
+        window.syncBubbleThemeMemory(theme.type === 'blueprint-light');
+      } else if (typeof applyBubbleConfigUI === 'function') {
+        if (window.nomadBubbles && window.BUBBLE_KEYS) {
+          window.BUBBLE_KEYS.forEach(key => applyBubbleConfigUI(key));
+        } else {
+          applyBubbleConfigUI();
+        }
       }
 
       const speedSignBox = document.getElementById('speed-sign-box');

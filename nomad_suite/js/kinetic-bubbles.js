@@ -28,33 +28,59 @@
     coords: { key: 'coords', title: 'Lat/Lon Coordinates', unitDefault: 'GPS', channel: 'LAT/LON' }
   };
 
+  // Curated Primary & Secondary Color Palette defaults for Dark Theme
+  // Speed = Primary Red (#ff2a2a), Compass = Primary Yellow (#ffe600), Altitude = Secondary Green (#30d158),
+  // Temp = Secondary Orange (#ff7700), Atmo = Secondary Purple (#bf5af2), Coords = Primary Blue (#0066ff)
+  const THEME_DEFAULTS = {
+    dark: {
+      speed: { color: '#ff2a2a', opacity: 18, textMode: 'match' },
+      compass: { color: '#ffe600', opacity: 18, textMode: 'match' },
+      altitude: { color: '#30d158', opacity: 18, textMode: 'match' },
+      temp: { color: '#ff7700', opacity: 18, textMode: 'match' },
+      atmo: { color: '#bf5af2', opacity: 18, textMode: 'match' },
+      coords: { color: '#0066ff', opacity: 18, textMode: 'match' }
+    },
+    light: {
+      speed: { color: '#ff2a2a', opacity: 18, textMode: 'black' },
+      compass: { color: '#ffe600', opacity: 18, textMode: 'black' },
+      altitude: { color: '#30d158', opacity: 18, textMode: 'black' },
+      temp: { color: '#ff7700', opacity: 18, textMode: 'black' },
+      atmo: { color: '#bf5af2', opacity: 18, textMode: 'black' },
+      coords: { color: '#0066ff', opacity: 18, textMode: 'black' }
+    }
+  };
+
   // 6-Bubble State Objects
   window.nomadBubbles = {
     speed: {
-      key: 'speed', active: true, shape: 'circle', color: '#00d4ff', opacity: 18, size: 90,
+      key: 'speed', active: true, shape: 'circle', color: '#ff2a2a', opacity: 18, size: 90,
       mode: 'kinetic', wallBehavior: 'bounce', safeZoneBehavior: 'bounce',
       spinMode: 'keel', spinRate: 2, currentRotation: 0, angularVelocity: 0, keelTime: 0,
-      speedLevel: 3, x: 28, y: 140, vx: 0.85, vy: 0.65, isDragging: false, isHovered: false
+      speedLevel: 3, x: 28, y: 140, vx: 0.85, vy: 0.65, isDragging: false, isHovered: false,
+      textMode: 'black' // 'black' (High Contrast in Light Theme) | 'match' (Match Border Color)
     },
     compass: {
-      key: 'compass', active: true, shape: 'egg', color: '#ffb703', opacity: 18, size: 90,
+      key: 'compass', active: true, shape: 'egg', color: '#ffe600', opacity: 18, size: 90,
       mode: 'kinetic', wallBehavior: 'bounce', safeZoneBehavior: 'bounce',
       spinMode: 'keel', spinRate: 2, currentRotation: 0, angularVelocity: 0, keelTime: 1.2,
       speedLevel: 3, x: 230, y: 150, vx: -0.75, vy: 0.80, isDragging: false, isHovered: false,
       headingSource: 'magnetometer', // 'magnetometer' (True Phone Sensor) | 'auto' (Smart Hybrid) | 'gps' (Course Over Ground)
-      needleMode: 'north' // 'north' (True North-Seeking Needle) | 'heading' (Travel Direction Pointer)
+      needleMode: 'north', // 'north' (True North-Seeking Needle) | 'heading' (Travel Direction Pointer)
+      textMode: 'black'
     },
     altitude: {
       key: 'altitude', active: true, shape: 'squirkle', color: '#30d158', opacity: 18, size: 90,
       mode: 'kinetic', wallBehavior: 'bounce', safeZoneBehavior: 'bounce',
       spinMode: 'keel', spinRate: 2, currentRotation: 0, angularVelocity: 0, keelTime: 2.4,
-      speedLevel: 3, x: 28, y: 310, vx: 0.90, vy: -0.70, isDragging: false, isHovered: false
+      speedLevel: 3, x: 28, y: 310, vx: 0.90, vy: -0.70, isDragging: false, isHovered: false,
+      textMode: 'black'
     },
     temp: {
       key: 'temp', active: true, shape: 'hexagon', color: '#ff7700', opacity: 18, size: 90,
       mode: 'kinetic', wallBehavior: 'bounce', safeZoneBehavior: 'bounce',
       spinMode: 'keel', spinRate: 2, currentRotation: 0, angularVelocity: 0, keelTime: 3.6,
-      speedLevel: 3, x: 230, y: 320, vx: -0.80, vy: -0.85, isDragging: false, isHovered: false
+      speedLevel: 3, x: 230, y: 320, vx: -0.80, vy: -0.85, isDragging: false, isHovered: false,
+      textMode: 'black'
     },
     atmo: {
       key: 'atmo', active: true, shape: 'pentagon', color: '#bf5af2', opacity: 18, size: 95,
@@ -62,13 +88,15 @@
       spinMode: 'keel', spinRate: 2, currentRotation: 0, angularVelocity: 0, keelTime: 4.8,
       speedLevel: 3, x: 28, y: 480, vx: 0.70, vy: 0.95, isDragging: false, isHovered: false,
       showHumidity: true, showUv: true, showPressure: true,
-      displayFormat: 'ticker', tickerSpeed: 2.5, currentTickerIndex: 0
+      displayFormat: 'ticker', tickerSpeed: 2.5, currentTickerIndex: 0,
+      textMode: 'black'
     },
     coords: {
-      key: 'coords', active: true, shape: 'rectangle', color: '#ffffff', opacity: 18, size: 90,
+      key: 'coords', active: true, shape: 'rectangle', color: '#0066ff', opacity: 18, size: 90,
       mode: 'kinetic', wallBehavior: 'bounce', safeZoneBehavior: 'bounce',
       spinMode: 'keel', spinRate: 2, currentRotation: 0, angularVelocity: 0, keelTime: 5.5,
-      speedLevel: 3, x: 230, y: 490, vx: -0.65, vy: -0.90, isDragging: false, isHovered: false
+      speedLevel: 3, x: 230, y: 490, vx: -0.65, vy: -0.90, isDragging: false, isHovered: false,
+      textMode: 'black'
     }
   };
 
@@ -96,8 +124,18 @@
    * Initializes all 6 bubbles, loads persistent settings, and starts physics loop
    */
   window.initKineticSpeedBubble = function() {
-    // 1. Load saved settings for all 6 bubbles
+    // 1. Load saved settings for all 6 bubbles with dual-theme memory support
     try {
+      const isLight = (typeof window.isLightMapThemeActive === 'function') ? window.isLightMapThemeActive() : false;
+      const themeKey = isLight ? 'light' : 'dark';
+
+      // Load theme-specific memories if present
+      let savedThemeMem = null;
+      try {
+        const rawThemeMem = localStorage.getItem(`nomad_v4_bubbles_${themeKey}`);
+        if (rawThemeMem) savedThemeMem = JSON.parse(rawThemeMem);
+      } catch(_) {}
+
       const savedMulti = localStorage.getItem('nomad_v4_bubbles');
       if (savedMulti) {
         const parsedMulti = JSON.parse(savedMulti);
@@ -115,7 +153,6 @@
           if (!window.nomadBubbles.coords.shape || window.nomadBubbles.coords.shape === 'square' || !window.nomadBubbles.coords.shapeMigratedToRect) {
             window.nomadBubbles.coords.shape = 'rectangle';
             window.nomadBubbles.coords.shapeMigratedToRect = true;
-            window.saveBubbleConfig();
           }
         }
       } else {
@@ -127,6 +164,37 @@
           Object.assign(window.nomadBubbles.speed, parsedLegacy);
         }
       }
+
+      // One-time color & palette migration for primary/secondary theme pairing
+      const hasMigratedPalette = localStorage.getItem('nomad_v4_primary_palette_v1');
+      if (!hasMigratedPalette) {
+        window.nomadBubbles.speed.color = '#ff2a2a';
+        window.nomadBubbles.compass.color = '#ffe600';
+        window.nomadBubbles.altitude.color = '#30d158';
+        window.nomadBubbles.temp.color = '#ff7700';
+        window.nomadBubbles.atmo.color = '#bf5af2';
+        window.nomadBubbles.coords.color = '#0066ff';
+        localStorage.setItem('nomad_v4_primary_palette_v1', 'true');
+        window.saveBubbleConfig();
+      }
+
+      // If active theme memory exists, apply theme-specific properties (color, opacity, textMode)
+      if (savedThemeMem) {
+        window.BUBBLE_KEYS.forEach(k => {
+          if (savedThemeMem[k]) {
+            if (savedThemeMem[k].color) window.nomadBubbles[k].color = savedThemeMem[k].color;
+            if (typeof savedThemeMem[k].opacity === 'number') window.nomadBubbles[k].opacity = savedThemeMem[k].opacity;
+            if (savedThemeMem[k].textMode) window.nomadBubbles[k].textMode = savedThemeMem[k].textMode;
+          }
+        });
+      }
+
+      // Ensure standard black text contrast mode is active upon visit/installation
+      window.BUBBLE_KEYS.forEach(k => {
+        if (!window.nomadBubbles[k].textMode) {
+          window.nomadBubbles[k].textMode = 'black';
+        }
+      });
     } catch (e) {}
 
     // 2. Clamp initial coordinates within viewport
@@ -173,11 +241,41 @@
   };
 
   /**
+   * Universal check for whether Light Map navigation theme is active.
+   * Checks DOM class, window variable, and persistent local storage.
+   */
+  window.isLightMapThemeActive = function() {
+    const mapCard = document.getElementById('map-card');
+    if (mapCard && mapCard.classList.contains('theme-light-active')) return true;
+    if (typeof window.currentThemeIndex === 'number') {
+      return window.currentThemeIndex === 1;
+    }
+    try {
+      const saved = localStorage.getItem('nomad_map_theme_index');
+      return saved === '1';
+    } catch (_) {}
+    return false;
+  };
+
+  /**
+   * High-contrast telemetry text setting for Light Navigation map theme.
+   * Defaults to 'black' upon visit/installation.
+   * Can be toggled to 'match' (matches border color).
+   */
+  window.getNomadTextContrastMode = function() {
+    try {
+      const saved = localStorage.getItem('nomad_light_text_mode');
+      if (saved === 'match' || saved === 'black') return saved;
+    } catch (_) {}
+    return 'black'; // Standard active default on installation
+  };
+
+  /**
    * Generates mathematical SVG vector markup with notched typography for each geometric shape.
    * Dynamically negotiates word length with an SVG knockout mask and matching aesthetic
    * pill badge frame so the shape stroke NEVER penetrates the label words on any geometry.
    */
-  window.getBubbleShapeSVGMarkup = function(shape, hex, fill, channelLabel = 'SPEED', unitLabel = null, bubbleKey = 'speed', isLight = false) {
+  window.getBubbleShapeSVGMarkup = function(shape, hex, fill, channelLabel = 'SPEED', unitLabel = null, bubbleKey = 'speed', isLight = false, textColor = null) {
     const strokeW = 2.4;
     const strokeJoin = 'round';
     const strokeCap = 'round';
@@ -187,6 +285,12 @@
     } else if (unitLabel === null || unitLabel === undefined) {
       unitLabel = (typeof window.isMph !== 'undefined' && !window.isMph) ? 'KM/H' : 'MPH';
     }
+
+    const lightModeActive = (typeof window.isLightMapThemeActive === 'function') ? window.isLightMapThemeActive() : isLight;
+    const isTextBlack = (typeof window.getNomadTextContrastMode === 'function')
+      ? (window.getNomadTextContrastMode() !== 'match')
+      : true;
+    const resolvedTextColor = textColor || ((lightModeActive && isTextBlack) ? '#000000' : hex);
 
     const bottomText = channelLabel || '';
     const topText = unitLabel || '';
@@ -228,10 +332,10 @@
       </defs>
 
       <!-- Top Notch Floating Typography -->
-      ${hasTopText ? `<text x="${cx}" y="${topY}" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${topFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="${topLetterSpacing}" style="text-shadow: none;">${topText}</text>` : ''}
+      ${hasTopText ? `<text x="${cx}" y="${topY}" text-anchor="middle" dominant-baseline="central" fill="${resolvedTextColor}" font-size="${topFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="${topLetterSpacing}" style="text-shadow: none;">${topText}</text>` : ''}
 
       <!-- Bottom Notch Floating Typography -->
-      ${hasBottomText ? `<text x="${cx}" y="${bottomY}" text-anchor="middle" dominant-baseline="central" fill="${hex}" font-size="${bottomFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="${bottomLetterSpacing}" style="text-shadow: none;">${bottomText}</text>` : ''}
+      ${hasBottomText ? `<text x="${cx}" y="${bottomY}" text-anchor="middle" dominant-baseline="central" fill="${resolvedTextColor}" font-size="${bottomFontSize}" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" letter-spacing="${bottomLetterSpacing}" style="text-shadow: none;">${bottomText}</text>` : ''}
     `;
 
     switch (shape) {
@@ -415,7 +519,9 @@
 
     // 2. Color & Glass Transparency
     const hex = b.color || '#00d4ff';
-    const isLight = document.getElementById('map-card')?.classList.contains('theme-light-active') || (window.currentThemeIndex === 1);
+    const isLight = (typeof window.isLightMapThemeActive === 'function')
+      ? window.isLightMapThemeActive()
+      : (document.getElementById('map-card')?.classList.contains('theme-light-active') || (window.currentThemeIndex === 1));
     const rawOpacity = (typeof b.opacity === 'number') ? b.opacity : 18;
     const alpha = (Math.max(0, Math.min(100, rawOpacity)) / 100).toFixed(2);
 
@@ -424,9 +530,14 @@
       fill = isLight ? `rgba(255, 255, 255, ${alpha})` : `rgba(8, 14, 26, ${alpha})`;
     }
 
-    // Synchronize CSS accent color variable
+    // Synchronize CSS accent color variable & high-contrast telemetry text color
+    const textMode = (typeof window.getNomadTextContrastMode === 'function')
+      ? window.getNomadTextContrastMode()
+      : (b.textMode || 'black');
+    const textColor = (textMode === 'black' && isLight) ? '#000000' : hex;
+
     el.style.setProperty('--bubble-accent', hex);
-    el.style.color = hex;
+    el.style.color = textColor;
 
     // Update classes for optical centroid offsets and rotation states
     el.className = `kinetic-bubble has-shape-${b.shape}` +
@@ -471,7 +582,7 @@
     if (shapeFrame) {
       const isRect = (b.shape === 'rectangle');
       const vb = isRect ? '0 0 124 68' : '0 0 100 100';
-      shapeFrame.innerHTML = `<svg viewBox="${vb}" class="kinetic-shape-svg" style="width:100%;height:100%;overflow:visible;display:block;filter:none;">${window.getBubbleShapeSVGMarkup(b.shape, hex, fill, channelLabel, unitLabel, bubbleKey, isLight)}</svg>`;
+      shapeFrame.innerHTML = `<svg viewBox="${vb}" class="kinetic-shape-svg" style="width:100%;height:100%;overflow:visible;display:block;filter:none;">${window.getBubbleShapeSVGMarkup(b.shape, hex, fill, channelLabel, unitLabel, bubbleKey, isLight, textColor)}</svg>`;
       shapeFrame.style.border = 'none';
       shapeFrame.style.background = 'transparent';
       shapeFrame.style.outline = 'none';
@@ -505,7 +616,7 @@
   };
 
   /**
-   * Persists multi-bubble configuration to localStorage
+   * Persists multi-bubble configuration to localStorage, including dual-theme memory
    */
   window.saveBubbleConfig = function() {
     try {
@@ -514,7 +625,72 @@
       if (window.nomadBubbles.speed) {
         localStorage.setItem('nomad_v4_speed_bubble', JSON.stringify(window.nomadBubbles.speed));
       }
+      // Save to current theme profile memory (dark or light)
+      window.saveBubbleThemeMemory();
     } catch (e) {}
+  };
+
+  /**
+   * Saves the current color, opacity, and textMode state into theme-specific memory
+   */
+  window.saveBubbleThemeMemory = function() {
+    try {
+      const isLight = (typeof window.isLightMapThemeActive === 'function') ? window.isLightMapThemeActive() : false;
+      const themeKey = isLight ? 'light' : 'dark';
+      const themeMem = {};
+      window.BUBBLE_KEYS.forEach(k => {
+        const b = window.nomadBubbles[k];
+        if (b) {
+          themeMem[k] = {
+            color: b.color,
+            opacity: (typeof b.opacity === 'number') ? b.opacity : 18,
+            textMode: b.textMode || (isLight ? 'black' : 'match')
+          };
+        }
+      });
+      localStorage.setItem(`nomad_v4_bubbles_${themeKey}`, JSON.stringify(themeMem));
+    } catch (_) {}
+  };
+
+  /**
+   * Switches bubble visual properties between Dark and Light theme memories on map toggle
+   */
+  window.syncBubbleThemeMemory = function(targetIsLight) {
+    const isLight = (typeof targetIsLight === 'boolean')
+      ? targetIsLight
+      : ((typeof window.isLightMapThemeActive === 'function') ? window.isLightMapThemeActive() : false);
+    const themeKey = isLight ? 'light' : 'dark';
+
+    let mem = null;
+    try {
+      const raw = localStorage.getItem(`nomad_v4_bubbles_${themeKey}`);
+      if (raw) mem = JSON.parse(raw);
+    } catch (_) {}
+
+    // If no custom memory was recorded yet for this theme, use curated defaults
+    if (!mem && THEME_DEFAULTS && THEME_DEFAULTS[themeKey]) {
+      mem = THEME_DEFAULTS[themeKey];
+    }
+
+    if (mem) {
+      window.BUBBLE_KEYS.forEach(k => {
+        const b = window.nomadBubbles[k];
+        const m = mem[k];
+        if (b && m) {
+          if (m.color) b.color = m.color;
+          if (typeof m.opacity === 'number') b.opacity = m.opacity;
+          if (m.textMode) b.textMode = m.textMode;
+        }
+      });
+    }
+
+    // Refresh UI rendering for all active bubbles and open modal controls
+    window.BUBBLE_KEYS.forEach(k => {
+      window.applyBubbleConfigUI(k);
+    });
+    if (typeof window.syncModalControlsForTab === 'function') {
+      window.syncModalControlsForTab(window.currentSelectedBubbleTab);
+    }
   };
 
   /**
@@ -1216,6 +1392,7 @@
     window.setBubbleWallBehaviorUI(b.wallBehavior || 'bounce');
     window.setBubbleShapeUI(b.shape || (tabId === 'coords' ? 'rectangle' : 'circle'));
     window.setBubbleColorUI(b.color || '#00d4ff');
+    window.syncBlackTextPillUI();
     window.setBubbleSizeUI(b.size || 90);
 
     const isStationary = (b.mode === 'stationary');
@@ -1556,6 +1733,100 @@
     }
   };
 
+  /**
+   * Toggles the map-wide Light Navigation black text contrast mode.
+   * 'black' (standard active on install): Solid black in light theme, vibrant border in dark theme
+   * 'match': Matches border accent color across all themes
+   */
+  window.toggleBlackTextMode = function() {
+    const curMode = window.getNomadTextContrastMode();
+    const newMode = (curMode === 'black') ? 'match' : 'black';
+    try {
+      localStorage.setItem('nomad_light_text_mode', newMode);
+    } catch (_) {}
+
+    // Apply map-wide across all active bubbles
+    window.BUBBLE_KEYS.forEach(key => {
+      if (window.nomadBubbles[key]) {
+        window.nomadBubbles[key].textMode = newMode;
+        window.applyBubbleConfigUI(key);
+      }
+    });
+    window.saveBubbleConfig();
+    window.syncBlackTextPillUI();
+
+    if (typeof window.showMapThemeToast === 'function') {
+      window.showMapThemeToast({
+        name: (newMode === 'black') ? 'Light Map: Black Text (Active)' : 'Light Map: Match Border Color',
+        type: 'perspective'
+      });
+    }
+  };
+
+  /**
+   * One-tap revert in Light Mode to match bubble border color across all telemetry bubbles
+   */
+  window.revertToMatchBorder = function() {
+    try {
+      localStorage.setItem('nomad_light_text_mode', 'match');
+    } catch (_) {}
+
+    window.BUBBLE_KEYS.forEach(key => {
+      if (window.nomadBubbles[key]) {
+        window.nomadBubbles[key].textMode = 'match';
+        window.applyBubbleConfigUI(key);
+      }
+    });
+    window.saveBubbleConfig();
+    window.syncBlackTextPillUI();
+
+    if (navigator.vibrate) try { navigator.vibrate(25); } catch (_) {}
+    if (typeof window.showMapThemeToast === 'function') {
+      window.showMapThemeToast({
+        name: '🎨 Text Reverted: Matches Border Color',
+        type: 'perspective'
+      });
+    }
+  };
+
+  window.syncBlackTextPillUI = function() {
+    const mode = window.getNomadTextContrastMode();
+    const isBlack = (mode === 'black');
+    const pill = document.getElementById('bubble-black-text-pill');
+    const revertPill = document.getElementById('bubble-match-border-pill');
+
+    if (pill) {
+      pill.classList.toggle('is-active', isBlack);
+      pill.innerText = isBlack ? 'Apply Black Text' : 'Match Border Color';
+      pill.setAttribute('title', isBlack ? 'Light map uses high-contrast black text • Tap to match border' : 'Light map matches border color • Tap to apply black text');
+    }
+    if (revertPill) {
+      revertPill.classList.toggle('is-active', !isBlack);
+      revertPill.style.display = isBlack ? 'inline-flex' : 'none';
+    }
+  };
+
+  // Compatibility aliases
+  window.setBubbleTextContrastMode = function(mode) {
+    if (mode) {
+      try { localStorage.setItem('nomad_light_text_mode', mode); } catch (_) {}
+      window.BUBBLE_KEYS.forEach(key => {
+        if (window.nomadBubbles[key]) {
+          window.nomadBubbles[key].textMode = mode;
+          window.applyBubbleConfigUI(key);
+        }
+      });
+      window.saveBubbleConfig();
+    }
+    window.syncBlackTextPillUI();
+  };
+  window.setBubbleTextContrastModeUI = function() {
+    window.syncBlackTextPillUI();
+  };
+  window.applyTextContrastToAll = function() {
+    window.toggleBlackTextMode();
+  };
+
   window.onBubbleOpacitySliderChange = function(val) {
     const b = window.nomadBubbles[window.currentSelectedBubbleTab];
     if (!b) return;
@@ -1573,6 +1844,58 @@
     }
     window.applyBubbleConfigUI(window.currentSelectedBubbleTab);
     window.saveBubbleConfig();
+  };
+
+  /**
+   * Applies the active bubble's glass transparency to all 6 telemetry bubbles
+   */
+  window.applyOpacityToAll = function() {
+    const currentTab = window.currentSelectedBubbleTab;
+    const b = window.nomadBubbles[currentTab];
+    if (!b) return;
+    const targetOpacity = (typeof b.opacity === 'number') ? b.opacity : 18;
+
+    window.BUBBLE_KEYS.forEach(key => {
+      if (window.nomadBubbles[key]) {
+        window.nomadBubbles[key].opacity = targetOpacity;
+        window.applyBubbleConfigUI(key);
+      }
+    });
+    window.saveBubbleConfig();
+
+    if (navigator.vibrate) try { navigator.vibrate(25); } catch (_) {}
+    if (typeof window.showMapThemeToast === 'function') {
+      window.showMapThemeToast({
+        name: `🔮 Transparency Applied to All: ${targetOpacity}% Glass`,
+        type: 'perspective'
+      });
+    }
+  };
+
+  /**
+   * Applies the active bubble's drift velocity speed to all 6 telemetry bubbles
+   */
+  window.applyFloatSpeedToAll = function() {
+    const currentTab = window.currentSelectedBubbleTab;
+    const b = window.nomadBubbles[currentTab];
+    if (!b) return;
+    const targetSpeed = b.speedLevel || 3;
+    const speedNames = ['', 'Gentle', 'Slow', 'Cruising Drift', 'Swift', 'Hyper'];
+
+    window.BUBBLE_KEYS.forEach(key => {
+      if (window.nomadBubbles[key]) {
+        window.nomadBubbles[key].speedLevel = targetSpeed;
+      }
+    });
+    window.saveBubbleConfig();
+
+    if (navigator.vibrate) try { navigator.vibrate(25); } catch (_) {}
+    if (typeof window.showMapThemeToast === 'function') {
+      window.showMapThemeToast({
+        name: `🚀 Float Speed Applied to All: ${speedNames[targetSpeed] || 'Drift'}`,
+        type: 'perspective'
+      });
+    }
   };
 
   window.onBubbleSizeSliderChange = function(val) {

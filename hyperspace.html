@@ -365,6 +365,17 @@
       transition: opacity 0.25s ease;
     }
 
+    .kinetic-bubble-value,
+    .kinetic-bubble-title,
+    .atmo-ticker-hero,
+    .atmo-ticker-value,
+    .atmo-ticker-label,
+    .atmo-metric-stack,
+    .atmo-metric-row,
+    .coords-line {
+      color: inherit;
+    }
+
     /* NOMAD Anti-Glow Rule: All data bubbles, tickers & HUD telemetry text are razor-sharp with ZERO text-shadow glows */
     .kinetic-bubble,
     .kinetic-bubble *,
@@ -806,6 +817,35 @@
       border-color: #00d4ff !important;
       font-weight: 700;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Sleek, Unbolded Map-Wide Light Mode Text Contrast Pill */
+    .bubble-contrast-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #94a3b8;
+      border-radius: 9999px;
+      padding: 3px 10px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.18s ease;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .bubble-contrast-pill:hover {
+      background: rgba(255, 255, 255, 0.10);
+      color: #e2e8f0;
+      border-color: rgba(255, 255, 255, 0.28);
+    }
+    .bubble-contrast-pill.is-active {
+      background: rgba(0, 212, 255, 0.15);
+      border-color: #00d4ff;
+      color: #00d4ff;
     }
 
     /* 3-Column Grid for Atmospheric Triad */
@@ -3336,11 +3376,27 @@
         <div class="bubble-color-swatch" data-color="#000000" style="background: #000000;" onclick="setBubbleColor('#000000')" title="Stealth Black"></div>
       </div>
 
+      <!-- Light Mode Text Contrast Pill: Compact, Unbolded, Map-Wide Toggle -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding: 2px 0;">
+        <span style="font-size: 0.72rem; color: #94a3b8; font-weight: 400; letter-spacing: 0.01em;">Light Map Contrast</span>
+        <div style="display: inline-flex; align-items: center; gap: 6px;">
+          <button type="button" class="bubble-contrast-pill is-active" id="bubble-black-text-pill" onclick="toggleBlackTextMode()" title="Light map uses high-contrast black text • Tap to toggle">
+            Apply Black Text
+          </button>
+          <button type="button" class="bubble-contrast-pill" id="bubble-match-border-pill" onclick="revertToMatchBorder()" title="Revert text to match bubble border color across all themes">
+            Match Border
+          </button>
+        </div>
+      </div>
+
       <!-- Transparency Slider -->
       <div class="slider-config-container" style="margin-top: 14px;">
         <div class="slider-header-row">
           <span class="config-section-label" style="margin:0;">Glass Transparency</span>
-          <span class="slider-val-badge" id="bubble-opacity-val-label">18% Sheer Glass</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" class="bubble-apply-all-btn" onclick="applyOpacityToAll()" title="Apply this glass transparency level to all active bubbles">Apply All</button>
+            <span class="slider-val-badge" id="bubble-opacity-val-label">18% Sheer Glass</span>
+          </div>
         </div>
         <div class="slider-track-wrap">
           <input type="range" min="0" max="80" step="5" id="bubble-opacity-slider" class="hud-range-slider" oninput="onBubbleOpacitySliderChange(this.value)">
@@ -3357,7 +3413,10 @@
       <div class="slider-config-container" style="margin-top: 14px;" id="bubble-speed-slider-wrap">
         <div class="slider-header-row">
           <span class="config-section-label" style="margin:0;">Float Speed</span>
-          <span class="slider-val-badge" id="bubble-speed-val-label">Cruising Drift</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" class="bubble-apply-all-btn" onclick="applyFloatSpeedToAll()" title="Apply this float speed drift to all active bubbles">Apply All</button>
+            <span class="slider-val-badge" id="bubble-speed-val-label">Cruising Drift</span>
+          </div>
         </div>
         <div class="slider-track-wrap">
           <input type="range" min="1" max="5" step="1" id="bubble-speed-slider" class="hud-range-slider" oninput="onBubbleSpeedSliderChange(this.value)">
@@ -3811,6 +3870,17 @@
         currentThemeIndex = savedTheme;
       }
     } catch(e) {}
+    window.currentThemeIndex = currentThemeIndex;
+
+    // Immediately reflect light theme classes synchronously if light theme is active
+    if (currentThemeIndex === 1) {
+      const mapCard = document.getElementById('map-card');
+      if (mapCard) mapCard.classList.add('theme-light-active');
+      const dash = document.getElementById('main-dashboard');
+      if (dash) dash.classList.add('theme-light-active');
+      const loc = document.getElementById('location-card');
+      if (loc) loc.classList.add('theme-light-active');
+    }
     let cachedDarkMatterStyle = null;
     let cachedPositronStyle = null;
 
@@ -6142,6 +6212,7 @@
     async function applyThemeByIndex(targetIndex, showToast = true) {
       if (targetIndex < 0 || targetIndex >= mapThemes.length) targetIndex = 0;
       currentThemeIndex = targetIndex;
+      window.currentThemeIndex = targetIndex;
       
       const theme = mapThemes[currentThemeIndex];
       if (theme.type !== 'kinetic-starfield') {
@@ -6240,9 +6311,15 @@
         }
       }
 
-      // Synchronize kinetic telemetry bubble transparent glass tint with the active map theme
-      if (typeof applyBubbleConfigUI === 'function') {
-        applyBubbleConfigUI();
+      // Synchronize kinetic telemetry bubble transparent glass tint, dual-theme memory & text contrast
+      if (typeof window.syncBubbleThemeMemory === 'function') {
+        window.syncBubbleThemeMemory(theme.type === 'blueprint-light');
+      } else if (typeof applyBubbleConfigUI === 'function') {
+        if (window.nomadBubbles && window.BUBBLE_KEYS) {
+          window.BUBBLE_KEYS.forEach(key => applyBubbleConfigUI(key));
+        } else {
+          applyBubbleConfigUI();
+        }
       }
 
       const speedSignBox = document.getElementById('speed-sign-box');
