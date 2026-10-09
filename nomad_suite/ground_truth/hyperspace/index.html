@@ -3,7 +3,6 @@
  NOMAD HUD & Telemetry Navigation System
  
  Proprietary & Created by BostonyFX
- Instagram: https://instagram.com/neurocosm
  All rights reserved.
  ====================================================================
 -->
@@ -16,9 +15,9 @@
   <link rel="icon" type="image/png" href="icons/icon-192.png" />
   
   <title>NOMAD: Hyperspace</title>
-  <meta name="description" content="NOMAD Version 4 - Hyperspace: Real-time Heads-Up GPS Navigation, Telemetry Dashboard, and Kinetic Visualizers" />
+  <meta name="description" content="NOMAD Hyperspace: Real-time Heads-Up GPS Navigation, Kinetic Telemetry Dashboard, and Visualizers" />
   <meta property="og:title" content="NOMAD: Hyperspace" />
-  <meta property="og:description" content="NOMAD Version 4 - Hyperspace: Real-time Heads-Up GPS Navigation, Telemetry Dashboard, and Kinetic Visualizers" />
+  <meta property="og:description" content="NOMAD Hyperspace: Real-time Heads-Up GPS Navigation, Kinetic Telemetry Dashboard, and Visualizers" />
 
   <!-- Web App Manifest & Mobile Display Metadata -->
   <meta name="mobile-web-app-capable" content="yes" />
@@ -786,13 +785,17 @@
       top: max(12px, env(safe-area-inset-top));
     }
 
+    :root {
+      --loc-pill-opacity: 0.44;
+    }
+
     /* The Floating Rounded Location Pill Body with 1px Orange Border & Semi-Transparent Glass */
     .location-pill-card {
       position: relative;
       width: 100%;
       border-radius: 20px;
       border: 1px solid #ff7700;
-      background: rgba(8, 14, 26, 0.44);
+      background: rgba(8, 14, 26, var(--loc-pill-opacity, 0.44));
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
@@ -803,13 +806,13 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, transform 0.15s ease;
+      transition: background 0.15s ease, box-shadow 0.3s ease, border-color 0.3s ease, transform 0.15s ease;
       -webkit-tap-highlight-color: transparent;
     }
 
     .location-pill-card:active {
       transform: scale(0.985);
-      background: rgba(14, 22, 38, 0.65);
+      background: rgba(14, 22, 38, calc(var(--loc-pill-opacity, 0.44) + 0.15));
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
     }
 
@@ -817,7 +820,7 @@
     .theme-light-active .location-pill-card,
     #map-card.theme-light-active ~ .location-channel-bar .location-pill-card,
     .location-channel-bar.theme-light-active .location-pill-card {
-      background: rgba(255, 255, 255, 0.52) !important;
+      background: rgba(255, 255, 255, var(--loc-pill-opacity, 0.52)) !important;
       border-color: rgba(255, 119, 0, 0.85) !important;
       box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12) !important;
     }
@@ -825,8 +828,26 @@
     .theme-light-active .location-pill-card:active,
     #map-card.theme-light-active ~ .location-channel-bar .location-pill-card:active,
     .location-channel-bar.theme-light-active .location-pill-card:active {
-      background: rgba(255, 255, 255, 0.78) !important;
+      background: rgba(255, 255, 255, calc(var(--loc-pill-opacity, 0.52) + 0.20)) !important;
       box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18) !important;
+    }
+
+    .loc-preset-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 119, 0, 0.3);
+      color: #cbd5e1;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .loc-preset-btn:hover, .loc-preset-btn.is-selected {
+      background: rgba(255, 119, 0, 0.25);
+      border-color: #ff7700;
+      color: #ff9d42;
     }
 
     .location-channel-content {
@@ -2376,6 +2397,75 @@
       box-shadow: 0 0 14px rgba(0, 212, 255, 0.25);
     }
 
+    .modal-cockpit-section {
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 10px 8px;
+      margin-bottom: 12px;
+    }
+    .modal-cockpit-header {
+      font-size: 0.68rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #94a3b8;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    .modal-cockpit-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+    }
+    .modal-cockpit-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 4px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      color: #f8fafc;
+      text-decoration: none;
+      font-size: 0.72rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      text-align: center;
+      line-height: 1.2;
+    }
+    .modal-cockpit-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #ffffff;
+    }
+    .modal-cockpit-btn.is-active {
+      background: rgba(255, 0, 85, 0.14);
+      border-color: #ff0055;
+      color: #ff0055;
+      box-shadow: 0 0 12px rgba(255, 0, 85, 0.35);
+    }
+    .modal-default-cockpit-wrap {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-default-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.68rem;
+      color: #cbd5e1;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+    }
+    .modal-default-toggle input {
+      accent-color: #ff0055;
+      cursor: pointer;
+    }
+
     .modal-version-tag {
       margin-top: 10px;
       font-size: 0.78rem;
@@ -2842,45 +2932,8 @@
     </div>
   </div>
 
-  <!-- BRANDING ABOUT MODAL OVERLAY -->
-  <div class="modal-overlay" id="about-modal" onclick="closeAboutModal(event)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <a href="features.html" class="modal-title-link" onclick="window.location.replace('features.html'); return false;" title="View Features & Guide">
-        <div class="modal-title">NOMAD: Hyperspace ↗</div>
-        <div class="modal-features-hint">Version 4 &bull; User Guide &amp; Features</div>
-      </a>
-      <div class="modal-author">by [merge_creator]</div>
-
-      <!-- Prominent System Version Banner -->
-      <div class="modal-version-banner">
-        <span style="opacity: 0.75; font-size: 0.75rem;">SYSTEM FIRMWARE</span>
-        <span class="nomad-version" id="nomad-modal-version-hero">v4.09162026.1953</span>
-      </div>
-
-      <div class="modal-body" style="margin-bottom: 12px;">
-        Real-time heads-up GPS telemetry, kinetic data bubbles, and sensory visualizer arcade.
-      </div>
-
-      <!-- One-Click In-App PWA Install Button (shown when installable) -->
-      <button class="modal-install-btn" id="modal-pwa-install-btn" onclick="triggerPWAInstall()">
-        📲 INSTALL NOMAD HYPERSPACE (PWA)
-      </button>
-      
-      <a href="visualizer.html" class="modal-vis-btn" onclick="window.location.replace('visualizer.html'); return false;">✨ VISUALIZER ARCADE ↗</a>
-      <a href="geek-stats.html" class="modal-stats-btn" onclick="window.location.replace('geek-stats.html'); return false;">&gt; GEEK STATS (VT220) _</a>
-
-      <!-- ONE-CLICK FULL WORKSPACE BACKUP DOWNLOAD -->
-      <a href="/api/download-zip" download="nomad_suite.zip" class="modal-purge-btn" style="background: #10b981; color: #000000; text-decoration: none; display: block; margin-bottom: 8px; font-weight: 700;">📦 DOWNLOAD ALL FILES (.ZIP)</a>
-
-      <!-- SCOPED TOTAL RECALL PURGE BUTTON -->
-      <button class="modal-purge-btn" onclick="executeTotalRecall()">⚠️ PURGE CACHE &amp; HARD RELOAD</button>
-
-      <div style="margin-top: 4px;">
-        <button class="modal-close-btn" onclick="closeAboutModal()">Close</button>
-      </div>
-      <div class="modal-version-tag nomad-version" id="nomad-modal-version">v4.09162026.1953</div>
-    </div>
-  </div>
+  <!-- Unified About / Settings Modal Container (rendered dynamically by /js/nomad-menu.js) -->
+  <div class="modal-overlay" id="about-modal"></div>
 
   <!-- WEATHER REFRESH CONFIG MODAL OVERLAY -->
   <div class="modal-overlay" id="weather-modal" onclick="closeWeatherModal(event)">
@@ -2923,6 +2976,24 @@
       </div>
       <div class="modal-body" style="margin-bottom: 8px;">
         Customize kinetic bounce physics, geometric shape, color, and telemetry.
+      </div>
+
+      <!-- Location Plaque Opacity Setting (At Top of Modal) -->
+      <div class="loc-opacity-container" style="background: rgba(255, 119, 0, 0.08); border: 1px solid rgba(255, 119, 0, 0.35); border-radius: 14px; padding: 10px 14px; margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 0.78rem; font-weight: 800; color: #ff9d42; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px;">
+            <span>📍</span> Location Plaque Opacity
+          </span>
+          <span id="loc-opacity-val" style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 800; color: #ff7700;">44%</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <input type="range" id="loc-opacity-slider" min="0" max="100" value="44" step="2" oninput="updateLocationPlaqueOpacity(this.value)" style="flex: 1; accent-color: #ff7700; cursor: pointer; height: 6px;" aria-label="Location Plaque Opacity Slider" />
+          <div style="display: flex; gap: 4px;">
+            <button type="button" class="loc-preset-btn" data-preset="15" onclick="updateLocationPlaqueOpacity(15)">15%</button>
+            <button type="button" class="loc-preset-btn is-selected" data-preset="44" onclick="updateLocationPlaqueOpacity(44)">44%</button>
+            <button type="button" class="loc-preset-btn" data-preset="85" onclick="updateLocationPlaqueOpacity(85)">85%</button>
+          </div>
+        </div>
       </div>
 
       <!-- Universal Bubble Tabs: 2-Row Segmented Glass Grid -->
@@ -4653,7 +4724,7 @@
           try { navigator.vibrate([40, 60, 80]); } catch (_) {}
         }
         if (!isFidgetActive()) {
-          const synthIdx = mapThemes.findIndex(t => t.id === 'kinetic-synthomatic');
+          const synthIdx = mapThemes.findIndex(t => t.subMode === 'kitt' || t.id === 'kinetic-synthomatic');
           const targetIdx = synthIdx !== -1 ? synthIdx : getFidgetIndices()[0];
           await applyThemeByIndex(targetIdx, true);
         } else {
@@ -5088,7 +5159,13 @@
     document.addEventListener('fullscreenchange', syncFullscreenIcon);
     document.addEventListener('webkitfullscreenchange', syncFullscreenIcon);
 
+    let isLocLongPress = false;
+
     function copyLocationLink(event) {
+      if (isLocLongPress) {
+        isLocLongPress = false;
+        return;
+      }
       if (event) event.stopPropagation();
       const toastEl = document.getElementById('copy-toast');
       if (lastLat === null || lastLon === null) {
@@ -5120,8 +5197,13 @@
     }
 
     function openAboutModal() {
+      if (window.NomadMenuEngine && typeof window.NomadMenuEngine.open === 'function') {
+        window.NomadMenuEngine.open();
+        return;
+      }
       const modal = document.getElementById('about-modal');
       if (modal) {
+        syncDefaultCockpitUI('hyperspace');
         if (typeof applyNomadRegistry === 'function') applyNomadRegistry();
         const ver = window.NOMAD_VERSION || 'v4';
         const heroVer = document.getElementById('nomad-modal-version-hero');
@@ -5137,6 +5219,29 @@
 
         modal.classList.add('active');
       }
+    }
+
+    function toggleDefaultCockpit(cockpitName) {
+      try {
+        const chk = document.getElementById('chk-default-cockpit');
+        if (chk && chk.checked) {
+          localStorage.setItem('nomad_default_cockpit', cockpitName);
+          if (typeof showToast === 'function') showToast(`Default Cockpit: ${cockpitName.toUpperCase()}`);
+        } else {
+          localStorage.removeItem('nomad_default_cockpit');
+          if (typeof showToast === 'function') showToast('Default Cockpit Cleared');
+        }
+      } catch (e) {}
+    }
+
+    function syncDefaultCockpitUI(cockpitName) {
+      try {
+        const chk = document.getElementById('chk-default-cockpit');
+        if (chk) {
+          const saved = localStorage.getItem('nomad_default_cockpit');
+          chk.checked = (saved === cockpitName);
+        }
+      } catch (e) {}
     }
 
     function closeAboutModal(event) {
@@ -5394,18 +5499,29 @@
       }
 
       const locationCard = document.getElementById('location-card');
-      if (locationCard) {
+      const locationPill = document.getElementById('location-pill-card');
+      const targetLocEl = locationPill || locationCard;
+      if (targetLocEl) {
         let locPressTimer;
-        locationCard.addEventListener('contextmenu', (e) => e.preventDefault());
-        const startLocPress = () => { locPressTimer = setTimeout(openAboutModal, 600); };
-        const cancelLocPress = () => clearTimeout(locPressTimer);
+        targetLocEl.addEventListener('contextmenu', (e) => e.preventDefault());
+        const startLocPress = () => {
+          isLocLongPress = false;
+          locPressTimer = setTimeout(() => {
+            isLocLongPress = true;
+            if (navigator.vibrate) try { navigator.vibrate([25, 40]); } catch (_) {}
+            openAboutModal();
+          }, 500);
+        };
+        const cancelLocPress = () => {
+          clearTimeout(locPressTimer);
+        };
 
-        locationCard.addEventListener('touchstart', startLocPress, { passive: true });
-        locationCard.addEventListener('touchend', cancelLocPress);
-        locationCard.addEventListener('touchmove', cancelLocPress);
-        locationCard.addEventListener('mousedown', startLocPress);
-        locationCard.addEventListener('mouseup', cancelLocPress);
-        locationCard.addEventListener('mouseleave', cancelLocPress);
+        targetLocEl.addEventListener('touchstart', startLocPress, { passive: true });
+        targetLocEl.addEventListener('touchend', cancelLocPress);
+        targetLocEl.addEventListener('touchmove', cancelLocPress);
+        targetLocEl.addEventListener('mousedown', startLocPress);
+        targetLocEl.addEventListener('mouseup', cancelLocPress);
+        targetLocEl.addEventListener('mouseleave', cancelLocPress);
       }
 
       const tempTile = document.getElementById('current-temp');
@@ -5968,6 +6084,11 @@
         if (mapCard) mapCard.classList.remove('theme-light-active');
         if (dashboardEl) dashboardEl.classList.remove('theme-light-active');
         if (locationCard) locationCard.classList.remove('theme-light-active');
+      }
+
+      if (typeof window.updateLocationPlaqueOpacity === 'function') {
+        const curOp = localStorage.getItem('nomad_loc_opacity') || 44;
+        window.updateLocationPlaqueOpacity(curOp);
       }
 
       if (compassBtn) {
@@ -6608,18 +6729,27 @@
         let response = null;
         let data = null;
 
+        // 1. Try server-side proxy first (bypasses browser CORS & includes valid User-Agent)
         try {
-          response = await fetch(url, {
-            headers: { "User-Agent": "NomadHyperspaceHUD/4.0" }
-          });
-          if (response.ok) {
-            data = await response.json();
+          const proxyRes = await fetch(`/api/geocode?lat=${lat}&lon=${lon}&zoom=${targetZoom}`);
+          if (proxyRes.ok) {
+            data = await proxyRes.json();
           }
-        } catch (netErr) {
-          console.warn("Primary Nominatim Geocode Network Error:", netErr);
+        } catch (_) {}
+
+        // 2. Direct Nominatim fallback
+        if (!data || !data.address) {
+          try {
+            response = await fetch(url);
+            if (response && response.ok) {
+              data = await response.json();
+            }
+          } catch (netErr) {
+            console.warn("Primary Nominatim Geocode Network Error:", netErr);
+          }
         }
 
-        // Secondary fallback if Nominatim is unreachable, rate-limited, or returned no road
+        // 3. Secondary fallback if Nominatim is unreachable, rate-limited, or returned no road
         let secondaryFallback = null;
         if (!data || !data.address || !data.address.road) {
           secondaryFallback = await fetchSecondaryReverseGeocode(lat, lon);
@@ -6810,8 +6940,12 @@
           const postcode = addr.postcode || secondaryFallback?.postcode || "";
           const stateCode = stateAbbreviations[stateFull] || stateFull;
 
-          document.getElementById('street-name').innerText = fullStreetAddress;
-          autoShrinkStreetName();
+          const displayStreet = fullStreetAddress || rawRoad || (city ? `${city} Area` : "Current Location");
+          const streetEl = document.getElementById('street-name');
+          if (streetEl) {
+            streetEl.innerText = displayStreet;
+            autoShrinkStreetName();
+          }
 
           const cityStateText = `${city}${city && stateCode ? ', ' : ''}${stateCode}`.trim();
           const countyZipText = `${county} ${postcode}`.trim();
@@ -7212,13 +7346,13 @@
     let ipFallbackTimer = null;
 
     function startTracking() {
-      // Trigger IP fallback in parallel after 1.5s if GPS hasn't locked yet
+      // Trigger IP fallback in parallel after 400ms if GPS hasn't locked yet
       if (ipFallbackTimer) clearTimeout(ipFallbackTimer);
       ipFallbackTimer = setTimeout(() => {
         if (lastLat === null) {
           fetchIpLocationFallback();
         }
-      }, 1500);
+      }, 400);
 
       if (!("geolocation" in navigator)) {
         document.getElementById('street-name').innerText = "GPS Unavailable";
@@ -7488,5 +7622,7 @@
       });
     }
   </script>
+  <script src="js/nomad-return.js"></script>
+  <script src="js/nomad-menu.js"></script>
 </body>
 </html>

@@ -172,4 +172,51 @@
     });
   };
 
+  /**
+   * Sets and persists the background opacity of the floating location plaque
+   */
+  window.updateLocationPlaqueOpacity = function(val) {
+    const num = parseInt(val, 10);
+    const clamped = Math.max(0, Math.min(100, isNaN(num) ? 44 : num));
+    const alpha = (clamped / 100).toFixed(2);
+    document.documentElement.style.setProperty('--loc-pill-opacity', alpha);
+    try {
+      localStorage.setItem('nomad_loc_opacity', clamped);
+    } catch (_) {}
+
+    const pill = document.getElementById('location-pill-card');
+    if (pill) {
+      const isLight = document.body.classList.contains('theme-light-active') ||
+                      document.getElementById('map-card')?.classList.contains('theme-light-active') ||
+                      document.getElementById('location-card')?.classList.contains('theme-light-active');
+      if (isLight) {
+        pill.style.setProperty('background', `rgba(255, 255, 255, ${alpha})`, 'important');
+      } else {
+        pill.style.setProperty('background', `rgba(8, 14, 26, ${alpha})`, 'important');
+      }
+    }
+
+    const label = document.getElementById('loc-opacity-val');
+    if (label) label.textContent = `${clamped}%`;
+
+    const slider = document.getElementById('loc-opacity-slider');
+    if (slider && parseInt(slider.value, 10) !== clamped) {
+      slider.value = clamped;
+    }
+
+    // Update active preset button highlight
+    document.querySelectorAll('.loc-preset-btn').forEach(btn => {
+      const p = parseInt(btn.getAttribute('data-preset'), 10);
+      btn.classList.toggle('is-selected', p === clamped);
+    });
+  };
+
+  // Initialize location plaque opacity from localStorage
+  let savedOpacity = 44;
+  try {
+    const s = localStorage.getItem('nomad_loc_opacity');
+    if (s !== null) savedOpacity = parseInt(s, 10);
+  } catch (_) {}
+  window.updateLocationPlaqueOpacity(savedOpacity);
+
 })();

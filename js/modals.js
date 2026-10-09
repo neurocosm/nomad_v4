@@ -113,6 +113,10 @@
     } else if (typeof window.syncBubbleModalWithState === 'function') {
       window.syncBubbleModalWithState();
     }
+    if (typeof window.updateLocationPlaqueOpacity === 'function') {
+      const currentOp = localStorage.getItem('nomad_loc_opacity') || 44;
+      window.updateLocationPlaqueOpacity(currentOp);
+    }
     modal.classList.add('active');
   };
 

@@ -45,6 +45,44 @@ app.get('/api/weather', async (req, res) => {
   }
 });
 
+// Reverse Geocoding Proxy Endpoint
+// Proxies Nominatim & OpenStreetMap requests with valid server User-Agent, bypassing browser CORS & ad-blockers
+app.get('/api/geocode', async (req, res) => {
+  try {
+    const lat = parseFloat(req.query.lat);
+    const lon = parseFloat(req.query.lon);
+    if (isNaN(lat) || isNaN(lon)) {
+      return res.status(400).json({ error: 'Invalid coordinates' });
+    }
+    const targetZoom = req.query.zoom || 18;
+    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=${targetZoom}&addressdetails=1&extratags=1&namedetails=1`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
+    const response = await fetch(url, {
+      headers: { 'User-Agent': 'NomadAvionicsSuite/4.0 (contact: support@nomadsuite.app)' },
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    if (!response.ok) {
+      throw new Error(`Nominatim returned status ${response.status}`);
+    }
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    try {
+      const lat = parseFloat(req.query.lat);
+      const lon = parseFloat(req.query.lon);
+      const photonUrl = `https://photon.komoot.io/reverse?lat=${lat}&lon=${lon}`;
+      const pRes = await fetch(photonUrl);
+      if (pRes.ok) {
+        const pData = await pRes.json();
+        return res.json(pData);
+      }
+    } catch (_) {}
+    res.status(502).json({ error: 'Failed to reverse geocode', message: err.message });
+  }
+});
+
 // Dynamic Project Backup Endpoint: Generates and serves a clean .ZIP archive of the entire project
 app.get(['/api/download-zip', '/download-zip', '/download'], (req, res) => {
   try {

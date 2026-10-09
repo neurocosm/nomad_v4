@@ -1,10 +1,9 @@
 /**
  * ====================================================================
- * NOMAD Avionics Suite — Autonomous Server
- * Single-folder autonomous server for standalone deployments & GitHub
+ * NOMAD HUD & Telemetry Navigation System
  * 
- * Visionary & Creator: BostonyFX
- * File: /nomad_suite/server.js
+ * Proprietary & Created by BostonyFX
+ * All rights reserved.
  * ====================================================================
  */
 
@@ -17,14 +16,15 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
-// Health check
+// API health endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', app: 'NOMAD: Avionics Suite' });
+  res.json({ status: 'ok', app: 'NOMAD: Hyperspace' });
 });
 
 // Atmospheric & Weather Telemetry Proxy Endpoint
+// Proxies Open-Meteo requests to bypass client ad-blockers, tracking prevention, and iframe restrictions
 app.get('/api/weather', async (req, res) => {
   try {
     const lat = parseFloat(req.query.lat) || 42.3765;
@@ -40,26 +40,64 @@ app.get('/api/weather', async (req, res) => {
     const data = await response.json();
     res.json(data);
   } catch (err) {
-    console.warn('Weather proxy warning:', err.message);
+    console.warn('Server weather proxy warning:', err.message);
     res.status(502).json({ error: 'Failed to fetch atmospheric telemetry', message: err.message });
   }
 });
 
-// Dynamic Project Backup Endpoint: Generates and serves a clean .ZIP archive of this suite
+// Reverse Geocoding Proxy Endpoint
+// Proxies Nominatim & OpenStreetMap requests with valid server User-Agent, bypassing browser CORS & ad-blockers
+app.get('/api/geocode', async (req, res) => {
+  try {
+    const lat = parseFloat(req.query.lat);
+    const lon = parseFloat(req.query.lon);
+    if (isNaN(lat) || isNaN(lon)) {
+      return res.status(400).json({ error: 'Invalid coordinates' });
+    }
+    const targetZoom = req.query.zoom || 18;
+    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=${targetZoom}&addressdetails=1&extratags=1&namedetails=1`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
+    const response = await fetch(url, {
+      headers: { 'User-Agent': 'NomadAvionicsSuite/4.0 (contact: support@nomadsuite.app)' },
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    if (!response.ok) {
+      throw new Error(`Nominatim returned status ${response.status}`);
+    }
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    try {
+      const lat = parseFloat(req.query.lat);
+      const lon = parseFloat(req.query.lon);
+      const photonUrl = `https://photon.komoot.io/reverse?lat=${lat}&lon=${lon}`;
+      const pRes = await fetch(photonUrl);
+      if (pRes.ok) {
+        const pData = await pRes.json();
+        return res.json(pData);
+      }
+    } catch (_) {}
+    res.status(502).json({ error: 'Failed to reverse geocode', message: err.message });
+  }
+});
+
+// Dynamic Project Backup Endpoint: Generates and serves a clean .ZIP archive of the entire project
 app.get(['/api/download-zip', '/download-zip', '/download'], (req, res) => {
   try {
     const zipPythonCmd = `
 import os, zipfile
 exclude_dirs = {'.git', 'node_modules', '.cache', '.npm'}
-exclude_files = {'nomad_suite.zip'}
+exclude_files = {'nomad_suite.zip', 'nomad-roadtrip.zip'}
 with zipfile.ZipFile('nomad_suite.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
-    for root, dirs, files in os.walk('.'):
+    for root, dirs, files in os.walk('nomad_suite'):
         dirs[:] = [d for d in dirs if d not in exclude_dirs]
         for file in files:
             if file in exclude_files:
                 continue
             path = os.path.join(root, file)
-            arcname = os.path.relpath(path, '.')
+            arcname = os.path.relpath(path, 'nomad_suite')
             zipf.write(path, arcname)
 `;
     execSync(`python3 -c "${zipPythonCmd.replace(/"/g, '\\"')}"`, { cwd: __dirname });
@@ -83,7 +121,7 @@ app.use(express.static(__dirname, {
   extensions: ['html']
 }));
 
-// Root fallback to index.html (Launch Control)
+// Root fallback to index.html
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -98,5 +136,5 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`NOMAD Avionics Suite running on http://0.0.0.0:${PORT}`);
+  console.log(`NOMAD: Hyperspace server running on http://0.0.0.0:${PORT}`);
 });
