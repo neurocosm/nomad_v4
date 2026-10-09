@@ -679,26 +679,94 @@
 
     .bubble-color-row {
       display: flex;
-      gap: 8px;
+      gap: 5px;
       margin-top: 6px;
-      flex-wrap: wrap;
-      justify-content: center;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      align-items: center;
       width: 100%;
       box-sizing: border-box;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .bubble-color-row::-webkit-scrollbar {
+      display: none;
     }
     .bubble-color-swatch {
-      width: 28px;
-      height: 28px;
+      width: 21px;
+      height: 21px;
+      flex: 0 0 21px;
       border-radius: 50%;
       cursor: pointer;
-      border: 2px solid transparent;
+      border: 1.5px solid rgba(255, 255, 255, 0.22);
       box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-      transition: transform 0.15s ease, border-color 0.15s ease;
+      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      box-sizing: border-box;
+    }
+    .bubble-color-swatch[data-color="#000000"] {
+      border: 1.5px solid rgba(255, 255, 255, 0.42);
+    }
+    .bubble-color-swatch[data-color="#ffffff"] {
+      border: 1.5px solid rgba(255, 255, 255, 0.75);
+    }
+    .bubble-color-swatch:hover {
+      transform: scale(1.15);
     }
     .bubble-color-swatch.is-selected {
-      transform: scale(1.15);
-      border-color: #ffffff !important;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      transform: scale(1.22);
+      border-color: #00d4ff !important;
+      box-shadow: 0 0 8px rgba(0, 212, 255, 0.75), 0 2px 6px rgba(0,0,0,0.5);
+    }
+
+    /* Custom Spectrum Color Button & Live Hex Badge */
+    .bubble-color-hex-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: #00d4ff;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 3px 8px;
+      border-radius: 8px;
+      letter-spacing: 0.05em;
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+    .bubble-color-custom-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 10px;
+      color: #e2e8f0;
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+    .bubble-color-custom-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.35);
+      color: #ffffff;
+    }
+    .bubble-color-custom-btn.is-active-custom {
+      background: rgba(0, 212, 255, 0.16);
+      border-color: #00d4ff;
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+    }
+    .bubble-color-custom-preview {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255, 255, 255, 0.65);
+      display: inline-block;
+      flex-shrink: 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.5);
     }
 
     .bubble-mode-toggle-group {
@@ -3179,7 +3247,6 @@
       <div class="slider-config-container" style="margin-top: 14px;">
         <div class="slider-header-row">
           <span class="config-section-label" style="margin:0;">Preset Dimensions</span>
-          <span class="slider-val-badge" id="bubble-size-val-label">90px (Compact)</span>
         </div>
         <div class="bubble-size-preset-group">
           <button class="bubble-size-btn is-selected" id="bubble-size-opt-90" onclick="setBubbleSize(90)">Compact<br><span style="font-size:0.65rem; opacity:0.8;">90px</span></button>
@@ -3237,16 +3304,36 @@
         </button>
       </div>
 
-      <!-- Color Theme Swatches -->
-      <div class="config-section-label" style="margin-top: 14px;">Border &amp; Glow Color</div>
+      <!-- Color Theme Swatches: Primaries, Secondaries, Cockpit Neons & Monochromes + Native Custom Spectrum Picker -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; margin-bottom: 6px;">
+        <span class="config-section-label" style="margin: 0;">Border &amp; Glow Color</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="bubble-color-hex-pill" id="bubble-color-hex-display">#00D4FF</span>
+          <label class="bubble-color-custom-btn" id="bubble-custom-color-label" title="Custom Spectrum &amp; Hex Color Picker">
+            <input type="color" id="bubble-custom-color-input" value="#00d4ff" oninput="setBubbleColor(this.value)" onchange="setBubbleColor(this.value)" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;" />
+            <span style="font-size: 0.85rem; line-height: 1;">🌈</span>
+            <span>Custom</span>
+            <span class="bubble-color-custom-preview" id="bubble-custom-preview-dot" style="background: #00d4ff;"></span>
+          </label>
+        </div>
+      </div>
       <div class="bubble-color-row" id="bubble-color-picker">
-        <div class="bubble-color-swatch is-selected" data-color="#00d4ff" style="background: #00d4ff;" onclick="setBubbleColor('#00d4ff')"></div>
-        <div class="bubble-color-swatch" data-color="#ffb703" style="background: #ffb703;" onclick="setBubbleColor('#ffb703')"></div>
-        <div class="bubble-color-swatch" data-color="#ff0055" style="background: #ff0055;" onclick="setBubbleColor('#ff0055')"></div>
-        <div class="bubble-color-swatch" data-color="#30d158" style="background: #30d158;" onclick="setBubbleColor('#30d158')"></div>
-        <div class="bubble-color-swatch" data-color="#bf5af2" style="background: #bf5af2;" onclick="setBubbleColor('#bf5af2')"></div>
-        <div class="bubble-color-swatch" data-color="#ffffff" style="background: #ffffff;" onclick="setBubbleColor('#ffffff')"></div>
-        <div class="bubble-color-swatch" data-color="#ff7700" style="background: #ff7700;" onclick="setBubbleColor('#ff7700')"></div>
+        <!-- Primary Colors -->
+        <div class="bubble-color-swatch" data-color="#ff2a2a" style="background: #ff2a2a;" onclick="setBubbleColor('#ff2a2a')" title="Primary Red"></div>
+        <div class="bubble-color-swatch" data-color="#ffe600" style="background: #ffe600;" onclick="setBubbleColor('#ffe600')" title="Primary Yellow"></div>
+        <div class="bubble-color-swatch" data-color="#0066ff" style="background: #0066ff;" onclick="setBubbleColor('#0066ff')" title="Primary Blue"></div>
+
+        <!-- Secondary Colors -->
+        <div class="bubble-color-swatch" data-color="#ff7700" style="background: #ff7700;" onclick="setBubbleColor('#ff7700')" title="Secondary Orange"></div>
+        <div class="bubble-color-swatch" data-color="#30d158" style="background: #30d158;" onclick="setBubbleColor('#30d158')" title="Secondary Green"></div>
+        <div class="bubble-color-swatch" data-color="#bf5af2" style="background: #bf5af2;" onclick="setBubbleColor('#bf5af2')" title="Secondary Purple"></div>
+
+        <!-- Cockpit Neons & Monochromes -->
+        <div class="bubble-color-swatch is-selected" data-color="#00d4ff" style="background: #00d4ff;" onclick="setBubbleColor('#00d4ff')" title="Electric Cyan"></div>
+        <div class="bubble-color-swatch" data-color="#ff0055" style="background: #ff0055;" onclick="setBubbleColor('#ff0055')" title="Hot Pink"></div>
+        <div class="bubble-color-swatch" data-color="#ffb703" style="background: #ffb703;" onclick="setBubbleColor('#ffb703')" title="Amber Gold"></div>
+        <div class="bubble-color-swatch" data-color="#ffffff" style="background: #ffffff;" onclick="setBubbleColor('#ffffff')" title="Pure White"></div>
+        <div class="bubble-color-swatch" data-color="#000000" style="background: #000000;" onclick="setBubbleColor('#000000')" title="Stealth Black"></div>
       </div>
 
       <!-- Transparency Slider -->
@@ -3396,14 +3483,17 @@
         <!-- Satellite Moon Color Palette -->
         <div class="config-section-label" style="margin-top: 14px;">Satellite Indicator Color</div>
         <div class="bubble-color-row" id="vehicle-satellite-swatches">
-          <div class="bubble-color-swatch" data-color="#ff2a2a" style="background: #ff2a2a;" onclick="setVehicleSatelliteColor('#ff2a2a')" title="Ruby Red (North)"></div>
+          <div class="bubble-color-swatch" data-color="#ff2a2a" style="background: #ff2a2a;" onclick="setVehicleSatelliteColor('#ff2a2a')" title="Primary Red"></div>
+          <div class="bubble-color-swatch" data-color="#ffe600" style="background: #ffe600;" onclick="setVehicleSatelliteColor('#ffe600')" title="Primary Yellow"></div>
+          <div class="bubble-color-swatch" data-color="#0066ff" style="background: #0066ff;" onclick="setVehicleSatelliteColor('#0066ff')" title="Primary Blue"></div>
+          <div class="bubble-color-swatch" data-color="#ff7700" style="background: #ff7700;" onclick="setVehicleSatelliteColor('#ff7700')" title="Secondary Orange"></div>
+          <div class="bubble-color-swatch" data-color="#30d158" style="background: #30d158;" onclick="setVehicleSatelliteColor('#30d158')" title="Secondary Green"></div>
+          <div class="bubble-color-swatch" data-color="#bf5af2" style="background: #bf5af2;" onclick="setVehicleSatelliteColor('#bf5af2')" title="Secondary Purple"></div>
           <div class="bubble-color-swatch" data-color="#00d4ff" style="background: #00d4ff;" onclick="setVehicleSatelliteColor('#00d4ff')" title="Cyan"></div>
           <div class="bubble-color-swatch" data-color="#ffb703" style="background: #ffb703;" onclick="setVehicleSatelliteColor('#ffb703')" title="Gold"></div>
           <div class="bubble-color-swatch" data-color="#ff0055" style="background: #ff0055;" onclick="setVehicleSatelliteColor('#ff0055')" title="Hot Pink"></div>
-          <div class="bubble-color-swatch" data-color="#30d158" style="background: #30d158;" onclick="setVehicleSatelliteColor('#30d158')" title="Neon Green"></div>
-          <div class="bubble-color-swatch" data-color="#bf5af2" style="background: #bf5af2;" onclick="setVehicleSatelliteColor('#bf5af2')" title="Violet"></div>
           <div class="bubble-color-swatch" data-color="#ffffff" style="background: #ffffff;" onclick="setVehicleSatelliteColor('#ffffff')" title="Ice White"></div>
-          <div class="bubble-color-swatch" data-color="#ff7700" style="background: #ff7700;" onclick="setVehicleSatelliteColor('#ff7700')" title="Sunset Orange"></div>
+          <div class="bubble-color-swatch" data-color="#000000" style="background: #000000;" onclick="setVehicleSatelliteColor('#000000')" title="Stealth Black"></div>
         </div>
 
         <!-- Satellite Moon Dot Dimension -->

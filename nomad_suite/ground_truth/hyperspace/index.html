@@ -679,24 +679,32 @@
 
     .bubble-color-row {
       display: flex;
-      gap: 8px;
+      gap: 5px;
       margin-top: 6px;
-      flex-wrap: wrap;
-      justify-content: center;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      align-items: center;
       width: 100%;
       box-sizing: border-box;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .bubble-color-row::-webkit-scrollbar {
+      display: none;
     }
     .bubble-color-swatch {
-      width: 28px;
-      height: 28px;
+      width: 21px;
+      height: 21px;
+      flex: 0 0 21px;
       border-radius: 50%;
       cursor: pointer;
-      border: 2px solid transparent;
+      border: 1.5px solid rgba(255, 255, 255, 0.22);
       box-shadow: 0 2px 6px rgba(0,0,0,0.4);
       transition: transform 0.15s ease, border-color 0.15s ease;
+      box-sizing: border-box;
     }
     .bubble-color-swatch.is-selected {
-      transform: scale(1.15);
+      transform: scale(1.22);
       border-color: #ffffff !important;
       box-shadow: 0 2px 8px rgba(0,0,0,0.5);
     }
@@ -3179,7 +3187,6 @@
       <div class="slider-config-container" style="margin-top: 14px;">
         <div class="slider-header-row">
           <span class="config-section-label" style="margin:0;">Preset Dimensions</span>
-          <span class="slider-val-badge" id="bubble-size-val-label">90px (Compact)</span>
         </div>
         <div class="bubble-size-preset-group">
           <button class="bubble-size-btn is-selected" id="bubble-size-opt-90" onclick="setBubbleSize(90)">Compact<br><span style="font-size:0.65rem; opacity:0.8;">90px</span></button>

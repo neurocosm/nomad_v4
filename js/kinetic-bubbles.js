@@ -1522,14 +1522,38 @@
   };
 
   window.setBubbleColorUI = function(colorHex) {
+    if (!colorHex) return;
+    const normHex = colorHex.toLowerCase().trim();
     const swatches = document.querySelectorAll('#bubble-color-picker .bubble-color-swatch');
+    let matchedPreset = false;
     swatches.forEach(sw => {
-      if (sw.getAttribute('data-color') === colorHex) {
+      const swColor = (sw.getAttribute('data-color') || '').toLowerCase().trim();
+      if (swColor === normHex) {
         sw.classList.add('is-selected');
+        matchedPreset = true;
       } else {
         sw.classList.remove('is-selected');
       }
     });
+
+    // Synchronize custom color input, preview dot, and hex code text badge
+    const customInput = document.getElementById('bubble-custom-color-input');
+    if (customInput && customInput.value.toLowerCase() !== normHex) {
+      customInput.value = colorHex;
+    }
+    const previewDot = document.getElementById('bubble-custom-preview-dot');
+    if (previewDot) {
+      previewDot.style.background = colorHex;
+    }
+    const hexDisplay = document.getElementById('bubble-color-hex-display');
+    if (hexDisplay) {
+      hexDisplay.textContent = colorHex.toUpperCase();
+      hexDisplay.style.color = colorHex;
+    }
+    const customLabel = document.getElementById('bubble-custom-color-label');
+    if (customLabel) {
+      customLabel.classList.toggle('is-active-custom', !matchedPreset);
+    }
   };
 
   window.onBubbleOpacitySliderChange = function(val) {
