@@ -316,7 +316,20 @@
     - 6 luminous color swatches (Theme Accent, Cyan Neon, Emerald Green, Amber Gold, Hot Pink, Ice White).
     - Turnaround sonic chime toggle.
   - **Unified Suite & Return to Launch Fixed**: Ensured "Return to Launch" everywhere routes strictly to `launch.html` without looping back to Hyperspace, and synchronized all DIGIT scanner engines across both root `/digit.html` and `/nomad_suite/digit.html`.
-  - **Version Registry Updated**: Updated `NOMAD_VERSION` to `v4.10092026.2108` in `version.js` and `nomad_suite/version.js` strictly following US Eastern Time.
+
+### v4 Step 23: NOMAD DIGIT Idle Motion Detection & 5-Second Resting Cadence [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **Ultra-Tranquil 5-Second Resting Idle Cadence**: When stationary in a browser or stopped in a vehicle, the scanner steps down to **1 movement per 5 seconds (5000ms)**. Eliminates frantic cycling when sitting still, transforming the effect into an organic watchtower pulse.
+  - **Coupled Motion Detection Sensor Fusion**:
+    - **GPS Stationary Zero-Clamp Deadband (< 1.8 MPH)**: Hard clamp eliminates indoor GPS drift and jitter, locking speed strictly to 0.0 MPH (`state.speedStatus = 'STOPPED'`).
+    - **Hardware Accelerometer Fusion (`devicemotion`)**: Continuously monitors 3D acceleration magnitude variance. Detects physical vehicular drive vibrations, bumps, and movement vs resting desk/mount stillness.
+    - **Sensor Fusion Status Indicator**: Live status card in `#scanner-modal` displays real-time motion diagnostics (`GPS DEADBAND + RESTING SENSOR` vs `GPS COURSE TRACK` vs `ACCELEROMETER MOTION`).
+  - **Smooth Kinetic Speed Transition**: When the vehicle starts moving (> 0.5 MPH), the engine smoothly ramps from the 5.0s idle cadence into the active driving cadence (460ms at 20 MPH), accelerating +10% faster for every 10 MPH beyond 20 MPH.
+  - **Ambient Idle Breathing Luminescence**: Added `.rounded-block.pulse-active.idle-mode` CSS keyframe animation (`idle-block-breathe 4.6s ease-in-out infinite`) providing a subtle, breathing glow while resting on an active block for 5 seconds.
+  - **Configurable Idle Cadences**: Added dedicated "IDLE CADENCE (STOPPED / NO MOTION)" segmented controls to `#scanner-modal` with choices for 5.0s (Tranquil - Default), 3.0s (Gentle), 1.5s (Subtle), and 460ms (Rapid).
+  - **Updated Speed Simulator Presets**: Preset buttons now include `0 MPH (5s)` alongside `30 MPH`, `55 MPH`, `80 MPH`, and `LIVE GPS`, allowing instant desktop testing of both resting 5s idle and high-speed motion states.
+  - **Version Registry Updated**: Updated `NOMAD_VERSION` to `v4.10092026.2121` in `version.js` and `nomad_suite/version.js` strictly following US Eastern Time.
 
 ### Upcoming Backlog & Wishlist
 - **Optimal Pre-Made Bubble Shape Defaults & Curated Geometry**: Curate and assign the ideal default shape for each telemetry bubble out of the box (e.g., Speed = Egg/Oval, Temp = Squirkle, Compass = Pentagon, Altitude = Diamond/Hexagon, Atmo = Circle/Octagon, Coords = Wobble Rectangle), giving each data element immediate visual identity while preserving user customizability.

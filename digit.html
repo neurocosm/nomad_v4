@@ -596,6 +596,21 @@
       background: var(--pulse-bg-glow, var(--bg-card-hover)) !important;
     }
 
+    @keyframes idle-block-breathe {
+      0%, 100% {
+        box-shadow: 0 0 var(--pulse-glow-spread, 12px) var(--pulse-outline-glow, rgba(0, 243, 255, 0.35)),
+                    inset 0 0 var(--pulse-inner-spread, 7px) var(--pulse-outline-inner, rgba(0, 243, 255, 0.10));
+      }
+      50% {
+        box-shadow: 0 0 calc(var(--pulse-glow-spread, 12px) * 1.4) var(--pulse-outline-glow, rgba(0, 243, 255, 0.58)),
+                    inset 0 0 calc(var(--pulse-inner-spread, 7px) * 1.35) var(--pulse-outline-inner, rgba(0, 243, 255, 0.22));
+      }
+    }
+
+    .rounded-block.pulse-active.idle-mode {
+      animation: idle-block-breathe 4.6s ease-in-out infinite;
+    }
+
     .rounded-block.pulse-active .block-meta-top span:first-child {
       color: var(--pulse-outline-color, var(--accent-cyan));
       text-shadow: 0 0 8px var(--pulse-outline-glow, rgba(0, 243, 255, 0.35));
@@ -1554,11 +1569,15 @@
         </div>
         <div class="scanner-status-line">
           <span>VEHICLE SPEED</span>
-          <span class="scanner-status-val" id="modal-status-speed">0.0 MPH</span>
+          <span class="scanner-status-val" id="modal-status-speed">0.0 MPH (STOPPED)</span>
+        </div>
+        <div class="scanner-status-line">
+          <span>MOTION SENSORS</span>
+          <span class="scanner-status-val" id="modal-status-sensor" style="color: #94a3b8; font-size: 0.60rem;">GPS DEADBAND + RESTING SENSOR</span>
         </div>
         <div class="scanner-status-line">
           <span>CADENCE RATE</span>
-          <span class="scanner-status-val" id="modal-status-mult">1.00x (460ms/step)</span>
+          <span class="scanner-status-val" id="modal-status-mult" style="color: #10b981;">1 step / 5.0s (IDLE LOCK)</span>
         </div>
       </div>
 
@@ -1578,7 +1597,7 @@
         <label class="scanner-toggle-row">
           <div>
             <div class="scanner-toggle-text">Accelerate With Vehicle Speed</div>
-            <div class="scanner-toggle-desc">+10% faster cadence for every 10 MPH traveled</div>
+            <div class="scanner-toggle-desc">1 step / 5s when stopped; +10% faster cadence per 10 MPH in motion</div>
           </div>
           <input type="checkbox" id="chk-scanner-speed-reactive" style="transform: scale(1.2); accent-color: var(--accent-cyan); cursor: pointer;" />
         </label>
@@ -1588,12 +1607,12 @@
       <div class="scanner-section">
         <div class="scanner-section-label">
           <span>SPEED SIMULATOR TEST</span>
-          <span id="slider-speed-val" style="color: var(--accent-cyan);">0 MPH (IDLE)</span>
+          <span id="slider-speed-val" style="color: var(--accent-cyan);">0 MPH (IDLE 5.0s)</span>
         </div>
         <div class="scanner-slider-container">
           <input type="range" class="scanner-slider" id="scanner-sim-slider" min="0" max="100" step="5" value="0" />
           <div class="scanner-slider-presets">
-            <button type="button" class="scanner-btn-preset" data-sim-val="0">0 MPH</button>
+            <button type="button" class="scanner-btn-preset" data-sim-val="0">0 MPH (5s)</button>
             <button type="button" class="scanner-btn-preset" data-sim-val="30">30 MPH</button>
             <button type="button" class="scanner-btn-preset" data-sim-val="55">55 MPH</button>
             <button type="button" class="scanner-btn-preset" data-sim-val="80">80 MPH</button>
@@ -1602,9 +1621,20 @@
         </div>
       </div>
 
-      <!-- Base Idle Cadence -->
+      <!-- Idle Cadence (When Stopped) -->
       <div class="scanner-section">
-        <div class="scanner-section-label">BASE IDLE CADENCE</div>
+        <div class="scanner-section-label">IDLE CADENCE (STOPPED / NO MOTION)</div>
+        <div class="scanner-grid-4">
+          <button type="button" class="scanner-btn-opt" data-opt-idle="5.0s">5.0s<br><span style="font-size:0.52rem;opacity:0.8;">TRANQUIL</span></button>
+          <button type="button" class="scanner-btn-opt" data-opt-idle="3.0s">3.0s<br><span style="font-size:0.52rem;opacity:0.8;">GENTLE</span></button>
+          <button type="button" class="scanner-btn-opt" data-opt-idle="1.5s">1.5s<br><span style="font-size:0.52rem;opacity:0.8;">SUBTLE</span></button>
+          <button type="button" class="scanner-btn-opt" data-opt-idle="460ms">460ms<br><span style="font-size:0.52rem;opacity:0.8;">RAPID</span></button>
+        </div>
+      </div>
+
+      <!-- Base Cruising Pace (When in Motion) -->
+      <div class="scanner-section">
+        <div class="scanner-section-label">CRUISING DRIVE PACE (IN MOTION)</div>
         <div class="scanner-grid-4">
           <button type="button" class="scanner-btn-opt" data-opt-pace="calm">CALM<br><span style="font-size:0.52rem;opacity:0.8;">620ms</span></button>
           <button type="button" class="scanner-btn-opt" data-opt-pace="standard">STANDARD<br><span style="font-size:0.52rem;opacity:0.8;">460ms</span></button>
@@ -3266,17 +3296,27 @@
 
     // ====================================================================
     // NOMAD DIGIT: KINETIC OUTLINE SCANNER ENGINE
-    // Sequential outline luminescence with speed-reactive acceleration (+10% per 10 MPH)
+    // Sequential outline luminescence with motion detection & speed-reactive acceleration
+    // Idle state (no motion / stopped): 1 movement per 5 seconds (5.0s tranquil breathing pulse)
+    // Motion state (vehicle driving): +10% faster cadence for every 10 MPH
     // Modes: Cascade (Top to Bottom repeat), Bounce (Top to Bottom to Top), Off
     // ====================================================================
     const SCANNER_CONFIG = {
       mode: localStorage.getItem('nomad_digit_scan_mode') || 'cascade', // 'cascade' | 'bounce' | 'off'
       speedReactive: localStorage.getItem('nomad_digit_scan_speed_reactive') !== 'false', // default true
+      idleCadence: localStorage.getItem('nomad_digit_scan_idle_cadence') || '5.0s', // '5.0s' (5000ms) | '3.0s' | '1.5s' | '460ms'
       basePace: localStorage.getItem('nomad_digit_scan_base_pace') || 'standard', // 'calm' | 'standard' | 'brisk' | 'hyper'
       intensity: localStorage.getItem('nomad_digit_scan_intensity') || 'subtle', // 'subtle' | 'medium' | 'vivid'
       color: localStorage.getItem('nomad_digit_scan_color') || 'theme',
       soundTurnaround: localStorage.getItem('nomad_digit_scan_sound') === 'true',
       simSpeedMph: null // null indicates live GPS telemetry
+    };
+
+    const SCANNER_IDLE_DURATIONS = {
+      '5.0s': 5000,
+      '3.0s': 3000,
+      '1.5s': 1500,
+      '460ms': 460
     };
 
     const SCANNER_PACE_DURATIONS = {
@@ -3298,6 +3338,38 @@
     let scannerSeqIndex = 0;
     let prevActiveBlockIdx = -1;
 
+    // Sensor Fusion: Hardware Accelerometer + GPS Stationary Zero-Clamp Deadband (< 1.8 MPH)
+    let hardwareMotionDetected = false;
+    let lastAccelMagnitude = 0;
+    let motionVariance = 0;
+    let lastMotionTimestamp = 0;
+
+    function initHardwareMotionDetection() {
+      if (typeof window !== 'undefined' && 'DeviceMotionEvent' in window) {
+        try {
+          window.addEventListener('devicemotion', (e) => {
+            const acc = e.acceleration || e.accelerationIncludingGravity;
+            if (!acc) return;
+            const x = acc.x || 0;
+            const y = acc.y || 0;
+            const z = acc.z || 0;
+            const mag = Math.sqrt(x*x + y*y + z*z);
+            const delta = Math.abs(mag - lastAccelMagnitude);
+            lastAccelMagnitude = mag;
+
+            motionVariance = motionVariance * 0.82 + delta * 0.18;
+            if (motionVariance > 0.28) {
+              lastMotionTimestamp = Date.now();
+              hardwareMotionDetected = true;
+            } else if (Date.now() - lastMotionTimestamp > 3200) {
+              hardwareMotionDetected = false;
+            }
+          }, { passive: true });
+        } catch (_) {}
+      }
+    }
+    initHardwareMotionDetection();
+
     function getEffectiveScannerSpeedMph() {
       if (SCANNER_CONFIG.simSpeedMph !== null) {
         return Math.max(0, SCANNER_CONFIG.simSpeedMph);
@@ -3305,17 +3377,98 @@
       return Math.max(0, (state && typeof state.clampedSpeedMph === 'number') ? state.clampedSpeedMph : 0);
     }
 
-    function calculateCurrentStepDuration() {
-      const baseMs = SCANNER_PACE_DURATIONS[SCANNER_CONFIG.basePace] || 460;
-      if (!SCANNER_CONFIG.speedReactive) {
-        return { duration: baseMs, multiplier: 1.0 };
+    function getMotionSensorStatus() {
+      const effSpeed = getEffectiveScannerSpeedMph();
+
+      if (SCANNER_CONFIG.simSpeedMph !== null) {
+        const isMoving = SCANNER_CONFIG.simSpeedMph >= 1.0;
+        return {
+          isMoving,
+          isStopped: !isMoving,
+          speedMph: SCANNER_CONFIG.simSpeedMph,
+          source: isMoving ? 'SIMULATOR ACTIVE' : 'SIMULATOR ZERO',
+          sensorText: isMoving ? `SIMULATED (${Math.round(effSpeed)} MPH)` : 'SIMULATOR ZERO LOCK'
+        };
       }
-      const speed = getEffectiveScannerSpeedMph();
-      // Every 10 mph speeds up by 10%
-      // multiplier = 1.10 ^ (speed / 10)
-      const multiplier = Math.min(4.0, Math.pow(1.10, speed / 10));
-      const stepDuration = Math.max(80, Math.round(baseMs / multiplier));
-      return { duration: stepDuration, multiplier };
+
+      // Live Telemetry:
+      // Real-world vehicular GPS is clamped by the hardware 1.8 MPH stationary zero-clamp deadband
+      const isGpsMoving = effSpeed >= 1.8;
+      const isAccelMoving = Boolean(hardwareMotionDetected);
+      const isMoving = isGpsMoving || (isAccelMoving && effSpeed >= 0.8);
+
+      let sensorText = 'GPS DEADBAND + RESTING SENSOR';
+      if (isGpsMoving) {
+        sensorText = `GPS COURSE TRACK (${effSpeed.toFixed(1)} MPH)`;
+      } else if (isAccelMoving) {
+        sensorText = 'ACCELEROMETER MOTION DETECTED';
+      } else {
+        sensorText = 'GPS DEADBAND + RESTING SENSOR';
+      }
+
+      return {
+        isMoving,
+        isStopped: !isMoving,
+        speedMph: effSpeed,
+        source: isGpsMoving ? 'GPS TRACK' : (isAccelMoving ? 'ACCELEROMETER' : 'STATIONARY DEADBAND (<1.8 MPH)'),
+        sensorText
+      };
+    }
+
+    function calculateCurrentStepDuration() {
+      const idleMs = SCANNER_IDLE_DURATIONS[SCANNER_CONFIG.idleCadence] || 5000;
+      const baseDriveMs = SCANNER_PACE_DURATIONS[SCANNER_CONFIG.basePace] || 460;
+      const motion = getMotionSensorStatus();
+
+      // If Speed-Reactive Avionics is disabled, user locked the pace:
+      if (!SCANNER_CONFIG.speedReactive) {
+        return {
+          duration: baseDriveMs,
+          multiplier: 1.0,
+          isIdle: false,
+          idleMs,
+          motion
+        };
+      }
+
+      // When stopped or sitting still in browser / no motion detected:
+      // Strictly lock to idle cadence (1 movement per 5 seconds / 5000ms by default)
+      if (motion.isStopped || motion.speedMph < 0.5) {
+        return {
+          duration: idleMs,
+          multiplier: 1.0,
+          isIdle: true,
+          idleMs,
+          motion
+        };
+      }
+
+      // Vehicle in motion (> 0.5 MPH):
+      // Smooth progressive transition from idleMs at 0 MPH down to active cruising base at 20 MPH,
+      // then accelerates +10% for every 10 MPH beyond 20 MPH!
+      const speed = motion.speedMph;
+      let stepDuration;
+      let multiplier;
+
+      if (speed < 20.0) {
+        const t = Math.max(0, Math.min(1.0, speed / 20.0));
+        const smoothT = (1 - Math.cos(t * Math.PI)) / 2;
+        stepDuration = Math.round(idleMs * (1 - smoothT) + baseDriveMs * smoothT);
+        multiplier = parseFloat((idleMs / stepDuration).toFixed(2));
+      } else {
+        const speedAbove20 = speed - 20.0;
+        const accelFactor = Math.pow(1.10, speedAbove20 / 10.0);
+        multiplier = parseFloat((idleMs / (baseDriveMs / accelFactor)).toFixed(2));
+        stepDuration = Math.max(80, Math.round(baseDriveMs / accelFactor));
+      }
+
+      return {
+        duration: stepDuration,
+        multiplier,
+        isIdle: false,
+        idleMs,
+        motion
+      };
     }
 
     function applyScannerCustomStyles() {
@@ -3353,18 +3506,23 @@
       }
     }
 
-    function updateBlockIllumination(activeBlockIndex, trailBlockIndex) {
+    function updateBlockIllumination(activeBlockIndex, trailBlockIndex, isIdle) {
       SCANNER_BLOCK_IDS.forEach((id, idx) => {
         const el = document.getElementById(id);
         if (!el) return;
         if (idx === activeBlockIndex) {
           el.classList.add('pulse-active');
+          if (isIdle) {
+            el.classList.add('idle-mode');
+          } else {
+            el.classList.remove('idle-mode');
+          }
           el.classList.remove('pulse-trail');
         } else if (idx === trailBlockIndex) {
           el.classList.add('pulse-trail');
-          el.classList.remove('pulse-active');
+          el.classList.remove('pulse-active', 'idle-mode');
         } else {
-          el.classList.remove('pulse-active', 'pulse-trail');
+          el.classList.remove('pulse-active', 'pulse-trail', 'idle-mode');
         }
       });
     }
@@ -3372,7 +3530,7 @@
     function clearAllIllumination() {
       SCANNER_BLOCK_IDS.forEach((id) => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('pulse-active', 'pulse-trail');
+        if (el) el.classList.remove('pulse-active', 'pulse-trail', 'idle-mode');
       });
       prevActiveBlockIdx = -1;
     }
@@ -3392,7 +3550,8 @@
       }
 
       const currentBlockIdx = sequence[scannerSeqIndex];
-      updateBlockIllumination(currentBlockIdx, prevActiveBlockIdx);
+      const calc = calculateCurrentStepDuration();
+      updateBlockIllumination(currentBlockIdx, prevActiveBlockIdx, calc.isIdle);
       prevActiveBlockIdx = currentBlockIdx;
 
       // Turnaround sonic feedback if bounce mode reached end
@@ -3404,7 +3563,6 @@
 
       scannerSeqIndex = (scannerSeqIndex + 1) % sequence.length;
 
-      const calc = calculateCurrentStepDuration();
       updateScannerModalLiveStatus(calc);
 
       scannerTimer = setTimeout(runScannerStep, calc.duration);
@@ -3437,12 +3595,14 @@
       btn.classList.remove('mode-cascade', 'mode-bounce', 'mode-off');
       btn.classList.add(`mode-${SCANNER_CONFIG.mode}`);
 
+      const calc = calculateCurrentStepDuration();
+
       if (SCANNER_CONFIG.mode === 'cascade') {
         label.textContent = 'CASCADE ⮛';
-        btn.setAttribute('title', 'Kinetic Outline Scanner: Active (Cascade Top-to-Bottom) • Tap to switch • Hold for Settings');
+        btn.setAttribute('title', `Kinetic Outline Scanner: Active (Cascade) • ${calc.isIdle ? 'IDLE (1 step / 5.0s)' : 'IN MOTION (+10%/10 MPH)'} • Hold for Settings`);
       } else if (SCANNER_CONFIG.mode === 'bounce') {
         label.textContent = 'BOUNCE ⮁';
-        btn.setAttribute('title', 'Kinetic Outline Scanner: Active (Bounce Back-and-Forth) • Tap to switch • Hold for Settings');
+        btn.setAttribute('title', `Kinetic Outline Scanner: Active (Bounce) • ${calc.isIdle ? 'IDLE (1 step / 5.0s)' : 'IN MOTION (+10%/10 MPH)'} • Hold for Settings`);
       } else {
         label.textContent = 'SCAN: OFF';
         btn.setAttribute('title', 'Kinetic Outline Scanner: Disabled • Tap to activate • Hold for Settings');
@@ -3494,34 +3654,45 @@
       const chkSpeed = document.getElementById('chk-scanner-speed-reactive');
       if (chkSpeed) chkSpeed.checked = SCANNER_CONFIG.speedReactive;
 
-      // 3. Cadence pace buttons
+      // 3. Idle cadence buttons (when stopped / no motion)
+      document.querySelectorAll('[data-opt-idle]').forEach(btn => {
+        btn.classList.toggle('is-selected', btn.getAttribute('data-opt-idle') === SCANNER_CONFIG.idleCadence);
+      });
+
+      // 4. Cruising base pace buttons (in motion)
       document.querySelectorAll('[data-opt-pace]').forEach(btn => {
         btn.classList.toggle('is-selected', btn.getAttribute('data-opt-pace') === SCANNER_CONFIG.basePace);
       });
 
-      // 4. Intensity buttons
+      // 5. Intensity buttons
       document.querySelectorAll('[data-opt-intensity]').forEach(btn => {
         btn.classList.toggle('is-selected', btn.getAttribute('data-opt-intensity') === SCANNER_CONFIG.intensity);
       });
 
-      // 5. Color swatches
+      // 6. Color swatches
       document.querySelectorAll('[data-opt-color]').forEach(swatch => {
         swatch.classList.toggle('is-selected', swatch.getAttribute('data-opt-color') === SCANNER_CONFIG.color);
       });
 
-      // 6. Sound turnaround
+      // 7. Sound turnaround
       const chkSound = document.getElementById('chk-scanner-sound');
       if (chkSound) chkSound.checked = SCANNER_CONFIG.soundTurnaround;
 
-      // 7. Sim slider
+      // 8. Sim slider
       const slider = document.getElementById('scanner-sim-slider');
       const sliderLabel = document.getElementById('slider-speed-val');
       const effSpeed = getEffectiveScannerSpeedMph();
       if (slider) slider.value = effSpeed;
       if (sliderLabel) {
-        sliderLabel.textContent = (SCANNER_CONFIG.simSpeedMph !== null)
-          ? `${Math.round(effSpeed)} MPH (SIMULATED)`
-          : `${Math.round(effSpeed)} MPH (LIVE GPS)`;
+        if (SCANNER_CONFIG.simSpeedMph !== null) {
+          sliderLabel.textContent = (effSpeed === 0) 
+            ? '0 MPH (IDLE 5.0s)' 
+            : `${Math.round(effSpeed)} MPH (SIMULATED)`;
+        } else {
+          sliderLabel.textContent = (effSpeed === 0)
+            ? '0 MPH (LIVE IDLE 5.0s)'
+            : `${Math.round(effSpeed)} MPH (LIVE GPS)`;
+        }
       }
 
       updateScannerModalLiveStatus(calculateCurrentStepDuration());
@@ -3531,6 +3702,7 @@
       const modeLabel = document.getElementById('modal-status-mode');
       const speedLabel = document.getElementById('modal-status-speed');
       const multLabel = document.getElementById('modal-status-mult');
+      const sensorLabel = document.getElementById('modal-status-sensor');
       if (!modeLabel || !speedLabel || !multLabel) return;
 
       const modeNames = {
@@ -3541,8 +3713,21 @@
       modeLabel.textContent = modeNames[SCANNER_CONFIG.mode] || 'OFF';
 
       const effSpeed = getEffectiveScannerSpeedMph();
-      speedLabel.textContent = `${effSpeed.toFixed(1)} MPH ${SCANNER_CONFIG.simSpeedMph !== null ? '(SIM)' : ''}`;
-      multLabel.textContent = `${calc.multiplier.toFixed(2)}x (${calc.duration}ms/step)`;
+      const isSim = SCANNER_CONFIG.simSpeedMph !== null;
+      speedLabel.textContent = `${effSpeed.toFixed(1)} MPH ${isSim ? '(SIM)' : (calc.motion.isStopped ? '(STOPPED)' : '(MOVING)')}`;
+
+      if (sensorLabel) {
+        sensorLabel.textContent = calc.motion.sensorText;
+        sensorLabel.style.color = calc.motion.isStopped ? '#94a3b8' : '#00f3ff';
+      }
+
+      if (calc.isIdle) {
+        multLabel.textContent = `1 step / ${(calc.duration / 1000).toFixed(1)}s (IDLE LOCK)`;
+        multLabel.style.color = '#10b981';
+      } else {
+        multLabel.textContent = `${calc.duration}ms/step (+10%/10 MPH)`;
+        multLabel.style.color = '#00f3ff';
+      }
     }
 
     // Bind Header Button & Modal Controls
@@ -3616,7 +3801,19 @@
       });
     }
 
-    // Cadence pace options
+    // Idle cadence options (when stopped)
+    document.querySelectorAll('[data-opt-idle]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        SCANNER_CONFIG.idleCadence = btn.getAttribute('data-opt-idle');
+        localStorage.setItem('nomad_digit_scan_idle_cadence', SCANNER_CONFIG.idleCadence);
+        syncScannerModalUI();
+        if (calculateCurrentStepDuration().isIdle) {
+          startScanner();
+        }
+      });
+    });
+
+    // Cruising pace options (in motion)
     document.querySelectorAll('[data-opt-pace]').forEach(btn => {
       btn.addEventListener('click', () => {
         SCANNER_CONFIG.basePace = btn.getAttribute('data-opt-pace');
@@ -3661,7 +3858,11 @@
       simSlider.addEventListener('input', (e) => {
         const val = parseFloat(e.target.value);
         SCANNER_CONFIG.simSpeedMph = val;
-        if (sliderLabel) sliderLabel.textContent = `${Math.round(val)} MPH (SIMULATED)`;
+        if (sliderLabel) {
+          sliderLabel.textContent = (val === 0) 
+            ? '0 MPH (IDLE 5.0s)' 
+            : `${Math.round(val)} MPH (SIMULATED)`;
+        }
         updateScannerModalLiveStatus(calculateCurrentStepDuration());
       });
     }
@@ -3678,12 +3879,14 @@
           showToast(`SPEED SIMULATOR: SET TO ${val} MPH`);
         }
         syncScannerModalUI();
+        startScanner();
       });
     });
 
     // Expose engine
     window.NomadDigitScanner = {
       getConfig: () => ({ ...SCANNER_CONFIG }),
+      getMotionStatus: getMotionSensorStatus,
       setMode: (m) => { SCANNER_CONFIG.mode = m; startScanner(); },
       cycleMode: cycleScannerMode,
       openSettings: openScannerModal,
