@@ -323,6 +323,18 @@
         justify-content: space-between;
         align-items: center;
       }
+      #about-modal .modal-scanner-btn {
+        background: rgba(48, 209, 88, 0.10);
+        border: 1.5px solid #30d158;
+        color: #ffffff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      #about-modal .modal-scanner-btn:hover {
+        background: rgba(48, 209, 88, 0.20);
+        box-shadow: 0 0 10px rgba(48, 209, 88, 0.3);
+      }
       #about-modal .modal-download-btn {
         background: #10b981;
         border: none;
@@ -432,14 +444,23 @@
       `;
     }
 
-    // Audio toggle row for DIGIT
+    // Audio and Kinetic Scanner toggle rows for DIGIT
     let audioHTML = '';
+    let scannerHTML = '';
     if (context === 'digit') {
       const isSoundOn = (window.digitSoundEnabled !== false);
       audioHTML = `
         <button id="btn-audio-modal" class="modal-btn-row modal-audio-btn" onclick="window.toggleUnifiedAudio()" title="Toggle Avionics Audio">
           <span>🔊 AVIONICS AUDIO</span>
           <span id="audio-modal-status" style="font-weight: 800; color: #00f3ff;">${isSoundOn ? 'ON' : 'OFF'}</span>
+        </button>
+      `;
+
+      const scanMode = (localStorage.getItem('nomad_digit_scan_mode') || 'cascade').toUpperCase();
+      scannerHTML = `
+        <button id="btn-scanner-modal-row" class="modal-btn-row modal-scanner-btn" onclick="window.closeAboutModal(); setTimeout(() => { if (window.openDigitScannerModal) window.openDigitScannerModal(); }, 120);" title="Configure Kinetic Block Outline Scanner">
+          <span>⚡ KINETIC SCANNER</span>
+          <span id="scanner-modal-status" style="font-weight: 800; color: #30d158;">${scanMode} ⚙</span>
         </button>
       `;
     }
@@ -475,6 +496,7 @@
 
         <!-- Action Buttons Stack -->
         <div class="modal-action-stack">
+          ${scannerHTML}
           ${audioHTML}
           <a href="visualizer.html?from=${context}" class="modal-btn-row modal-vis-btn">✨ VISUALIZER ARCADE ↗</a>
           <a href="geek-stats.html?from=${context}" class="modal-btn-row modal-stats-btn">&gt; GEEK STATS (VT220) _</a>

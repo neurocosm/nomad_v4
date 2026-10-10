@@ -296,6 +296,28 @@
   - **Bubble Active / Inactive Status**: Added quick visibility state toggles (`👁️ Active` vs `💤 Inactive`) in the Hyperspace modal with live dot status on tab buttons.
   - **Version Registry Updated**: Updated `NOMAD_VERSION` to `v4.09182026.1440` in `version.js` and refreshed `sw.js` cache to match.
 
+### v4 Step 22: NOMAD DIGIT Kinetic Block Outline Scanner & Speed-Reactive Avionics [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **Kinetic Block Outline Scanner**: Implemented DIGIT's signature visual hallmark — an autonomous, sequential outline luminescence sweeping through the 5 tactical horizontal blocks (`#block-location`, `#block-motion`, `#block-weather`, `#block-time`, `#block-philosophy`).
+  - **Live Velocity Acceleration (+10% per 10 MPH)**: Scanner cadence scales dynamically with vehicle velocity: `multiplier = 1.10 ^ (speedMph / 10)` (clamped between 1.0x and 4.0x), smoothly accelerating from a calm idle breathing pulse at 0 MPH to a rapid racing sweep at highway speeds.
+  - **Dual Motion Patterns (Cascade & Bounce)**:
+    - **Cascade Mode (Top to Bottom Repeat)**: Continuous downward waterfall pulse `[0 ➔ 1 ➔ 2 ➔ 3 ➔ 4 ➔ 0...]`.
+    - **Bounce Mode (Top to Bottom to Top)**: Pendulum/Cylon oscillation `[0 ➔ 1 ➔ 2 ➔ 3 ➔ 4 ➔ 3 ➔ 2 ➔ 1 ➔ 0...]` with optional sub-audible turnaround sonic chime.
+    - **Disabled Mode (Off)**: Clean toggle option to silence the effect.
+  - **Tactile Top-Header Control Button (`#btn-pulse-mode`)**: Added top-right header button with glowing status dot cycling `CASCADE ⮛` ➔ `BOUNCE ⮁` ➔ `SCAN: OFF` on tap, and launching the full configuration modal on 520ms long press.
+  - **Dedicated Scanner Configuration Modal (`#scanner-modal`)**: Built full tactical cockpit modal with:
+    - Live status card displaying active pattern, real-time vehicle speed, and live multiplier.
+    - Direction pattern segmented controls (Cascade, Bounce, Off).
+    - Speed-reactive avionics toggle (+10% per 10 MPH).
+    - Interactive speed simulation test slider (0 to 100 MPH) with quick-select presets (0, 30, 55, 80 MPH, Live GPS).
+    - Base idle cadence selector (Calm 620ms, Standard 460ms, Brisk 330ms, Hyper 220ms).
+    - Luminous glow intensity selector (Subtle Outline, Medium Luminescence, Vivid Glow).
+    - 6 luminous color swatches (Theme Accent, Cyan Neon, Emerald Green, Amber Gold, Hot Pink, Ice White).
+    - Turnaround sonic chime toggle.
+  - **Unified Suite & Return to Launch Fixed**: Ensured "Return to Launch" everywhere routes strictly to `launch.html` without looping back to Hyperspace, and synchronized all DIGIT scanner engines across both root `/digit.html` and `/nomad_suite/digit.html`.
+  - **Version Registry Updated**: Updated `NOMAD_VERSION` to `v4.10092026.2108` in `version.js` and `nomad_suite/version.js` strictly following US Eastern Time.
+
 ### Upcoming Backlog & Wishlist
 - **Optimal Pre-Made Bubble Shape Defaults & Curated Geometry**: Curate and assign the ideal default shape for each telemetry bubble out of the box (e.g., Speed = Egg/Oval, Temp = Squirkle, Compass = Pentagon, Altitude = Diamond/Hexagon, Atmo = Circle/Octagon, Coords = Wobble Rectangle), giving each data element immediate visual identity while preserving user customizability.
 - **Wobbling Rectangle Shape Geometry**: Introduce a dedicated kinetic rectangular shape with soft rounded corners and kinetic wobble physics, tailor-made to frame stacked two-line coordinate pairs (Latitude & Longitude) without clipping.
