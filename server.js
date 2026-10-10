@@ -40,7 +40,7 @@ app.get(['/version.json', '/public/version.json', '/api/version'], (req, res) =>
     console.error('Error reading version.json:', err);
   }
   res.json({
-    version: 'v4.10102026.0901',
+    version: 'v4.10102026.0914',
     timestamp: Date.now()
   });
 });

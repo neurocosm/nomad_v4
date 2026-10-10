@@ -674,32 +674,42 @@
 
     /* Kinetic Outline Scanner: 10-Step Line-Cycle Active Top Bar / Line */
     .rounded-block.line-top-active {
-      border-top-color: var(--pulse-outline-color, var(--accent-cyan)) !important;
-      border-top-width: 2.5px !important;
-      border-right-color: var(--border-cyan) !important;
-      border-bottom-color: var(--border-cyan) !important;
-      border-left-color: var(--border-cyan) !important;
-      box-shadow: inset 0 2px 8px rgba(0, 243, 255, 0.28) !important;
+      border-top: 3px solid var(--pulse-outline-color, var(--accent-cyan)) !important;
+      border-right: 1.5px solid var(--border-cyan) !important;
+      border-bottom: 1.5px solid var(--border-cyan) !important;
+      border-left: 1.5px solid var(--border-cyan) !important;
+      box-shadow: 0 -2px 12px rgba(0, 243, 255, 0.35) !important;
       background: var(--bg-card) !important;
     }
     .rounded-block.line-top-active .block-meta-top {
-      color: var(--pulse-outline-color, var(--accent-cyan)) !important;
-      font-weight: 700 !important;
+      color: #ffffff !important;
+      background: rgba(0, 243, 255, 0.22) !important;
+      border: 1px solid var(--pulse-outline-color, var(--accent-cyan)) !important;
+      border-radius: 6px !important;
+      padding: 3px 6px !important;
+      font-weight: 800 !important;
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.4) !important;
+      transition: all 0.15s ease !important;
     }
 
     /* Kinetic Outline Scanner: 10-Step Line-Cycle Active Bottom Bar / Line */
     .rounded-block.line-bottom-active {
-      border-top-color: var(--border-cyan) !important;
-      border-right-color: var(--border-cyan) !important;
-      border-bottom-color: var(--pulse-outline-color, var(--accent-cyan)) !important;
-      border-bottom-width: 2.5px !important;
-      border-left-color: var(--border-cyan) !important;
-      box-shadow: inset 0 -2px 8px rgba(0, 243, 255, 0.28) !important;
+      border-top: 1.5px solid var(--border-cyan) !important;
+      border-right: 1.5px solid var(--border-cyan) !important;
+      border-bottom: 3px solid var(--pulse-outline-color, var(--accent-cyan)) !important;
+      border-left: 1.5px solid var(--border-cyan) !important;
+      box-shadow: 0 2px 12px rgba(0, 243, 255, 0.35) !important;
       background: var(--bg-card) !important;
     }
     .rounded-block.line-bottom-active .block-meta-bottom {
-      color: var(--pulse-outline-color, var(--accent-cyan)) !important;
-      font-weight: 700 !important;
+      color: #ffffff !important;
+      background: rgba(0, 243, 255, 0.22) !important;
+      border: 1px solid var(--pulse-outline-color, var(--accent-cyan)) !important;
+      border-radius: 6px !important;
+      padding: 3px 6px !important;
+      font-weight: 800 !important;
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.4) !important;
+      transition: all 0.15s ease !important;
     }
 
     /* Inactive prior block remains untouched with default card border */
@@ -3158,7 +3168,7 @@
     // ==========================================
     // NOMAD: DIGIT — Versioning & PWA Call-Home Engine
     // ==========================================
-    const NOMAD_CURRENT_VERSION = 'v4.10102026.0901';
+    const NOMAD_CURRENT_VERSION = 'v4.10102026.0914';
     let serviceWorkerRegistration = null;
     let isUpdateAvailable = false;
 
@@ -3428,6 +3438,12 @@
     // Strictly enforce 5.0s (5000ms tranquil pulse) as the resting idle cadence
     let initialIdleCadence = '5.0s';
     localStorage.setItem('nomad_digit_scan_idle_cadence', '5.0s');
+
+    // Automatic migration: Ensure 10-Step Top & Bottom Bar Line-Cycle is default active target
+    if (!localStorage.getItem('nomad_digit_10step_active_v4')) {
+      localStorage.setItem('nomad_digit_scan_target', 'lines');
+      localStorage.setItem('nomad_digit_10step_active_v4', 'true');
+    }
 
     const SCANNER_CONFIG = {
       mode: localStorage.getItem('nomad_digit_scan_mode') || 'cascade', // 'cascade' | 'bounce' | 'off'
@@ -3788,10 +3804,10 @@
       const stepCount = (SCANNER_CONFIG.target === 'lines') ? '10' : '5';
 
       if (SCANNER_CONFIG.mode === 'cascade') {
-        label.textContent = calc.isIdle ? `CASCADE (${idleSec}s) ⮛` : `CASCADE (${stepCount}) ⮛`;
+        label.textContent = `CASCADE (${stepCount}) ⮛`;
         btn.setAttribute('title', `Kinetic Outline Scanner: Active (Cascade - ${SCANNER_CONFIG.target === 'lines' ? '10-Step Top & Bottom Bars' : '5-Step Full Outline'}) • ${calc.isIdle ? `IDLE (1 step / ${idleSec}s)` : `${calc.duration}ms/step (+10%/10 MPH)`} • Hold for Settings`);
       } else if (SCANNER_CONFIG.mode === 'bounce') {
-        label.textContent = calc.isIdle ? `BOUNCE (${idleSec}s) ⮁` : `BOUNCE (${stepCount}) ⮁`;
+        label.textContent = `BOUNCE (${stepCount}) ⮁`;
         btn.setAttribute('title', `Kinetic Outline Scanner: Active (Bounce - ${SCANNER_CONFIG.target === 'lines' ? 'Top & Bottom Bars' : 'Full Outline'}) • ${calc.isIdle ? `IDLE (1 step / ${idleSec}s)` : `${calc.duration}ms/step (+10%/10 MPH)`} • Hold for Settings`);
       } else {
         label.textContent = 'SCAN: OFF';
