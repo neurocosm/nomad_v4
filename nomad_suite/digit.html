@@ -672,44 +672,24 @@
       background: var(--bg-card) !important;
     }
 
-    /* Kinetic Outline Scanner: 10-Step Line-Cycle Active Top Bar / Line */
+    /* Kinetic Outline Scanner: 10-Step Line-Cycle Active Top Bar / Line (Zero Glow, Borders Only) */
     .rounded-block.line-top-active {
-      border-top: 3px solid var(--pulse-outline-color, var(--accent-cyan)) !important;
-      border-right: 1.5px solid var(--border-cyan) !important;
-      border-bottom: 1.5px solid var(--border-cyan) !important;
-      border-left: 1.5px solid var(--border-cyan) !important;
-      box-shadow: 0 -2px 12px rgba(0, 243, 255, 0.35) !important;
+      border-top-color: var(--pulse-outline-color, var(--accent-cyan)) !important;
+      border-right-color: var(--border-cyan) !important;
+      border-bottom-color: var(--border-cyan) !important;
+      border-left-color: var(--border-cyan) !important;
+      box-shadow: none !important;
       background: var(--bg-card) !important;
-    }
-    .rounded-block.line-top-active .block-meta-top {
-      color: #ffffff !important;
-      background: rgba(0, 243, 255, 0.22) !important;
-      border: 1px solid var(--pulse-outline-color, var(--accent-cyan)) !important;
-      border-radius: 6px !important;
-      padding: 3px 6px !important;
-      font-weight: 800 !important;
-      box-shadow: 0 0 10px rgba(0, 243, 255, 0.4) !important;
-      transition: all 0.15s ease !important;
     }
 
-    /* Kinetic Outline Scanner: 10-Step Line-Cycle Active Bottom Bar / Line */
+    /* Kinetic Outline Scanner: 10-Step Line-Cycle Active Bottom Bar / Line (Zero Glow, Borders Only) */
     .rounded-block.line-bottom-active {
-      border-top: 1.5px solid var(--border-cyan) !important;
-      border-right: 1.5px solid var(--border-cyan) !important;
-      border-bottom: 3px solid var(--pulse-outline-color, var(--accent-cyan)) !important;
-      border-left: 1.5px solid var(--border-cyan) !important;
-      box-shadow: 0 2px 12px rgba(0, 243, 255, 0.35) !important;
+      border-top-color: var(--border-cyan) !important;
+      border-right-color: var(--border-cyan) !important;
+      border-bottom-color: var(--pulse-outline-color, var(--accent-cyan)) !important;
+      border-left-color: var(--border-cyan) !important;
+      box-shadow: none !important;
       background: var(--bg-card) !important;
-    }
-    .rounded-block.line-bottom-active .block-meta-bottom {
-      color: #ffffff !important;
-      background: rgba(0, 243, 255, 0.22) !important;
-      border: 1px solid var(--pulse-outline-color, var(--accent-cyan)) !important;
-      border-radius: 6px !important;
-      padding: 3px 6px !important;
-      font-weight: 800 !important;
-      box-shadow: 0 0 10px rgba(0, 243, 255, 0.4) !important;
-      transition: all 0.15s ease !important;
     }
 
     /* Inactive prior block remains untouched with default card border */
@@ -3168,7 +3148,7 @@
     // ==========================================
     // NOMAD: DIGIT — Versioning & PWA Call-Home Engine
     // ==========================================
-    const NOMAD_CURRENT_VERSION = 'v4.10102026.0914';
+    const NOMAD_CURRENT_VERSION = 'v4.10102026.0936';
     let serviceWorkerRegistration = null;
     let isUpdateAvailable = false;
 

@@ -402,6 +402,19 @@
     - Updated `NOMAD_VERSION` to `v4.10102026.0755` strictly following US Eastern Time across `version.js`, `nomad_suite/version.js`, `version.json`, `server.js`, and both `sw.js` manifests (`nomad-avionics-suite-v4-10102026-0755`).
     - Synchronized all changes 1:1 between root `/digit.html` and `/nomad_suite/digit.html`.
 
+### v4 Step 28: Strict Borders-Only Color Shifting & Inner Element Style Eradication [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **Strict Borders-Only Illumination**:
+    - Eradicated all inner element overrides (`.block-meta-top` and `.block-meta-bottom` styling), removing unintended background fills, bright white text color overrides, inner border boxes, and internal glows.
+    - Eliminated card box-shadows (`box-shadow: none !important;`) for both top and bottom active states, restoring pure zero-glow aesthetics.
+  - **Clean Single-Line Border Color Shifts**:
+    - `.line-top-active`: Strictly shifts `border-top-color: var(--pulse-outline-color, var(--accent-cyan)) !important;` while maintaining right, bottom, and left at default card border (`var(--border-cyan)`).
+    - `.line-bottom-active`: Strictly shifts `border-bottom-color: var(--pulse-outline-color, var(--accent-cyan)) !important;` while maintaining top, right, and left at `var(--border-cyan)`.
+    - Content inside the block (coordinates, telemetry, badges, icons, labels, fonts) remains 100% untouched and unchanged throughout the entire 10-step sequence.
+  - **Version Registry & PWA Cache Synchronized**:
+    - Updated `NOMAD_VERSION` to `v4.10102026.0936` strictly following US Eastern Time across `version.js`, `version.json`, `sw.js` (`nomad-avionics-suite-v4-10102026-0936`), and both `/digit.html` and `/nomad_suite/digit.html`.
+
 ### Upcoming Backlog & Wishlist
 - **Optimal Pre-Made Bubble Shape Defaults & Curated Geometry**: Curate and assign the ideal default shape for each telemetry bubble out of the box (e.g., Speed = Egg/Oval, Temp = Squirkle, Compass = Pentagon, Altitude = Diamond/Hexagon, Atmo = Circle/Octagon, Coords = Wobble Rectangle), giving each data element immediate visual identity while preserving user customizability.
 - **Wobbling Rectangle Shape Geometry**: Introduce a dedicated kinetic rectangular shape with soft rounded corners and kinetic wobble physics, tailor-made to frame stacked two-line coordinate pairs (Latitude & Longitude) without clipping.
