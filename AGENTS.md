@@ -432,6 +432,23 @@
   - **Version Registry & PWA Cache Synchronized**:
     - Updated `NOMAD_VERSION` to `v4.10102026.1017` strictly following US Eastern Time across `version.js`, `version.json`, `sw.js` (`nomad-avionics-suite-v4-10102026-1017`), and both `/digit.html` and `/nomad_suite/digit.html`.
 
+### v4 Step 30: Instant NOMAD DIGIT Color Tap & Location Block Long-Press Menu [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **Instant Single-Tap Color Cycling on NOMAD DIGIT**:
+    - Restored direct, zero-delay single-tap cycling on `NOMAD: DIGIT` (`#btn-brand-mode`), completely removing long-press timers and pointer conflicts from the title text.
+    - Tapping immediately steps through all 4 color schemes: Original Vivid HUD, Relaxed 256-Gray, Apollo (R-W-B), and Arizona Dusk with audio confirmation and toast feedback.
+  - **Location Block Long-Press Menu Anchor (550ms)**:
+    - Anchored suite branding modal access strictly to long-pressing the Location Block (`#block-location`, 01 // LOCATION & COORDS).
+    - Long-pressing for 550ms triggers subtle `.pressing` tactile scaling, haptic vibration (`navigator.vibrate(60)`), an avionics chime (`playTone(1600)`), and opens the NOMAD Suite Branding & Settings modal (`NomadMenuEngine.open()`).
+    - Smart press suppression: When a long-press triggers, subsequent synthetic `click` events are intercepted and suppressed, preventing accidental coordinate copying or toast overlaps upon finger lift.
+    - Short tap (< 550ms) on the Location Block continues to copy coordinates / Google Maps URL to clipboard.
+    - Updated card metadata hints to `TAP: COORDS • HOLD: MENU`.
+  - **Seamless Kinetic Features Navigation**:
+    - Updated branding modal controls with bold, clear `⚡ KINETIC FEATURES & SETTINGS` hero button (`OPEN ➔`), granting one-tap access to all granular scanner parameters (pace, idle cadence, colors, and audio) as well as quick FLOW and GEOMETRY toggles.
+  - **Version Registry & PWA Cache Synchronized**:
+    - Updated `NOMAD_VERSION` to `v4.10102026.1032` strictly following US Eastern Time across `version.js`, `nomad_suite/version.js`, `version.json`, `nomad_suite/version.json`, `sw.js` and `nomad_suite/sw.js` (`nomad-avionics-suite-v4-10102026-1032`), and both root `/digit.html` and `/nomad_suite/digit.html`.
+
 ### Upcoming Backlog & Wishlist
 - **Optimal Pre-Made Bubble Shape Defaults & Curated Geometry**: Curate and assign the ideal default shape for each telemetry bubble out of the box (e.g., Speed = Egg/Oval, Temp = Squirkle, Compass = Pentagon, Altitude = Diamond/Hexagon, Atmo = Circle/Octagon, Coords = Wobble Rectangle), giving each data element immediate visual identity while preserving user customizability.
 - **Wobbling Rectangle Shape Geometry**: Introduce a dedicated kinetic rectangular shape with soft rounded corners and kinetic wobble physics, tailor-made to frame stacked two-line coordinate pairs (Latitude & Longitude) without clipping.

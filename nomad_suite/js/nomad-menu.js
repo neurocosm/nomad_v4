@@ -463,7 +463,7 @@
       scannerHTML = `
         <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:4px; padding:8px 10px; background:rgba(0, 243, 255, 0.06); border:1px solid rgba(0, 243, 255, 0.25); border-radius:10px;">
           <div style="font-size:0.62rem; font-weight:800; color:#00f3ff; letter-spacing:0.08em; display:flex; justify-content:space-between; align-items:center;">
-            <span>⚡ KINETIC FX OUTLINE SCANNER</span>
+            <span>⚡ KINETIC FEATURES &amp; OUTLINE SCANNER</span>
             <span style="font-size:0.56rem; padding:1px 5px; border-radius:4px; background:rgba(0, 243, 255, 0.15); border:1px solid rgba(0, 243, 255, 0.3); color:#fff;">DIGIT FX</span>
           </div>
           <button id="btn-suite-mode-cycle" class="modal-btn-row modal-scanner-btn" onclick="if (window.cycleDigitScanMode) { window.cycleDigitScanMode(); } else { const modes=['cascade','bounce','off']; const cur=localStorage.getItem('nomad_digit_scan_mode')||'cascade'; const next=modes[(modes.indexOf(cur)+1)%modes.length]; localStorage.setItem('nomad_digit_scan_mode', next); } NomadMenuEngine.render();" title="Cycle Kinetic FX Scanner Mode (Cascade ➔ Bounce ➔ Off)" style="background: rgba(0, 243, 255, 0.12); border-color: rgba(0, 243, 255, 0.45); color: #fff;">
@@ -475,7 +475,7 @@
             <span style="font-weight: 800; color: #10b981; font-size: 0.65rem; border: 1px solid rgba(16, 185, 129, 0.5); padding: 2px 6px; border-radius: 6px; background: rgba(16, 185, 129, 0.18);">TAP: SWITCH</span>
           </button>
           <button id="btn-scanner-modal-row" class="modal-btn-row modal-scanner-btn" onclick="if (window.closeAboutModal) window.closeAboutModal(); setTimeout(() => { if (window.openDigitScannerModal) window.openDigitScannerModal(); }, 60);" title="Configure All Kinetic FX Outline Scanner Settings" style="background: linear-gradient(135deg, rgba(0, 243, 255, 0.18), rgba(245, 158, 11, 0.18)); border-color: rgba(0, 243, 255, 0.6); color: #fff;">
-            <span style="display:flex; align-items:center; gap:6px;">⚙ ALL KINETIC FX SETTINGS</span>
+            <span style="display:flex; align-items:center; gap:6px; font-weight:700;">⚡ KINETIC FEATURES &amp; SETTINGS</span>
             <span id="scanner-modal-status" style="font-weight: 800; color: #ffb703; font-size: 0.68rem; border: 1px solid rgba(255, 183, 3, 0.5); padding: 3px 8px; border-radius: 6px; background: rgba(255, 183, 3, 0.18);">OPEN ➔</span>
           </button>
         </div>

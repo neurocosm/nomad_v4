@@ -665,6 +665,14 @@
       transform: scale(0.992);
     }
 
+    /* Long-press active tactile feedback */
+    .rounded-block.pressing {
+      transform: scale(0.985);
+      border-color: var(--accent-cyan) !important;
+      box-shadow: 0 0 14px rgba(0, 243, 255, 0.3) !important;
+      transition: transform 0.12s ease, border-color 0.12s ease;
+    }
+
     /* Kinetic Outline Scanner: Full Block Outline (5-Step) — Pure Crisp Line Color Shift (Zero Glow) */
     .rounded-block.pulse-active {
       border-color: var(--pulse-outline-color, var(--accent-cyan)) !important;
@@ -1458,7 +1466,7 @@
 
   <!-- Top Header -->
   <div class="top-header">
-    <div id="btn-brand-mode" class="app-title" title="Tap: Cycle Color Theme • Hold: Branding &amp; Kinetic FX Settings">
+    <div id="btn-brand-mode" class="app-title" title="Tap to cycle color schemes">
       <span class="dot"></span>
       <span>NOMAD: DIGIT</span>
     </div>
@@ -1468,7 +1476,7 @@
   <div class="blocks-stack">
 
     <!-- BLOCK 1: Location & Coordinates -->
-    <div id="block-location" class="rounded-block" title="Tap to copy coordinates">
+    <div id="block-location" class="rounded-block" title="Tap: Copy Coordinates • Hold: Suite Branding &amp; Settings">
       <div class="block-meta-top">
         <span>01 // LOCATION &amp; COORDS</span>
         <span id="corridor-axis-badge" class="block-badge stopped">SEEKING...</span>
@@ -1488,7 +1496,7 @@
         <span id="coords-lat-lon" class="font-mono" style="color: var(--accent-cyan); font-weight: 450;">
           ACQUIRING POSITION...
         </span>
-        <span style="color: var(--accent-cyan); font-weight: 450;">TAP: COPY COORDS</span>
+        <span style="color: var(--accent-cyan); font-weight: 450;">TAP: COORDS • HOLD: MENU</span>
       </div>
     </div>
 
@@ -2900,19 +2908,73 @@
     }
     fetchWeather(state.latitude, state.longitude);
 
-    // Tap Interactions for Blocks
-    document.getElementById('block-location').addEventListener('click', () => {
-      playTone(1300);
-      if (state.latitude !== 0 || state.longitude !== 0) {
-        const coordsText = `${state.latitude.toFixed(6)}, ${state.longitude.toFixed(6)}`;
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(state.location.googleMapsUrl || coordsText);
-        }
-        showToast('COORDINATES COPIED');
+    // Block 1 (Location & Coords): Tap to Copy Coords • Long-Press (550ms) to Open NOMAD Suite Branding & Settings
+    const locBlock = document.getElementById('block-location');
+    let locPressTimer = null;
+    let isLocLongPress = false;
+    let locTouchStartX = 0;
+    let locTouchStartY = 0;
+
+    function startLocPress(e) {
+      isLocLongPress = false;
+      if (e.touches && e.touches[0]) {
+        locTouchStartX = e.touches[0].clientX;
+        locTouchStartY = e.touches[0].clientY;
       } else {
-        showToast('ACQUIRING POSITION...');
+        locTouchStartX = e.clientX;
+        locTouchStartY = e.clientY;
       }
-    });
+      if (locBlock) locBlock.classList.add('pressing');
+      clearTimeout(locPressTimer);
+      locPressTimer = setTimeout(() => {
+        isLocLongPress = true;
+        if (locBlock) locBlock.classList.remove('pressing');
+        try {
+          if ('vibrate' in navigator) navigator.vibrate(60);
+        } catch (_) {}
+        playTone(1600);
+        openAboutModal();
+      }, 550); // 550ms hold to open NOMAD Suite & Branding modal
+    }
+
+    function cancelLocPress(e) {
+      if (e && e.type === 'touchmove' && e.touches && e.touches[0]) {
+        const dx = Math.abs(e.touches[0].clientX - locTouchStartX);
+        const dy = Math.abs(e.touches[0].clientY - locTouchStartY);
+        if (dx < 12 && dy < 12) return; // ignore slight finger tremor
+      }
+      clearTimeout(locPressTimer);
+      if (locBlock) locBlock.classList.remove('pressing');
+    }
+
+    if (locBlock) {
+      locBlock.addEventListener('touchstart', startLocPress, { passive: true });
+      locBlock.addEventListener('touchend', cancelLocPress);
+      locBlock.addEventListener('touchcancel', cancelLocPress);
+      locBlock.addEventListener('touchmove', cancelLocPress, { passive: true });
+      locBlock.addEventListener('mousedown', startLocPress);
+      locBlock.addEventListener('mouseup', cancelLocPress);
+      locBlock.addEventListener('mouseleave', cancelLocPress);
+
+      locBlock.addEventListener('click', (e) => {
+        if (isLocLongPress) {
+          e.preventDefault();
+          e.stopPropagation();
+          isLocLongPress = false;
+          return;
+        }
+        playTone(1300);
+        if (state.latitude !== 0 || state.longitude !== 0) {
+          const coordsText = `${state.latitude.toFixed(6)}, ${state.longitude.toFixed(6)}`;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(state.location.googleMapsUrl || coordsText);
+          }
+          showToast('COORDINATES COPIED');
+        } else {
+          showToast('ACQUIRING POSITION...');
+        }
+      });
+    }
 
     document.getElementById('block-motion').addEventListener('click', () => {
       playTone(1000);
@@ -2969,43 +3031,10 @@
       } catch (e) {}
     }
 
+    // Tap NOMAD: DIGIT Title to Cycle Color Schemes
     const brandBtn = document.getElementById('btn-brand-mode');
-    let brandPressTimer = null;
-    let isBrandLongPress = false;
-
-    function startBrandPress(e) {
-      isBrandLongPress = false;
-      if (brandBtn) brandBtn.classList.add('pressing');
-      clearTimeout(brandPressTimer);
-      brandPressTimer = setTimeout(() => {
-        isBrandLongPress = true;
-        if (brandBtn) brandBtn.classList.remove('pressing');
-        try {
-          if ('vibrate' in navigator) navigator.vibrate(60);
-        } catch (_) {}
-        playTone(1600);
-        openAboutModal();
-      }, 550); // 550ms threshold for menu reveal
-    }
-
-    function cancelBrandPress() {
-      clearTimeout(brandPressTimer);
-      if (brandBtn) brandBtn.classList.remove('pressing');
-    }
-
     if (brandBtn) {
-      brandBtn.addEventListener('pointerdown', startBrandPress);
-      brandBtn.addEventListener('pointerup', cancelBrandPress);
-      brandBtn.addEventListener('pointercancel', cancelBrandPress);
-      brandBtn.addEventListener('pointerleave', cancelBrandPress);
-
-      brandBtn.addEventListener('click', (e) => {
-        if (isBrandLongPress) {
-          e.preventDefault();
-          e.stopPropagation();
-          isBrandLongPress = false;
-          return;
-        }
+      brandBtn.addEventListener('click', () => {
         const currentIndex = NOMAD_THEMES.findIndex(t => t.id === state.colorTheme);
         const nextIndex = (currentIndex + 1) % NOMAD_THEMES.length;
         const nextTheme = NOMAD_THEMES[nextIndex];
@@ -3134,7 +3163,7 @@
     // ==========================================
     // NOMAD: DIGIT — Versioning & PWA Call-Home Engine
     // ==========================================
-    const NOMAD_CURRENT_VERSION = 'v4.10102026.1017';
+    const NOMAD_CURRENT_VERSION = 'v4.10102026.1032';
     let serviceWorkerRegistration = null;
     let isUpdateAvailable = false;
 
@@ -3378,20 +3407,6 @@
       } catch (err) {
         window.location.reload(true);
       }
-    }
-
-    // Long-press on location block opens about modal
-    const locBlock = document.getElementById('block-location');
-    if (locBlock) {
-      let locPressTimer;
-      const startLocPress = () => { locPressTimer = setTimeout(openAboutModal, 600); };
-      const cancelLocPress = () => clearTimeout(locPressTimer);
-      locBlock.addEventListener('touchstart', startLocPress, { passive: true });
-      locBlock.addEventListener('touchend', cancelLocPress);
-      locBlock.addEventListener('touchmove', cancelLocPress);
-      locBlock.addEventListener('mousedown', startLocPress);
-      locBlock.addEventListener('mouseup', cancelLocPress);
-      locBlock.addEventListener('mouseleave', cancelLocPress);
     }
 
     // ====================================================================
