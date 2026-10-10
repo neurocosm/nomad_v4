@@ -571,10 +571,8 @@
       flex-direction: column;
       justify-content: space-between;
       cursor: pointer;
-      transition: border-color 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
-                  box-shadow 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
-                  background-color 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
-                  transform 0.1s;
+      /* Instantaneous border color switching with zero transition delay eliminates lingering prior block illumination */
+      transition: background-color 0.15s ease, transform 0.1s ease;
       overflow: hidden;
       position: relative;
     }
@@ -588,38 +586,36 @@
       transform: scale(0.992);
     }
 
-    /* Kinetic Outline Scanner Active Illuminated Block */
+    /* Kinetic Outline Scanner: Full Block Outline (5-Step) — Pure Crisp Line Color Shift (Zero Glow) */
     .rounded-block.pulse-active {
       border-color: var(--pulse-outline-color, var(--accent-cyan)) !important;
-      box-shadow: 0 0 var(--pulse-glow-spread, 12px) var(--pulse-outline-glow, rgba(0, 243, 255, 0.42)),
-                  inset 0 0 var(--pulse-inner-spread, 7px) var(--pulse-outline-inner, rgba(0, 243, 255, 0.12)) !important;
-      background: var(--pulse-bg-glow, var(--bg-card-hover)) !important;
+      box-shadow: none !important;
+      background: var(--bg-card) !important;
     }
 
-    @keyframes idle-block-breathe {
-      0%, 100% {
-        box-shadow: 0 0 var(--pulse-glow-spread, 12px) var(--pulse-outline-glow, rgba(0, 243, 255, 0.35)),
-                    inset 0 0 var(--pulse-inner-spread, 7px) var(--pulse-outline-inner, rgba(0, 243, 255, 0.10));
-      }
-      50% {
-        box-shadow: 0 0 calc(var(--pulse-glow-spread, 12px) * 1.4) var(--pulse-outline-glow, rgba(0, 243, 255, 0.58)),
-                    inset 0 0 calc(var(--pulse-inner-spread, 7px) * 1.35) var(--pulse-outline-inner, rgba(0, 243, 255, 0.22));
-      }
+    /* Kinetic Outline Scanner: 10-Step Line-Cycle Active Top Bar / Line */
+    .rounded-block.line-top-active {
+      border-top-color: var(--pulse-outline-color, var(--accent-cyan)) !important;
+      border-right-color: var(--border-cyan) !important;
+      border-bottom-color: var(--border-cyan) !important;
+      border-left-color: var(--border-cyan) !important;
+      box-shadow: none !important;
+      background: var(--bg-card) !important;
     }
 
-    .rounded-block.pulse-active.idle-mode {
-      animation: idle-block-breathe 4.6s ease-in-out infinite;
+    /* Kinetic Outline Scanner: 10-Step Line-Cycle Active Bottom Bar / Line */
+    .rounded-block.line-bottom-active {
+      border-top-color: var(--border-cyan) !important;
+      border-right-color: var(--border-cyan) !important;
+      border-bottom-color: var(--pulse-outline-color, var(--accent-cyan)) !important;
+      border-left-color: var(--border-cyan) !important;
+      box-shadow: none !important;
+      background: var(--bg-card) !important;
     }
 
-    .rounded-block.pulse-active .block-meta-top span:first-child {
-      color: var(--pulse-outline-color, var(--accent-cyan));
-      text-shadow: 0 0 8px var(--pulse-outline-glow, rgba(0, 243, 255, 0.35));
-    }
-
-    /* Trailing Soft Afterglow on Neighboring / Previous Block */
+    /* Inactive prior block remains untouched with default card border */
     .rounded-block.pulse-trail {
-      border-color: var(--pulse-trail-color, rgba(0, 243, 255, 0.45)) !important;
-      box-shadow: 0 0 7px var(--pulse-trail-glow, rgba(0, 243, 255, 0.2)) !important;
+      /* Prior block has zero illumination */
     }
 
     /* Scanner Modal Styling */
@@ -717,6 +713,12 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+
+    .scanner-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
     }
 
     .scanner-grid-3 {
@@ -1591,6 +1593,19 @@
         </div>
       </div>
 
+      <!-- Scan Target Geometry: Top & Bottom Bars (10-Step) vs Full Outline (5-Step) -->
+      <div class="scanner-section">
+        <div class="scanner-section-label">SCAN GEOMETRY / LINE-CYCLE</div>
+        <div class="scanner-grid-2">
+          <button type="button" class="scanner-btn-opt" data-opt-target="lines">
+            ⮛ TOP &amp; BTM BARS<br><span style="font-size:0.55rem;opacity:0.8;">10-STEP LINE CYCLE</span>
+          </button>
+          <button type="button" class="scanner-btn-opt" data-opt-target="full">
+            ▢ FULL OUTLINE<br><span style="font-size:0.55rem;opacity:0.8;">5-STEP BLOCK PERIMETER</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Velocity Acceleration -->
       <div class="scanner-section">
         <div class="scanner-section-label">SPEED-REACTIVE AVIONICS</div>
@@ -1643,8 +1658,8 @@
         </div>
       </div>
 
-      <!-- Luminescence Intensity -->
-      <div class="scanner-section">
+      <!-- Luminescence Intensity (Disabled: zero glow mode active) -->
+      <div class="scanner-section" style="display: none;">
         <div class="scanner-section-label">GLOW INTENSITY</div>
         <div class="scanner-grid-3">
           <button type="button" class="scanner-btn-opt" data-opt-intensity="subtle">SUBTLE<br><span style="font-size:0.55rem;opacity:0.8;">IDLE OUTLINE</span></button>
@@ -1655,7 +1670,7 @@
 
       <!-- Accent Color Swatches -->
       <div class="scanner-section">
-        <div class="scanner-section-label">LUMINOUS COLOR</div>
+        <div class="scanner-section-label">OUTLINE LINE COLOR</div>
         <div class="scanner-color-row">
           <div class="scanner-swatch" data-opt-color="theme" style="background: linear-gradient(135deg, #00f3ff, #f59e0b); color:#fff;" title="Theme Accent">THEME</div>
           <div class="scanner-swatch" data-opt-color="#00f3ff" style="background: #00f3ff; color:#050811;" title="Cyan Neon">CYAN</div>
@@ -3034,7 +3049,7 @@
     // ==========================================
     // NOMAD: DIGIT — Versioning & PWA Call-Home Engine
     // ==========================================
-    const NOMAD_CURRENT_VERSION = 'v4.10102026.0519';
+    const NOMAD_CURRENT_VERSION = 'v4.10102026.0709';
     let serviceWorkerRegistration = null;
     let isUpdateAvailable = false;
 
@@ -3307,6 +3322,7 @@
 
     const SCANNER_CONFIG = {
       mode: localStorage.getItem('nomad_digit_scan_mode') || 'cascade', // 'cascade' | 'bounce' | 'off'
+      target: localStorage.getItem('nomad_digit_scan_target') || 'lines', // 'lines' (10-Step Top & Bottom Bars) | 'full' (5-Step Full Outline)
       speedReactive: localStorage.getItem('nomad_digit_scan_speed_reactive') !== 'false', // default true
       idleCadence: initialIdleCadence, // '5.0s' (5000ms) | '3.0s' | '2.0s' | '1.0s'
       basePace: localStorage.getItem('nomad_digit_scan_base_pace') || 'standard', // 'calm' | 'standard' | 'brisk' | 'hyper'
@@ -3491,55 +3507,47 @@
     function applyScannerCustomStyles() {
       const root = document.documentElement;
       
-      // 1. Color resolution
+      // Crisp outline border color resolution (Zero Glow)
       if (SCANNER_CONFIG.color === 'theme' || !SCANNER_CONFIG.color) {
         root.style.removeProperty('--pulse-outline-color');
-        root.style.removeProperty('--pulse-outline-glow');
-        root.style.removeProperty('--pulse-outline-inner');
-        root.style.removeProperty('--pulse-trail-color');
-        root.style.removeProperty('--pulse-trail-glow');
       } else {
-        const hex = SCANNER_CONFIG.color;
-        root.style.setProperty('--pulse-outline-color', hex);
-        root.style.setProperty('--pulse-outline-glow', hex + '66');
-        root.style.setProperty('--pulse-outline-inner', hex + '22');
-        root.style.setProperty('--pulse-trail-color', hex + '44');
-        root.style.setProperty('--pulse-trail-glow', hex + '1a');
+        root.style.setProperty('--pulse-outline-color', SCANNER_CONFIG.color);
       }
 
-      // 2. Intensity resolution
-      if (SCANNER_CONFIG.intensity === 'subtle') {
-        root.style.setProperty('--pulse-glow-spread', '10px');
-        root.style.setProperty('--pulse-inner-spread', '6px');
-        root.style.setProperty('--pulse-bg-glow', 'rgba(0, 243, 255, 0.04)');
-      } else if (SCANNER_CONFIG.intensity === 'medium') {
-        root.style.setProperty('--pulse-glow-spread', '16px');
-        root.style.setProperty('--pulse-inner-spread', '9px');
-        root.style.setProperty('--pulse-bg-glow', 'rgba(0, 243, 255, 0.08)');
-      } else if (SCANNER_CONFIG.intensity === 'vivid') {
-        root.style.setProperty('--pulse-glow-spread', '22px');
-        root.style.setProperty('--pulse-inner-spread', '12px');
-        root.style.setProperty('--pulse-bg-glow', 'rgba(0, 243, 255, 0.14)');
-      }
+      // Eliminate all glow & trail CSS custom properties
+      root.style.removeProperty('--pulse-outline-glow');
+      root.style.removeProperty('--pulse-outline-inner');
+      root.style.removeProperty('--pulse-trail-color');
+      root.style.removeProperty('--pulse-trail-glow');
+      root.style.removeProperty('--pulse-bg-glow');
+      root.style.removeProperty('--pulse-glow-spread');
+      root.style.removeProperty('--pulse-inner-spread');
     }
 
-    function updateBlockIllumination(activeBlockIndex, trailBlockIndex, isIdle) {
+    function updateBlockIllumination(step) {
       SCANNER_BLOCK_IDS.forEach((id, idx) => {
         const el = document.getElementById(id);
         if (!el) return;
-        if (idx === activeBlockIndex) {
-          el.classList.add('pulse-active');
-          if (isIdle) {
-            el.classList.add('idle-mode');
+        if (SCANNER_CONFIG.target === 'lines') {
+          if (step && typeof step === 'object' && idx === step.blockIdx) {
+            if (step.line === 'top') {
+              el.classList.add('line-top-active');
+              el.classList.remove('line-bottom-active', 'pulse-active', 'pulse-trail');
+            } else {
+              el.classList.add('line-bottom-active');
+              el.classList.remove('line-top-active', 'pulse-active', 'pulse-trail');
+            }
           } else {
-            el.classList.remove('idle-mode');
+            el.classList.remove('line-top-active', 'line-bottom-active', 'pulse-active', 'pulse-trail', 'idle-mode');
           }
-          el.classList.remove('pulse-trail');
-        } else if (idx === trailBlockIndex) {
-          el.classList.add('pulse-trail');
-          el.classList.remove('pulse-active', 'idle-mode');
         } else {
-          el.classList.remove('pulse-active', 'pulse-trail', 'idle-mode');
+          const activeIdx = (typeof step === 'object' && step !== null) ? step.blockIdx : step;
+          if (idx === activeIdx) {
+            el.classList.add('pulse-active');
+            el.classList.remove('line-top-active', 'line-bottom-active', 'pulse-trail');
+          } else {
+            el.classList.remove('pulse-active', 'line-top-active', 'line-bottom-active', 'pulse-trail', 'idle-mode');
+          }
         }
       });
     }
@@ -3547,7 +3555,7 @@
     function clearAllIllumination() {
       SCANNER_BLOCK_IDS.forEach((id) => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('pulse-active', 'pulse-trail', 'idle-mode');
+        if (el) el.classList.remove('pulse-active', 'line-top-active', 'line-bottom-active', 'pulse-trail', 'idle-mode');
       });
       prevActiveBlockIdx = -1;
     }
@@ -3558,22 +3566,71 @@
         return;
       }
 
-      const sequence = (SCANNER_CONFIG.mode === 'bounce')
-        ? [0, 1, 2, 3, 4, 3, 2, 1]
-        : [0, 1, 2, 3, 4];
+      let sequence;
+      if (SCANNER_CONFIG.target === 'lines') {
+        // 10-step process: top and bottom bars of each block change color
+        // block 01 top line -> bottom line -> block 2 top line -> bottom line ... -> block 5 bottom line
+        if (SCANNER_CONFIG.mode === 'bounce') {
+          // Bounce: 10 steps top-to-bottom, then bounce back up
+          sequence = [
+            { blockIdx: 0, line: 'top' },
+            { blockIdx: 0, line: 'bottom' },
+            { blockIdx: 1, line: 'top' },
+            { blockIdx: 1, line: 'bottom' },
+            { blockIdx: 2, line: 'top' },
+            { blockIdx: 2, line: 'bottom' },
+            { blockIdx: 3, line: 'top' },
+            { blockIdx: 3, line: 'bottom' },
+            { blockIdx: 4, line: 'top' },
+            { blockIdx: 4, line: 'bottom' },
+            { blockIdx: 4, line: 'top' },
+            { blockIdx: 3, line: 'bottom' },
+            { blockIdx: 3, line: 'top' },
+            { blockIdx: 2, line: 'bottom' },
+            { blockIdx: 2, line: 'top' },
+            { blockIdx: 1, line: 'bottom' },
+            { blockIdx: 1, line: 'top' },
+            { blockIdx: 0, line: 'bottom' }
+          ];
+        } else {
+          // Cascade: 10 steps top-to-bottom, then wrap
+          sequence = [
+            { blockIdx: 0, line: 'top' },
+            { blockIdx: 0, line: 'bottom' },
+            { blockIdx: 1, line: 'top' },
+            { blockIdx: 1, line: 'bottom' },
+            { blockIdx: 2, line: 'top' },
+            { blockIdx: 2, line: 'bottom' },
+            { blockIdx: 3, line: 'top' },
+            { blockIdx: 3, line: 'bottom' },
+            { blockIdx: 4, line: 'top' },
+            { blockIdx: 4, line: 'bottom' }
+          ];
+        }
+      } else {
+        // Full block outline: 5 steps
+        sequence = (SCANNER_CONFIG.mode === 'bounce')
+          ? [0, 1, 2, 3, 4, 3, 2, 1]
+          : [0, 1, 2, 3, 4];
+      }
 
       if (scannerSeqIndex >= sequence.length) {
         scannerSeqIndex = 0;
       }
 
-      const currentBlockIdx = sequence[scannerSeqIndex];
+      const currentStep = sequence[scannerSeqIndex];
       const calc = calculateCurrentStepDuration();
-      updateBlockIllumination(currentBlockIdx, prevActiveBlockIdx, calc.isIdle);
-      prevActiveBlockIdx = currentBlockIdx;
 
-      // Turnaround sonic feedback if bounce mode reached end
-      if (SCANNER_CONFIG.mode === 'bounce' && (scannerSeqIndex === 0 || scannerSeqIndex === 4)) {
-        if (SCANNER_CONFIG.soundTurnaround && state.soundEnabled && typeof playTone === 'function') {
+      // Only illuminate the current active step / line — prior block/line has zero illumination
+      updateBlockIllumination(currentStep);
+      prevActiveBlockIdx = (typeof currentStep === 'object') ? currentStep.blockIdx : currentStep;
+
+      // Turnaround sonic feedback if bounce mode reached turnaround endpoints
+      if (SCANNER_CONFIG.mode === 'bounce') {
+        const isReversal = (SCANNER_CONFIG.target === 'lines')
+          ? (scannerSeqIndex === 0 || scannerSeqIndex === 9)
+          : (scannerSeqIndex === 0 || scannerSeqIndex === 4);
+        if (isReversal && SCANNER_CONFIG.soundTurnaround && state.soundEnabled && typeof playTone === 'function') {
           playTone(1350, 0.04);
         }
       }
@@ -3619,13 +3676,14 @@
 
       const calc = calculateCurrentStepDuration();
       const idleSec = (calc.idleMs / 1000).toFixed(0);
+      const stepCount = (SCANNER_CONFIG.target === 'lines') ? '10' : '5';
 
       if (SCANNER_CONFIG.mode === 'cascade') {
-        label.textContent = calc.isIdle ? `CASCADE (${idleSec}s) ⮛` : 'CASCADE ⮛';
-        btn.setAttribute('title', `Kinetic Outline Scanner: Active (Cascade) • ${calc.isIdle ? `IDLE (1 step / ${idleSec}s)` : `${calc.duration}ms/step (+10%/10 MPH)`} • Hold for Settings`);
+        label.textContent = calc.isIdle ? `CASCADE (${idleSec}s) ⮛` : `CASCADE (${stepCount}) ⮛`;
+        btn.setAttribute('title', `Kinetic Outline Scanner: Active (Cascade - ${SCANNER_CONFIG.target === 'lines' ? '10-Step Top & Bottom Bars' : '5-Step Full Outline'}) • ${calc.isIdle ? `IDLE (1 step / ${idleSec}s)` : `${calc.duration}ms/step (+10%/10 MPH)`} • Hold for Settings`);
       } else if (SCANNER_CONFIG.mode === 'bounce') {
-        label.textContent = calc.isIdle ? `BOUNCE (${idleSec}s) ⮁` : 'BOUNCE ⮁';
-        btn.setAttribute('title', `Kinetic Outline Scanner: Active (Bounce) • ${calc.isIdle ? `IDLE (1 step / ${idleSec}s)` : `${calc.duration}ms/step (+10%/10 MPH)`} • Hold for Settings`);
+        label.textContent = calc.isIdle ? `BOUNCE (${idleSec}s) ⮁` : `BOUNCE (${stepCount}) ⮁`;
+        btn.setAttribute('title', `Kinetic Outline Scanner: Active (Bounce - ${SCANNER_CONFIG.target === 'lines' ? 'Top & Bottom Bars' : 'Full Outline'}) • ${calc.isIdle ? `IDLE (1 step / ${idleSec}s)` : `${calc.duration}ms/step (+10%/10 MPH)`} • Hold for Settings`);
       } else {
         label.textContent = 'SCAN: OFF';
         btn.setAttribute('title', 'Kinetic Outline Scanner: Disabled • Tap to activate • Hold for Settings');
@@ -3633,10 +3691,11 @@
     }
 
     function cycleScannerMode() {
+      const isLines = SCANNER_CONFIG.target === 'lines';
       if (SCANNER_CONFIG.mode === 'cascade') {
         SCANNER_CONFIG.mode = 'bounce';
         playTone(1400);
-        showToast('⚡ SCANNER: BOUNCE (BACK & FORTH ⮁)');
+        showToast(isLines ? '⚡ SCANNER: BOUNCE (TOP & BTM LINES ⮁)' : '⚡ SCANNER: BOUNCE (BACK & FORTH ⮁)');
       } else if (SCANNER_CONFIG.mode === 'bounce') {
         SCANNER_CONFIG.mode = 'off';
         playTone(800);
@@ -3644,7 +3703,7 @@
       } else {
         SCANNER_CONFIG.mode = 'cascade';
         playTone(1200);
-        showToast('⚡ SCANNER: CASCADE (TOP ➔ BTM ⮛)');
+        showToast(isLines ? '⚡ SCANNER: CASCADE (10-STEP LINE-CYCLE ⮛)' : '⚡ SCANNER: CASCADE (TOP ➔ BTM ⮛)');
       }
       localStorage.setItem('nomad_digit_scan_mode', SCANNER_CONFIG.mode);
       startScanner();
@@ -3671,6 +3730,11 @@
       // 1. Mode buttons
       document.querySelectorAll('[data-opt-mode]').forEach(btn => {
         btn.classList.toggle('is-selected', btn.getAttribute('data-opt-mode') === SCANNER_CONFIG.mode);
+      });
+
+      // 1b. Target geometry buttons (10-step lines vs 5-step full)
+      document.querySelectorAll('[data-opt-target]').forEach(btn => {
+        btn.classList.toggle('is-selected', btn.getAttribute('data-opt-target') === SCANNER_CONFIG.target);
       });
 
       // 2. Speed reactive toggle
@@ -3728,9 +3792,10 @@
       const sensorLabel = document.getElementById('modal-status-sensor');
       if (!modeLabel || !speedLabel || !multLabel) return;
 
+      const targetDesc = (SCANNER_CONFIG.target === 'lines') ? '10-STEP LINES' : '5-STEP FULL';
       const modeNames = {
-        cascade: 'CASCADE (TOP ➔ BTM)',
-        bounce: 'BOUNCE (BACK & FORTH)',
+        cascade: `CASCADE (${targetDesc})`,
+        bounce: `BOUNCE (${targetDesc})`,
         off: 'DISABLED (OFF)'
       };
       modeLabel.textContent = modeNames[SCANNER_CONFIG.mode] || 'OFF';
@@ -3811,6 +3876,20 @@
         localStorage.setItem('nomad_digit_scan_mode', SCANNER_CONFIG.mode);
         syncScannerModalUI();
         startScanner();
+      });
+    });
+
+    // Scan target options (10-step line-cycle vs 5-step full outline)
+    document.querySelectorAll('[data-opt-target]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        SCANNER_CONFIG.target = btn.getAttribute('data-opt-target');
+        localStorage.setItem('nomad_digit_scan_target', SCANNER_CONFIG.target);
+        scannerSeqIndex = 0;
+        syncScannerModalUI();
+        startScanner();
+        showToast(SCANNER_CONFIG.target === 'lines' 
+          ? '⚡ SCANNER: 10-STEP LINE-CYCLE ACTIVE (TOP ➔ BTM BARS)' 
+          : '⚡ SCANNER: 5-STEP FULL BLOCK OUTLINE ACTIVE');
       });
     });
 

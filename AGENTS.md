@@ -354,6 +354,50 @@
     - Updated version registry to `v4.10102026.0519` strictly following US Eastern Time across `version.js`, `nomad_suite/version.js`, `version.json`, `digit.html`, `nomad_suite/digit.html`, `server.js`, and both `sw.js` manifests (`nomad-avionics-suite-v4-10102026-0519`).
   - **Verified Synchronization**: Verified with zero-difference diffs across all root and `nomad_suite` files.
 
+### v4 Step 26: Prior Block Afterglow Elimination & Zero-Glow Crisp Line Outline [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **Prior Block Afterglow Trailing Eliminated**:
+    - Diagnosed the source of the subtle prior block illumination: `updateBlockIllumination()` was explicitly passing `prevActiveBlockIdx` as `trailBlockIndex` and applying `.pulse-trail` with a secondary soft border (`rgba(0, 243, 255, 0.45)`) and shadow, appearing as an anomaly on mobile OLED screens.
+    - Removed `pulse-trail` class assignments from `updateBlockIllumination(activeBlockIndex)`. Only the current active block receives highlight styling; all previous and inactive blocks immediately return to their default card border (`1.5px solid var(--border-cyan)`).
+  - **Zero-Glow Crisp Border Line Illumination**:
+    - Completely stripped `box-shadow` (outer glow), `inset box-shadow` (inner glow), and `background` glow from `.rounded-block.pulse-active` (`box-shadow: none !important; background: var(--bg-card) !important;`).
+    - Removed `@keyframes idle-block-breathe` shadow pulsation and eliminated `text-shadow` glow from the block metadata title (`text-shadow: none !important;`).
+    - The active block now undergoes a pure, crisp line color change (`border-color: var(--pulse-outline-color, var(--accent-cyan)) !important;`) without any outer blur, haze, or card tinting.
+  - **Cleaned Scanner Modal Custom Properties**:
+    - Updated `applyScannerCustomStyles()` to remove all glow and trail custom CSS variables (`--pulse-outline-glow`, `--pulse-outline-inner`, `--pulse-trail-color`, `--pulse-trail-glow`, `--pulse-bg-glow`, `--pulse-glow-spread`, `--pulse-inner-spread`), setting strictly `--pulse-outline-color`.
+    - Hidden the redundant `GLOW INTENSITY` control in the modal to keep settings focused on flow patterns, drive pace, idle cadences, and outline line colors.
+  - **Version Registry & PWA Cache Updated**:
+    - Updated `NOMAD_VERSION` to `v4.10102026.0709` strictly following US Eastern Time across all registries and manifests (`nomad-avionics-suite-v4-10102026-0709`).
+    - Synchronized all changes 1:1 between root `/digit.html` and `/nomad_suite/digit.html`.
+
+### v4 Step 27: 10-Step Top & Bottom Bar Line-Cycle Engine & Instant Border Color Shift [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **10-Step Top & Bottom Bar Line-Cycle Engine**:
+    - Implemented the 10-step sequential line-cycle process across the 5 tactical blocks (`SCANNER_CONFIG.target = 'lines'`).
+    - Flow: Block 01 top line ➔ Block 01 bottom line ➔ Block 02 top line ➔ Block 02 bottom line ➔ Block 03 top line ➔ Block 03 bottom line ➔ Block 04 top line ➔ Block 04 bottom line ➔ Block 05 top line ➔ Block 05 bottom line ➔ repeat!
+    - Full bidirectional support in Bounce mode: steps down all 10 bars (0T to 4B) and bounces back up (4T to 0B) with sonic turnaround feedback.
+  - **Zero-Transition Instant Border Color Shift (Mobile Lingering Fix)**:
+    - Diagnosed the mobile anomaly where the prior block appeared slightly illuminated: `.rounded-block` possessed a `transition: border-color 0.22s`, causing the prior block's border to fade out slowly over 220ms rather than cutting immediately on step change.
+    - Stripped `border-color` from the CSS `transition` list (`transition: background-color 0.15s ease, transform 0.1s ease;`).
+    - Border color now switches synchronously and instantaneously per step frame with zero lingering illumination on previous blocks.
+    - Removed title text color shift (`.block-meta-top span:first-child`), ensuring strictly the border line itself changes color.
+  - **Sleek Line-Cycle Styling (`.line-top-active` & `.line-bottom-active`)**:
+    - `.line-top-active`: Sets `border-top-color: var(--pulse-outline-color, var(--accent-cyan)) !important;` with right, bottom, and left remaining the subtle card border (`var(--border-cyan)`).
+    - `.line-bottom-active`: Sets `border-bottom-color: var(--pulse-outline-color, var(--accent-cyan)) !important;` with top, right, and left remaining `var(--border-cyan)`.
+    - Zero glow (`box-shadow: none !important;`) and zero background shift across all active states.
+  - **Scan Geometry Settings in Scanner Modal**:
+    - Added dedicated `SCAN GEOMETRY / LINE-CYCLE` section to the settings modal with two quick-select modes:
+      - `⮛ TOP & BTM BARS (10-STEP LINE CYCLE)`
+      - `▢ FULL OUTLINE (5-STEP BLOCK PERIMETER)`
+    - Instant selection persistence in `localStorage` (`nomad_digit_scan_target`) with live modal status update (`CASCADE (10-STEP LINES)`) and toast feedback.
+  - **Header HUD Button Synchronization**:
+    - Updated `#scanner-btn-label` to display `CASCADE (10) ⮛` or `CASCADE (5) ⮛` (and `(5s)` when idle), providing instant HUD verification of active step count.
+  - **Version Registry & PWA Cache Updated**:
+    - Updated `NOMAD_VERSION` to `v4.10102026.0735` strictly following US Eastern Time across `version.js`, `nomad_suite/version.js`, `version.json`, `server.js`, and both `sw.js` manifests (`nomad-avionics-suite-v4-10102026-0735`).
+    - Synchronized all changes 1:1 between root `/digit.html` and `/nomad_suite/digit.html`.
+
 ### Upcoming Backlog & Wishlist
 - **Optimal Pre-Made Bubble Shape Defaults & Curated Geometry**: Curate and assign the ideal default shape for each telemetry bubble out of the box (e.g., Speed = Egg/Oval, Temp = Squirkle, Compass = Pentagon, Altitude = Diamond/Hexagon, Atmo = Circle/Octagon, Coords = Wobble Rectangle), giving each data element immediate visual identity while preserving user customizability.
 - **Wobbling Rectangle Shape Geometry**: Introduce a dedicated kinetic rectangular shape with soft rounded corners and kinetic wobble physics, tailor-made to frame stacked two-line coordinate pairs (Latitude & Longitude) without clipping.
