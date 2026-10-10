@@ -394,8 +394,12 @@
     - Instant selection persistence in `localStorage` (`nomad_digit_scan_target`) with live modal status update (`CASCADE (10-STEP LINES)`) and toast feedback.
   - **Header HUD Button Synchronization**:
     - Updated `#scanner-btn-label` to display `CASCADE (10) ⮛` or `CASCADE (5) ⮛` (and `(5s)` when idle), providing instant HUD verification of active step count.
+  - **Dedicated Header Settings Button (⚙) & Direct Modal Access**:
+    - Added a dedicated, one-tap `⚙` button (`#btn-scanner-gear`) directly in the DIGIT top-right header adjacent to the mode toggle button. Tapping it immediately opens the Kinetic Outline Scanner Settings modal without requiring a hidden 520ms long-press.
+    - Updated `js/nomad-menu.js` so tapping `⚡ KINETIC SCANNER` in the general NOMAD menu seamlessly transitions to the Scanner settings modal.
+    - Visually highlighted the `⚡ LINE-CYCLE / STEP PROCESS` section in the modal with a cyan accent border, vibrant `NEW` badge, and clear explanations of the 10-step vs 5-step options.
   - **Version Registry & PWA Cache Updated**:
-    - Updated `NOMAD_VERSION` to `v4.10102026.0735` strictly following US Eastern Time across `version.js`, `nomad_suite/version.js`, `version.json`, `server.js`, and both `sw.js` manifests (`nomad-avionics-suite-v4-10102026-0735`).
+    - Updated `NOMAD_VERSION` to `v4.10102026.0755` strictly following US Eastern Time across `version.js`, `nomad_suite/version.js`, `version.json`, `server.js`, and both `sw.js` manifests (`nomad-avionics-suite-v4-10102026-0755`).
     - Synchronized all changes 1:1 between root `/digit.html` and `/nomad_suite/digit.html`.
 
 ### Upcoming Backlog & Wishlist

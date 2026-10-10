@@ -546,6 +546,85 @@
       box-shadow: 0 0 8px var(--accent-cyan) !important;
     }
 
+    .btn-pulse-gear {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 2px 8px;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      line-height: 1.3;
+      border-radius: 12px;
+      color: var(--accent-cyan);
+      border: 1px solid rgba(0, 243, 255, 0.55);
+      background: rgba(0, 243, 255, 0.14);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+      box-shadow: 0 0 8px rgba(0, 243, 255, 0.2);
+    }
+
+    .btn-pulse-gear:hover {
+      background: rgba(0, 243, 255, 0.28);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(0, 243, 255, 0.45);
+    }
+
+    .btn-pulse-gear:active {
+      transform: scale(0.92);
+    }
+
+    .btn-pulse-gear .gear-icon {
+      font-size: 0.78rem;
+      display: inline-block;
+      transition: transform 0.3s ease;
+    }
+
+    .btn-pulse-gear:hover .gear-icon {
+      transform: rotate(45deg);
+    }
+
+    .btn-pulse-target {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 2px 7px;
+      font-size: 0.60rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      line-height: 1.3;
+      border-radius: 12px;
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      background: rgba(56, 189, 248, 0.12);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .btn-pulse-target.is-lines {
+      color: #10b981;
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.16);
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-pulse-target:hover {
+      filter: brightness(1.2);
+    }
+
+    .btn-pulse-target:active {
+      transform: scale(0.92);
+    }
+
+    .btn-pulse-target .target-icon {
+      font-size: 0.65rem;
+      line-height: 1;
+    }
+
     /* Vertical 5-Block Stack for Pixel 11 PRO / Mobile Viewport (100dvh non-scrollable) */
     .blocks-stack {
       width: 100%;
@@ -596,11 +675,16 @@
     /* Kinetic Outline Scanner: 10-Step Line-Cycle Active Top Bar / Line */
     .rounded-block.line-top-active {
       border-top-color: var(--pulse-outline-color, var(--accent-cyan)) !important;
+      border-top-width: 2.5px !important;
       border-right-color: var(--border-cyan) !important;
       border-bottom-color: var(--border-cyan) !important;
       border-left-color: var(--border-cyan) !important;
-      box-shadow: none !important;
+      box-shadow: inset 0 2px 8px rgba(0, 243, 255, 0.28) !important;
       background: var(--bg-card) !important;
+    }
+    .rounded-block.line-top-active .block-meta-top {
+      color: var(--pulse-outline-color, var(--accent-cyan)) !important;
+      font-weight: 700 !important;
     }
 
     /* Kinetic Outline Scanner: 10-Step Line-Cycle Active Bottom Bar / Line */
@@ -608,9 +692,14 @@
       border-top-color: var(--border-cyan) !important;
       border-right-color: var(--border-cyan) !important;
       border-bottom-color: var(--pulse-outline-color, var(--accent-cyan)) !important;
+      border-bottom-width: 2.5px !important;
       border-left-color: var(--border-cyan) !important;
-      box-shadow: none !important;
+      box-shadow: inset 0 -2px 8px rgba(0, 243, 255, 0.28) !important;
       background: var(--bg-card) !important;
+    }
+    .rounded-block.line-bottom-active .block-meta-bottom {
+      color: var(--pulse-outline-color, var(--accent-cyan)) !important;
+      font-weight: 700 !important;
     }
 
     /* Inactive prior block remains untouched with default card border */
@@ -1388,6 +1477,14 @@
         <span class="scanner-dot"></span>
         <span id="scanner-btn-label">CASCADE ⮛</span>
       </button>
+      <button type="button" id="btn-scanner-target" class="btn-ctrl btn-pulse-target is-lines" title="Tap to switch between 10-Step Top/Bottom Lines and 5-Step Full Box Perimeter">
+        <span class="target-icon">⚡</span>
+        <span id="scanner-target-label">10-LINES</span>
+      </button>
+      <button type="button" id="btn-scanner-gear" class="btn-ctrl btn-pulse-gear" title="Kinetic Scanner Settings (10-Step Line-Cycle, Speed, Colors)" aria-label="Scanner Settings">
+        <span class="gear-icon">⚙</span>
+        <span class="gear-label">SETTINGS</span>
+      </button>
     </div>
   </div>
 
@@ -1563,11 +1660,36 @@
         Autonomous sequential block outline illumination with speed-reactive acceleration (+10% per 10 MPH).
       </div>
 
+      <!-- Hero Section 1: 10-Step Line Cycle (Top & Bottom Bars) vs 5-Step Full Outline -->
+      <div class="scanner-section" style="border: 1.5px solid #00f3ff; border-radius: 12px; padding: 12px 10px 10px 10px; background: rgba(0, 243, 255, 0.12); margin-bottom: 12px; box-shadow: 0 0 16px rgba(0, 243, 255, 0.2);">
+        <div class="scanner-section-label" style="color: #00f3ff; font-weight: 800; font-size: 0.72rem; margin-bottom: 8px;">
+          <span>⚡ LINE-CYCLE / STEP PROCESS</span>
+          <span style="font-size: 0.58rem; color: #10b981; font-weight: 800; background: rgba(16, 185, 129, 0.2); padding: 2px 7px; border-radius: 6px; border: 1px solid #10b981;">SUBTLE OPTION</span>
+        </div>
+        <div class="scanner-grid-2">
+          <button type="button" class="scanner-btn-opt" data-opt-target="lines" style="padding: 10px 6px;">
+            <span style="font-size:0.75rem; font-weight:800; display:block; margin-bottom:3px; color:#fff;">⮛ TOP &amp; BTM BARS</span>
+            <span style="font-size:0.58rem;font-weight:700;color:var(--accent-cyan);display:block;">10-STEP LINE CYCLE</span>
+          </button>
+          <button type="button" class="scanner-btn-opt" data-opt-target="full" style="padding: 10px 6px;">
+            <span style="font-size:0.75rem; font-weight:800; display:block; margin-bottom:3px; color:#fff;">▢ FULL OUTLINE</span>
+            <span style="font-size:0.58rem;font-weight:700;opacity:0.85;display:block;">5-STEP BLOCK PERIMETER</span>
+          </button>
+        </div>
+        <div style="font-size: 0.60rem; color: #cbd5e1; margin-top: 7px; line-height: 1.35; padding: 4px 6px; background: rgba(0,0,0,0.3); border-radius: 6px;">
+          <strong style="color: #38bdf8;">10-Step:</strong> Cycles Block 01 top line ➔ bottom line ➔ Block 02 top line... through Block 05.
+        </div>
+      </div>
+
       <!-- Live Status Card -->
       <div class="scanner-status-card">
         <div class="scanner-status-line">
           <span>SCANNER STATUS</span>
           <span class="scanner-status-val" id="modal-status-mode">CASCADE (TOP ➔ BTM)</span>
+        </div>
+        <div class="scanner-status-line">
+          <span>LINE CYCLE TARGET</span>
+          <span class="scanner-status-val" id="modal-status-target" style="color: #00f3ff; font-weight: 800;">10-STEP (TOP ➔ BTM BARS)</span>
         </div>
         <div class="scanner-status-line">
           <span>VEHICLE SPEED</span>
@@ -1590,19 +1712,6 @@
           <button type="button" class="scanner-btn-opt" data-opt-mode="cascade">⮛ CASCADE<br><span style="font-size:0.55rem;opacity:0.8;">TOP ➔ BTM</span></button>
           <button type="button" class="scanner-btn-opt" data-opt-mode="bounce">⮁ BOUNCE<br><span style="font-size:0.55rem;opacity:0.8;">BACK &amp; FORTH</span></button>
           <button type="button" class="scanner-btn-opt" data-opt-mode="off">⊘ OFF<br><span style="font-size:0.55rem;opacity:0.8;">DISABLED</span></button>
-        </div>
-      </div>
-
-      <!-- Scan Target Geometry: Top & Bottom Bars (10-Step) vs Full Outline (5-Step) -->
-      <div class="scanner-section">
-        <div class="scanner-section-label">SCAN GEOMETRY / LINE-CYCLE</div>
-        <div class="scanner-grid-2">
-          <button type="button" class="scanner-btn-opt" data-opt-target="lines">
-            ⮛ TOP &amp; BTM BARS<br><span style="font-size:0.55rem;opacity:0.8;">10-STEP LINE CYCLE</span>
-          </button>
-          <button type="button" class="scanner-btn-opt" data-opt-target="full">
-            ▢ FULL OUTLINE<br><span style="font-size:0.55rem;opacity:0.8;">5-STEP BLOCK PERIMETER</span>
-          </button>
         </div>
       </div>
 
@@ -3049,7 +3158,7 @@
     // ==========================================
     // NOMAD: DIGIT — Versioning & PWA Call-Home Engine
     // ==========================================
-    const NOMAD_CURRENT_VERSION = 'v4.10102026.0709';
+    const NOMAD_CURRENT_VERSION = 'v4.10102026.0901';
     let serviceWorkerRegistration = null;
     let isUpdateAvailable = false;
 
@@ -3695,15 +3804,15 @@
       if (SCANNER_CONFIG.mode === 'cascade') {
         SCANNER_CONFIG.mode = 'bounce';
         playTone(1400);
-        showToast(isLines ? '⚡ SCANNER: BOUNCE (TOP & BTM LINES ⮁)' : '⚡ SCANNER: BOUNCE (BACK & FORTH ⮁)');
+        showToast(isLines ? '⚡ BOUNCE (10-STEP LINES ⮁) • TAP ⚙ SETTINGS' : '⚡ BOUNCE (5-STEP FULL ⮁) • TAP ⚙ SETTINGS');
       } else if (SCANNER_CONFIG.mode === 'bounce') {
         SCANNER_CONFIG.mode = 'off';
         playTone(800);
-        showToast('⚡ SCANNER: DISABLED (OFF ⊘)');
+        showToast('⚡ SCANNER: DISABLED (OFF ⊘) • TAP ⚙ SETTINGS');
       } else {
         SCANNER_CONFIG.mode = 'cascade';
         playTone(1200);
-        showToast(isLines ? '⚡ SCANNER: CASCADE (10-STEP LINE-CYCLE ⮛)' : '⚡ SCANNER: CASCADE (TOP ➔ BTM ⮛)');
+        showToast(isLines ? '⚡ CASCADE (10-STEP LINES ⮛) • TAP ⚙ SETTINGS' : '⚡ CASCADE (5-STEP FULL ⮛) • TAP ⚙ SETTINGS');
       }
       localStorage.setItem('nomad_digit_scan_mode', SCANNER_CONFIG.mode);
       startScanner();
@@ -3726,6 +3835,19 @@
     window.openDigitScannerModal = openScannerModal;
     window.closeDigitScannerModal = closeScannerModal;
 
+    function toggleScannerTarget() {
+      SCANNER_CONFIG.target = (SCANNER_CONFIG.target === 'lines') ? 'full' : 'lines';
+      localStorage.setItem('nomad_digit_scan_target', SCANNER_CONFIG.target);
+      scannerSeqIndex = 0;
+      playTone(SCANNER_CONFIG.target === 'lines' ? 1480 : 1120);
+      syncScannerModalUI();
+      startScanner();
+      showToast(SCANNER_CONFIG.target === 'lines'
+        ? '⚡ 10-STEP LINE CYCLE (TOP ➔ BTM BARS)'
+        : '⚡ 5-STEP FULL BLOCK OUTLINE');
+    }
+    window.toggleDigitScanTarget = toggleScannerTarget;
+
     function syncScannerModalUI() {
       // 1. Mode buttons
       document.querySelectorAll('[data-opt-mode]').forEach(btn => {
@@ -3736,6 +3858,24 @@
       document.querySelectorAll('[data-opt-target]').forEach(btn => {
         btn.classList.toggle('is-selected', btn.getAttribute('data-opt-target') === SCANNER_CONFIG.target);
       });
+
+      // Synchronize top header target button label and active styling
+      const targetLabel = document.getElementById('scanner-target-label');
+      if (targetLabel) {
+        targetLabel.textContent = (SCANNER_CONFIG.target === 'lines') ? '10-LINES' : '5-FULL';
+      }
+      const targetBtn = document.getElementById('btn-scanner-target');
+      if (targetBtn) {
+        targetBtn.classList.toggle('is-lines', SCANNER_CONFIG.target === 'lines');
+      }
+
+      // Synchronize live status card target value
+      const modalTargetVal = document.getElementById('modal-status-target');
+      if (modalTargetVal) {
+        modalTargetVal.textContent = (SCANNER_CONFIG.target === 'lines')
+          ? '10-STEP (TOP ➔ BTM BARS)'
+          : '5-STEP (FULL BOX)';
+      }
 
       // 2. Speed reactive toggle
       const chkSpeed = document.getElementById('chk-scanner-speed-reactive');
@@ -3852,6 +3992,45 @@
           return;
         }
         cycleScannerMode();
+      });
+
+      scannerHeaderBtn.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openScannerModal();
+      });
+    }
+
+    const scannerTargetBtn = document.getElementById('btn-scanner-target');
+    if (scannerTargetBtn) {
+      scannerTargetBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        try { if ('vibrate' in navigator) navigator.vibrate(35); } catch (_) {}
+        toggleScannerTarget();
+      });
+    }
+
+    const scannerGearBtn = document.getElementById('btn-scanner-gear');
+    if (scannerGearBtn) {
+      scannerGearBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        try { if ('vibrate' in navigator) navigator.vibrate(40); } catch (_) {}
+        playTone(1500);
+        openScannerModal();
+      });
+    }
+
+    // Tap toast to open scanner modal if toast relates to scanner
+    const toastPillEl = document.getElementById('toast-pill');
+    if (toastPillEl) {
+      toastPillEl.addEventListener('click', () => {
+        const txt = toastPillEl.textContent || '';
+        if (txt.includes('SETTINGS') || txt.includes('SCANNER') || txt.includes('10-STEP') || txt.includes('CASCADE') || txt.includes('BOUNCE')) {
+          toastPillEl.style.display = 'none';
+          openScannerModal();
+        }
       });
     }
 

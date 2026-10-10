@@ -40,7 +40,7 @@ app.get(['/version.json', '/public/version.json', '/api/version'], (req, res) =>
     console.error('Error reading version.json:', err);
   }
   res.json({
-    version: 'v4.10102026.0735',
+    version: 'v4.10102026.0901',
     timestamp: Date.now()
   });
 });
@@ -136,6 +136,23 @@ with zipfile.ZipFile('nomad_suite.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
 // Canonical redirect for legacy nomad_digit path
 app.get(['/nomad_digit', '/nomad_digit.html'], (req, res) => {
   res.redirect(301, '/digit.html');
+});
+
+// Dedicated routes for DIGIT with aggressive cache busting
+app.get(['/digit', '/digit.html'], (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.sendFile(path.join(__dirname, 'digit.html'));
+});
+
+// Dedicated routes for Service Worker (Never cache sw.js, allow immediate update checks)
+app.get(['/sw.js', '/nomad_suite/sw.js'], (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.setHeader('Service-Worker-Allowed', '/');
+  res.sendFile(path.join(__dirname, req.path));
 });
 
 // Dedicated routes for Launch Control

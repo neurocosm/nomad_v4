@@ -457,11 +457,19 @@
       `;
 
       const scanMode = (localStorage.getItem('nomad_digit_scan_mode') || 'cascade').toUpperCase();
+      const currentTarget = localStorage.getItem('nomad_digit_scan_target') || 'lines';
+      const scanTarget = currentTarget === 'lines' ? '10-STEP LINE CYCLE' : '5-STEP FULL OUTLINE';
       scannerHTML = `
-        <button id="btn-scanner-modal-row" class="modal-btn-row modal-scanner-btn" onclick="window.closeAboutModal(); setTimeout(() => { if (window.openDigitScannerModal) window.openDigitScannerModal(); }, 120);" title="Configure Kinetic Block Outline Scanner">
-          <span>⚡ KINETIC SCANNER</span>
-          <span id="scanner-modal-status" style="font-weight: 800; color: #30d158;">${scanMode} ⚙</span>
-        </button>
+        <div style="display:flex; flex-direction:column; gap:4px; margin-bottom:2px;">
+          <button id="btn-suite-target-toggle" class="modal-btn-row modal-scanner-btn" onclick="if (window.toggleDigitScanTarget) { window.toggleDigitScanTarget(); } else { const n = (localStorage.getItem('nomad_digit_scan_target') || 'lines') === 'lines' ? 'full' : 'lines'; localStorage.setItem('nomad_digit_scan_target', n); } NomadMenuEngine.render();" title="Toggle 10-Step Top/Bottom Lines vs 5-Step Full Outline" style="background: rgba(16, 185, 129, 0.16); border: 1px solid #10b981; color: #fff;">
+            <span style="display:flex; align-items:center; gap:6px;">⚡ TARGET: ${scanTarget}</span>
+            <span style="font-weight: 800; color: #10b981; font-size: 0.65rem; border: 1px solid rgba(16, 185, 129, 0.5); padding: 2px 6px; border-radius: 6px; background: rgba(16, 185, 129, 0.18);">TAP: SWITCH</span>
+          </button>
+          <button id="btn-scanner-modal-row" class="modal-btn-row modal-scanner-btn" onclick="if (window.closeAboutModal) window.closeAboutModal(); setTimeout(() => { if (window.openDigitScannerModal) window.openDigitScannerModal(); }, 40);" title="Configure Kinetic Block Outline Scanner &amp; Line-Cycle Settings" style="background: rgba(0, 243, 255, 0.12); border-color: rgba(0, 243, 255, 0.55); color: #fff;">
+            <span style="display:flex; align-items:center; gap:6px;">⚡ KINETIC SCANNER (${scanMode})</span>
+            <span id="scanner-modal-status" style="font-weight: 800; color: #00f3ff; font-size: 0.68rem; border: 1px solid rgba(0, 243, 255, 0.4); padding: 3px 8px; border-radius: 6px; background: rgba(0, 243, 255, 0.18);">⚙ ALL SETTINGS</span>
+          </button>
+        </div>
       `;
     }
 
