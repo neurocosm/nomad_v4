@@ -415,6 +415,23 @@
   - **Version Registry & PWA Cache Synchronized**:
     - Updated `NOMAD_VERSION` to `v4.10102026.0936` strictly following US Eastern Time across `version.js`, `version.json`, `sw.js` (`nomad-avionics-suite-v4-10102026-0936`), and both `/digit.html` and `/nomad_suite/digit.html`.
 
+### v4 Step 29: Mobile Header Spacing Optimization & Menu-Anchored Kinetic FX Access [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **Mobile Spacing Issue Resolved**:
+    - Eliminated the three crowded accessory buttons (`#btn-pulse-mode`, `#btn-scanner-target`, `#btn-scanner-gear`) from the top utility header (`.top-header`), eradicating horizontal squishing, wrapping, and vertical pushing on mobile screens.
+    - Preserved `NOMAD: DIGIT` (`#btn-brand-mode`) as the clean, solitary title element on the top-left with generous breathing room and zero layout compression.
+  - **Color Scheme Cycling Intact on Tap**:
+    - Maintained direct single-tap cycling on `NOMAD: DIGIT` across the 4 color schemes: Original Vivid HUD, Relaxed 256-Gray, Apollo (R-W-B), and Arizona Dusk.
+  - **Menu-Anchored Kinetic FX Access via Long-Press**:
+    - Holding `NOMAD: DIGIT` for 550ms opens the NOMAD Branding & Suite menu (`NomadMenuEngine.open()`).
+    - Integrated a dedicated, clean Kinetic FX control card inside the branding menu:
+      - `FLOW: CASCADE / BOUNCE / OFF` with one-tap `TAP: CYCLE`
+      - `GEOMETRY: 10-STEP LINES / 5-STEP FULL` with one-tap `TAP: SWITCH`
+      - `⚙ ALL KINETIC FX SETTINGS` (`OPEN ➔`) seamlessly transitioning into the full Outline Scanner settings modal for granular pace, idle cadence, color swatch, and audio chime configuration.
+  - **Version Registry & PWA Cache Synchronized**:
+    - Updated `NOMAD_VERSION` to `v4.10102026.1017` strictly following US Eastern Time across `version.js`, `version.json`, `sw.js` (`nomad-avionics-suite-v4-10102026-1017`), and both `/digit.html` and `/nomad_suite/digit.html`.
+
 ### Upcoming Backlog & Wishlist
 - **Optimal Pre-Made Bubble Shape Defaults & Curated Geometry**: Curate and assign the ideal default shape for each telemetry bubble out of the box (e.g., Speed = Egg/Oval, Temp = Squirkle, Compass = Pentagon, Altitude = Diamond/Hexagon, Atmo = Circle/Octagon, Coords = Wobble Rectangle), giving each data element immediate visual identity while preserving user customizability.
 - **Wobbling Rectangle Shape Geometry**: Introduce a dedicated kinetic rectangular shape with soft rounded corners and kinetic wobble physics, tailor-made to frame stacked two-line coordinate pairs (Latitude & Longitude) without clipping.

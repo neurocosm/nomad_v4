@@ -9,7 +9,7 @@
 
 // NOMAD Central Version Registry
 // Edit this single line at the end of a session to update the version across all pages and modals.
-window.NOMAD_VERSION = "v4.10102026.0936";
+window.NOMAD_VERSION = "v4.10102026.1017";
 
 // NOMAD Creator & Visionary Registry (SINGLE FILE OF REFERENCE FOR ALL BRANDING)
 window.NOMAD_CREATOR = {

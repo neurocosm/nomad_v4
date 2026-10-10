@@ -1456,25 +1456,11 @@
     <span id="gpsTimestamp">0</span>
   </div>
 
-  <!-- Top Controls -->
+  <!-- Top Header -->
   <div class="top-header">
-    <div id="btn-brand-mode" class="app-title" title="Tap: Cycle Theme (Vivid / 256-Gray / Apollo / Arizona) • Hold: Menu &amp; Settings">
+    <div id="btn-brand-mode" class="app-title" title="Tap: Cycle Color Theme • Hold: Branding &amp; Kinetic FX Settings">
       <span class="dot"></span>
       <span>NOMAD: DIGIT</span>
-    </div>
-    <div class="top-controls">
-      <button type="button" id="btn-pulse-mode" class="btn-ctrl btn-pulse-scanner mode-cascade" title="Kinetic Outline Scanner: Tap to cycle (Cascade / Bounce / Off) • Hold for Settings">
-        <span class="scanner-dot"></span>
-        <span id="scanner-btn-label">CASCADE ⮛</span>
-      </button>
-      <button type="button" id="btn-scanner-target" class="btn-ctrl btn-pulse-target is-lines" title="Tap to switch between 10-Step Top/Bottom Lines and 5-Step Full Box Perimeter">
-        <span class="target-icon">⚡</span>
-        <span id="scanner-target-label">10-LINES</span>
-      </button>
-      <button type="button" id="btn-scanner-gear" class="btn-ctrl btn-pulse-gear" title="Kinetic Scanner Settings (10-Step Line-Cycle, Speed, Colors)" aria-label="Scanner Settings">
-        <span class="gear-icon">⚙</span>
-        <span class="gear-label">SETTINGS</span>
-      </button>
     </div>
   </div>
 
@@ -3148,7 +3134,7 @@
     // ==========================================
     // NOMAD: DIGIT — Versioning & PWA Call-Home Engine
     // ==========================================
-    const NOMAD_CURRENT_VERSION = 'v4.10102026.0936';
+    const NOMAD_CURRENT_VERSION = 'v4.10102026.1017';
     let serviceWorkerRegistration = null;
     let isUpdateAvailable = false;
 
@@ -3800,20 +3786,24 @@
       if (SCANNER_CONFIG.mode === 'cascade') {
         SCANNER_CONFIG.mode = 'bounce';
         playTone(1400);
-        showToast(isLines ? '⚡ BOUNCE (10-STEP LINES ⮁) • TAP ⚙ SETTINGS' : '⚡ BOUNCE (5-STEP FULL ⮁) • TAP ⚙ SETTINGS');
+        showToast(isLines ? '⚡ BOUNCE (10-STEP LINES ⮁)' : '⚡ BOUNCE (5-STEP FULL ⮁)');
       } else if (SCANNER_CONFIG.mode === 'bounce') {
         SCANNER_CONFIG.mode = 'off';
         playTone(800);
-        showToast('⚡ SCANNER: DISABLED (OFF ⊘) • TAP ⚙ SETTINGS');
+        showToast('⚡ SCANNER: DISABLED (OFF ⊘)');
       } else {
         SCANNER_CONFIG.mode = 'cascade';
         playTone(1200);
-        showToast(isLines ? '⚡ CASCADE (10-STEP LINES ⮛) • TAP ⚙ SETTINGS' : '⚡ CASCADE (5-STEP FULL ⮛) • TAP ⚙ SETTINGS');
+        showToast(isLines ? '⚡ CASCADE (10-STEP LINES ⮛)' : '⚡ CASCADE (5-STEP FULL ⮛)');
       }
       localStorage.setItem('nomad_digit_scan_mode', SCANNER_CONFIG.mode);
       startScanner();
       syncScannerModalUI();
+      if (window.NomadMenuEngine && typeof window.NomadMenuEngine.render === 'function') {
+        try { window.NomadMenuEngine.render(); } catch (_) {}
+      }
     }
+    window.cycleDigitScanMode = cycleScannerMode;
 
     // Modal Interaction Handlers
     function openScannerModal() {
@@ -3841,6 +3831,9 @@
       showToast(SCANNER_CONFIG.target === 'lines'
         ? '⚡ 10-STEP LINE CYCLE (TOP ➔ BTM BARS)'
         : '⚡ 5-STEP FULL BLOCK OUTLINE');
+      if (window.NomadMenuEngine && typeof window.NomadMenuEngine.render === 'function') {
+        try { window.NomadMenuEngine.render(); } catch (_) {}
+      }
     }
     window.toggleDigitScanTarget = toggleScannerTarget;
 
