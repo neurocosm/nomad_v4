@@ -9,6 +9,7 @@
 
 import express from 'express';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
 
@@ -21,6 +22,27 @@ const PORT = 3000;
 // API health endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', app: 'NOMAD: Hyperspace' });
+});
+
+// Central Version Endpoint for PWA cache update checks
+app.get(['/version.json', '/public/version.json', '/api/version'], (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  try {
+    const versionPath = path.join(__dirname, 'version.json');
+    if (fs.existsSync(versionPath)) {
+      const data = JSON.parse(fs.readFileSync(versionPath, 'utf8'));
+      res.json(data);
+      return;
+    }
+  } catch (err) {
+    console.error('Error reading version.json:', err);
+  }
+  res.json({
+    version: 'v4.10102026.0519',
+    timestamp: Date.now()
+  });
 });
 
 // Atmospheric & Weather Telemetry Proxy Endpoint
@@ -121,19 +143,28 @@ app.get(['/launch', '/launch.html', '/launcher', '/nomad_launch'], (req, res) =>
   res.sendFile(path.join(__dirname, 'launch.html'));
 });
 
-// Serve static assets with html extension support
+// Serve static assets with html extension support and cache control for rapid updates
 app.use(express.static(__dirname, {
-  extensions: ['html']
+  extensions: ['html'],
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html') || filePath.endsWith('.js') || filePath.endsWith('.json')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
+  }
 }));
 
 // Root fallback to index.html
 app.get('/', (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Fallback for HTML navigation requests
 app.use((req, res) => {
   if (req.accepts('html')) {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.sendFile(path.join(__dirname, 'index.html'));
     return;
   }

@@ -1627,8 +1627,8 @@
         <div class="scanner-grid-4">
           <button type="button" class="scanner-btn-opt" data-opt-idle="5.0s">5.0s<br><span style="font-size:0.52rem;opacity:0.8;">TRANQUIL</span></button>
           <button type="button" class="scanner-btn-opt" data-opt-idle="3.0s">3.0s<br><span style="font-size:0.52rem;opacity:0.8;">GENTLE</span></button>
-          <button type="button" class="scanner-btn-opt" data-opt-idle="1.5s">1.5s<br><span style="font-size:0.52rem;opacity:0.8;">SUBTLE</span></button>
-          <button type="button" class="scanner-btn-opt" data-opt-idle="460ms">460ms<br><span style="font-size:0.52rem;opacity:0.8;">RAPID</span></button>
+          <button type="button" class="scanner-btn-opt" data-opt-idle="2.0s">2.0s<br><span style="font-size:0.52rem;opacity:0.8;">STEADY</span></button>
+          <button type="button" class="scanner-btn-opt" data-opt-idle="1.0s">1.0s<br><span style="font-size:0.52rem;opacity:0.8;">BRISK</span></button>
         </div>
       </div>
 
@@ -2378,21 +2378,22 @@
         measuredSpeedMps = speedMps;
       } else if (lastValidPos && !isIp) {
         const dMeters = distanceMeters(lat, lon, lastValidPos.lat, lastValidPos.lon);
-        // Only calculate synthetic speed if displacement clearly exceeds the GPS accuracy radius
-        const minNoiseRadius = Math.max(7.0, (accuracyM || 5) * 0.75);
-        if (dMeters > minNoiseRadius && dt >= 1.0) {
+        // Wi-Fi or desktop jitter filtering: Only calculate synthetic speed if accuracy is high (< 15m),
+        // displacement clearly exceeds physical GPS jitter (> 35m), and elapsed time is >= 2.0s
+        const minNoiseRadius = Math.max(35.0, (accuracyM || 5) * 2.0);
+        if (accuracyM && accuracyM <= 15 && dMeters > minNoiseRadius && dt >= 2.0) {
           measuredSpeedMps = Math.min(70, dMeters / dt);
         } else {
           measuredSpeedMps = 0;
         }
       }
 
-      // Hard Stationary Zero-Clamp Deadband (< 1.8 MPH / 0.804 m/s)
+      // Hard Stationary Zero-Clamp Deadband (< 2.5 MPH / 1.11 m/s)
       let clampedMps = measuredSpeedMps;
       const rawMph = clampedMps * 2.23694;
-      if (rawMph < 1.8) {
+      if (rawMph < 2.5) {
         clampedMps = 0;
-      } else if (accuracyM && accuracyM > 20 && rawMph < 2.5) {
+      } else if (accuracyM && accuracyM > 12 && rawMph < 4.0) {
         clampedMps = 0;
       }
 
@@ -3033,7 +3034,7 @@
     // ==========================================
     // NOMAD: DIGIT — Versioning & PWA Call-Home Engine
     // ==========================================
-    const NOMAD_CURRENT_VERSION = 'v1.10022026.2157';
+    const NOMAD_CURRENT_VERSION = 'v4.10102026.0519';
     let serviceWorkerRegistration = null;
     let isUpdateAvailable = false;
 
@@ -3085,8 +3086,6 @@
     }
 
     async function checkRemoteVersion(showFeedbackOnUpToDate = false) {
-      if (isUpdateAvailable) return;
-
       try {
         let res = await fetch(`/version.json?t=${Date.now()}`, {
           cache: 'no-store',
@@ -3103,7 +3102,8 @@
         if (res && res.ok) {
           const data = await res.json();
           if (data && data.version && data.version !== NOMAD_CURRENT_VERSION) {
-            setUpdateAvailableState(data.version);
+            console.log('Update found:', data.version, 'Local:', NOMAD_CURRENT_VERSION);
+            applySystemUpdate();
             return;
           }
         }
@@ -3163,7 +3163,7 @@
             serviceWorkerRegistration = reg;
 
             if (reg.waiting) {
-              setUpdateAvailableState();
+              reg.waiting.postMessage({ type: 'SKIP_WAITING' });
             }
 
             reg.addEventListener('updatefound', () => {
@@ -3171,7 +3171,7 @@
               if (newWorker) {
                 newWorker.addEventListener('statechange', () => {
                   if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                    setUpdateAvailableState();
+                    newWorker.postMessage({ type: 'SKIP_WAITING' });
                   }
                 });
               }
@@ -3301,10 +3301,14 @@
     // Motion state (vehicle driving): +10% faster cadence for every 10 MPH
     // Modes: Cascade (Top to Bottom repeat), Bounce (Top to Bottom to Top), Off
     // ====================================================================
+    // Strictly enforce 5.0s (5000ms tranquil pulse) as the resting idle cadence
+    let initialIdleCadence = '5.0s';
+    localStorage.setItem('nomad_digit_scan_idle_cadence', '5.0s');
+
     const SCANNER_CONFIG = {
       mode: localStorage.getItem('nomad_digit_scan_mode') || 'cascade', // 'cascade' | 'bounce' | 'off'
       speedReactive: localStorage.getItem('nomad_digit_scan_speed_reactive') !== 'false', // default true
-      idleCadence: localStorage.getItem('nomad_digit_scan_idle_cadence') || '5.0s', // '5.0s' (5000ms) | '3.0s' | '1.5s' | '460ms'
+      idleCadence: initialIdleCadence, // '5.0s' (5000ms) | '3.0s' | '2.0s' | '1.0s'
       basePace: localStorage.getItem('nomad_digit_scan_base_pace') || 'standard', // 'calm' | 'standard' | 'brisk' | 'hyper'
       intensity: localStorage.getItem('nomad_digit_scan_intensity') || 'subtle', // 'subtle' | 'medium' | 'vivid'
       color: localStorage.getItem('nomad_digit_scan_color') || 'theme',
@@ -3315,8 +3319,8 @@
     const SCANNER_IDLE_DURATIONS = {
       '5.0s': 5000,
       '3.0s': 3000,
-      '1.5s': 1500,
-      '460ms': 460
+      '2.0s': 2000,
+      '1.0s': 1000
     };
 
     const SCANNER_PACE_DURATIONS = {
@@ -3338,7 +3342,7 @@
     let scannerSeqIndex = 0;
     let prevActiveBlockIdx = -1;
 
-    // Sensor Fusion: Hardware Accelerometer + GPS Stationary Zero-Clamp Deadband (< 1.8 MPH)
+    // Sensor Fusion: Hardware Accelerometer + GPS Stationary Zero-Clamp Deadband (< 2.5 MPH)
     let hardwareMotionDetected = false;
     let lastAccelMagnitude = 0;
     let motionVariance = 0;
@@ -3354,11 +3358,16 @@
             const y = acc.y || 0;
             const z = acc.z || 0;
             const mag = Math.sqrt(x*x + y*y + z*z);
+            if (lastAccelMagnitude === 0) {
+              lastAccelMagnitude = mag;
+              return;
+            }
             const delta = Math.abs(mag - lastAccelMagnitude);
             lastAccelMagnitude = mag;
 
             motionVariance = motionVariance * 0.82 + delta * 0.18;
-            if (motionVariance > 0.28) {
+            // Only true vehicular drive vibrations / physical movement trip hardware motion (> 0.85 m/s²)
+            if (motionVariance > 0.85) {
               lastMotionTimestamp = Date.now();
               hardwareMotionDetected = true;
             } else if (Date.now() - lastMotionTimestamp > 3200) {
@@ -3374,43 +3383,49 @@
       if (SCANNER_CONFIG.simSpeedMph !== null) {
         return Math.max(0, SCANNER_CONFIG.simSpeedMph);
       }
-      return Math.max(0, (state && typeof state.clampedSpeedMph === 'number') ? state.clampedSpeedMph : 0);
+      // If vehicle status is STOPPED or speed is below 2.5 MPH deadband, lock speed strictly to 0.0 MPH
+      if (!state || state.speedStatus === 'STOPPED' || (typeof state.clampedSpeedMph === 'number' && state.clampedSpeedMph < 2.5)) {
+        return 0;
+      }
+      return Math.max(0, (typeof state.clampedSpeedMph === 'number') ? state.clampedSpeedMph : 0);
     }
 
     function getMotionSensorStatus() {
       const effSpeed = getEffectiveScannerSpeedMph();
 
       if (SCANNER_CONFIG.simSpeedMph !== null) {
-        const isMoving = SCANNER_CONFIG.simSpeedMph >= 1.0;
+        const isMoving = SCANNER_CONFIG.simSpeedMph >= 2.5;
         return {
           isMoving,
           isStopped: !isMoving,
           speedMph: SCANNER_CONFIG.simSpeedMph,
           source: isMoving ? 'SIMULATOR ACTIVE' : 'SIMULATOR ZERO',
-          sensorText: isMoving ? `SIMULATED (${Math.round(effSpeed)} MPH)` : 'SIMULATOR ZERO LOCK'
+          sensorText: isMoving ? `SIMULATED (${Math.round(effSpeed)} MPH)` : 'SIMULATOR ZERO LOCK (IDLE 5.0s)'
         };
       }
 
       // Live Telemetry:
-      // Real-world vehicular GPS is clamped by the hardware 1.8 MPH stationary zero-clamp deadband
-      const isGpsMoving = effSpeed >= 1.8;
-      const isAccelMoving = Boolean(hardwareMotionDetected);
-      const isMoving = isGpsMoving || (isAccelMoving && effSpeed >= 0.8);
+      // Real-world vehicular GPS requires real measured speed >= 2.5 MPH.
+      // If speed < 2.5 MPH OR state.speedStatus === 'STOPPED', it is 100% STOPPED (IDLE 5.0s)!
+      const isStopped = (!state || state.speedStatus === 'STOPPED') || (effSpeed < 2.5);
+      const isGpsMoving = !isStopped && (effSpeed >= 2.5);
+      const isAccelMoving = Boolean(hardwareMotionDetected) && !isStopped;
+      const isMoving = isGpsMoving || isAccelMoving;
 
-      let sensorText = 'GPS DEADBAND + RESTING SENSOR';
+      let sensorText = 'RESTING SENSOR (IDLE 5.0s CADENCE)';
       if (isGpsMoving) {
         sensorText = `GPS COURSE TRACK (${effSpeed.toFixed(1)} MPH)`;
       } else if (isAccelMoving) {
         sensorText = 'ACCELEROMETER MOTION DETECTED';
       } else {
-        sensorText = 'GPS DEADBAND + RESTING SENSOR';
+        sensorText = 'GPS DEADBAND + RESTING SENSOR (5.0s IDLE)';
       }
 
       return {
-        isMoving,
-        isStopped: !isMoving,
-        speedMph: effSpeed,
-        source: isGpsMoving ? 'GPS TRACK' : (isAccelMoving ? 'ACCELEROMETER' : 'STATIONARY DEADBAND (<1.8 MPH)'),
+        isMoving: !isStopped,
+        isStopped,
+        speedMph: isStopped ? 0 : effSpeed,
+        source: isStopped ? 'STATIONARY DEADBAND (<2.5 MPH)' : (isGpsMoving ? 'GPS TRACK' : 'ACCELEROMETER'),
         sensorText
       };
     }
@@ -3420,20 +3435,10 @@
       const baseDriveMs = SCANNER_PACE_DURATIONS[SCANNER_CONFIG.basePace] || 460;
       const motion = getMotionSensorStatus();
 
-      // If Speed-Reactive Avionics is disabled, user locked the pace:
-      if (!SCANNER_CONFIG.speedReactive) {
-        return {
-          duration: baseDriveMs,
-          multiplier: 1.0,
-          isIdle: false,
-          idleMs,
-          motion
-        };
-      }
-
-      // When stopped or sitting still in browser / no motion detected:
-      // Strictly lock to idle cadence (1 movement per 5 seconds / 5000ms by default)
-      if (motion.isStopped || motion.speedMph < 0.5) {
+      // Priority 1: When stopped or sitting still in browser / no motion detected:
+      // Strictly lock to idle cadence (1 movement per 5 seconds / 5000ms by default)!
+      // This applies whether Speed-Reactive Avionics is enabled OR disabled!
+      if (motion.isStopped || motion.speedMph < 2.5) {
         return {
           duration: idleMs,
           multiplier: 1.0,
@@ -3443,7 +3448,19 @@
         };
       }
 
-      // Vehicle in motion (> 0.5 MPH):
+      // Priority 2: When vehicle is in motion:
+      // If Speed-Reactive Avionics is disabled, use user's selected cruising base pace:
+      if (!SCANNER_CONFIG.speedReactive) {
+        return {
+          duration: baseDriveMs,
+          multiplier: parseFloat((idleMs / baseDriveMs).toFixed(2)),
+          isIdle: false,
+          idleMs,
+          motion
+        };
+      }
+
+      // Priority 3: Vehicle in motion with Speed-Reactive Avionics active:
       // Smooth progressive transition from idleMs at 0 MPH down to active cruising base at 20 MPH,
       // then accelerates +10% for every 10 MPH beyond 20 MPH!
       const speed = motion.speedMph;
@@ -3564,7 +3581,12 @@
       scannerSeqIndex = (scannerSeqIndex + 1) % sequence.length;
 
       updateScannerModalLiveStatus(calc);
+      updateScannerHeaderButton();
 
+      if (scannerTimer) {
+        clearTimeout(scannerTimer);
+        scannerTimer = null;
+      }
       scannerTimer = setTimeout(runScannerStep, calc.duration);
     }
 
@@ -3596,13 +3618,14 @@
       btn.classList.add(`mode-${SCANNER_CONFIG.mode}`);
 
       const calc = calculateCurrentStepDuration();
+      const idleSec = (calc.idleMs / 1000).toFixed(0);
 
       if (SCANNER_CONFIG.mode === 'cascade') {
-        label.textContent = 'CASCADE ⮛';
-        btn.setAttribute('title', `Kinetic Outline Scanner: Active (Cascade) • ${calc.isIdle ? 'IDLE (1 step / 5.0s)' : 'IN MOTION (+10%/10 MPH)'} • Hold for Settings`);
+        label.textContent = calc.isIdle ? `CASCADE (${idleSec}s) ⮛` : 'CASCADE ⮛';
+        btn.setAttribute('title', `Kinetic Outline Scanner: Active (Cascade) • ${calc.isIdle ? `IDLE (1 step / ${idleSec}s)` : `${calc.duration}ms/step (+10%/10 MPH)`} • Hold for Settings`);
       } else if (SCANNER_CONFIG.mode === 'bounce') {
-        label.textContent = 'BOUNCE ⮁';
-        btn.setAttribute('title', `Kinetic Outline Scanner: Active (Bounce) • ${calc.isIdle ? 'IDLE (1 step / 5.0s)' : 'IN MOTION (+10%/10 MPH)'} • Hold for Settings`);
+        label.textContent = calc.isIdle ? `BOUNCE (${idleSec}s) ⮁` : 'BOUNCE ⮁';
+        btn.setAttribute('title', `Kinetic Outline Scanner: Active (Bounce) • ${calc.isIdle ? `IDLE (1 step / ${idleSec}s)` : `${calc.duration}ms/step (+10%/10 MPH)`} • Hold for Settings`);
       } else {
         label.textContent = 'SCAN: OFF';
         btn.setAttribute('title', 'Kinetic Outline Scanner: Disabled • Tap to activate • Hold for Settings');

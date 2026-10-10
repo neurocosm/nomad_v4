@@ -331,6 +331,29 @@
   - **Updated Speed Simulator Presets**: Preset buttons now include `0 MPH (5s)` alongside `30 MPH`, `55 MPH`, `80 MPH`, and `LIVE GPS`, allowing instant desktop testing of both resting 5s idle and high-speed motion states.
   - **Version Registry Updated**: Updated `NOMAD_VERSION` to `v4.10092026.2121` in `version.js` and `nomad_suite/version.js` strictly following US Eastern Time.
 
+### v4 Step 24: NOMAD DIGIT 5s Idle Cadence Hardening & Service Worker Cache Invalidation [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **Idle Priority Duration Resolution**: Refactored `calculateCurrentStepDuration()` so resting stillness (`motion.isStopped || motion.speedMph < 2.5`) is evaluated as top-priority, guaranteeing the 5000ms (5.0s) tranquil cadence runs even if `speedReactive` is toggled or customized.
+  - **Indoor Wi-Fi & Desktop GPS Deadband Hardening**: Increased `minNoiseRadius` to `Math.max(35.0, (accuracyM || 5) * 2.0)` and required `accuracyM <= 15` with `dt >= 2.0s` for synthetic speeds. Enforced zero-speed clamping whenever `rawMph < 2.5` or `state.speedStatus === 'STOPPED'`, preventing indoor Wi-Fi triangulation jumps from simulating false driving speeds on desktop/mobile browsers.
+  - **Accelerometer Gravity Shock Filter**: Fixed initial `lastAccelMagnitude` reading in `initHardwareMotionDetection()` so initial gravity (9.8 m/s²) does not trigger false motion on page boot. Set true vehicle movement threshold to `motionVariance > 0.85`.
+  - **Idle Cadence Auto-Migration**: Added startup auto-migration forcing `idleCadence` strictly to `'5.0s'` (5000ms) if missing or legacy (`'460ms'`). Updated modal idle options to `5.0s`, `3.0s`, `2.0s`, `1.0s`.
+  - **Dynamic Button Status Visibility**: Updated header button `#scanner-btn-label` to dynamically display `CASCADE (5s) ⮛` or `BOUNCE (5s) ⮁` when idle, providing immediate visual verification on the HUD that the 5-second cadence is actively locked.
+
+### v4 Step 25: Automated PWA Cache Purge, Active Tab Reload & Unconditional 5s Lock [COMPLETED & VERIFIED]
+- **Status**: Completed & Verified.
+- **Achievements**:
+  - **Unconditional 5.0s Idle Lock**: Initialized `initialIdleCadence` strictly to `'5.0s'` (5000ms) on boot across both root `/digit.html` and `/nomad_suite/digit.html`, eliminating any residual or legacy local storage cadences from causing rapid cycling.
+  - **Active Window Auto-Reload on Service Worker Activation**:
+    - Upgraded `sw.js` and `nomad_suite/sw.js` `install` handler to call `self.skipWaiting()` immediately upon installation.
+    - Added window client iteration in `activate` (`self.clients.matchAll({ type: 'window' }).then(...)`) triggering `client.navigate(client.url)`, forcing all open tabs running stale cached code to refresh immediately to the fresh network source upon worker activation.
+  - **Automated Client Version Call-Home Upgrade**:
+    - Enhanced `checkRemoteVersion()` in `digit.html` so that when a new version is detected from `/version.json`, `applySystemUpdate()` is executed automatically (purging CacheStorage and issuing instant clean reload) rather than passively waiting for the user to tap the version tag.
+  - **Server Version Endpoint Stability**:
+    - Imported `fs` module in `server.js` preventing `ReferenceError` on version endpoint checks.
+    - Updated version registry to `v4.10102026.0519` strictly following US Eastern Time across `version.js`, `nomad_suite/version.js`, `version.json`, `digit.html`, `nomad_suite/digit.html`, `server.js`, and both `sw.js` manifests (`nomad-avionics-suite-v4-10102026-0519`).
+  - **Verified Synchronization**: Verified with zero-difference diffs across all root and `nomad_suite` files.
+
 ### Upcoming Backlog & Wishlist
 - **Optimal Pre-Made Bubble Shape Defaults & Curated Geometry**: Curate and assign the ideal default shape for each telemetry bubble out of the box (e.g., Speed = Egg/Oval, Temp = Squirkle, Compass = Pentagon, Altitude = Diamond/Hexagon, Atmo = Circle/Octagon, Coords = Wobble Rectangle), giving each data element immediate visual identity while preserving user customizability.
 - **Wobbling Rectangle Shape Geometry**: Introduce a dedicated kinetic rectangular shape with soft rounded corners and kinetic wobble physics, tailor-made to frame stacked two-line coordinate pairs (Latitude & Longitude) without clipping.
