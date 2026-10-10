@@ -111,6 +111,11 @@
     window.location.href = target.file;
   }
 
+  function returnToLaunch() {
+    if (typeof window === 'undefined') return;
+    window.location.href = 'launch.html';
+  }
+
   // Hardware-grade Purge Cache & Hard Reload
   async function purgeCacheAndReload() {
     if (typeof window === 'undefined') return;
@@ -183,6 +188,7 @@
     getDefaultCockpitId,
     setDefaultCockpitId,
     switchCockpit,
+    returnToLaunch,
     purgeCacheAndReload,
     getState,
     onUpdate: (cb) => {

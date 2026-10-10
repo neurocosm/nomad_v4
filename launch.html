@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>NOMAD: Launch Control // Mission Control</title>
+  <meta name="description" content="NOMAD Launch Control - Central Multi-Cockpit HUD Launcher & Mission Control by BostonyFX" />
+  <meta name="theme-color" content="#050811" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="NOMAD" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-space: #050811;
+      --bg-panel: rgba(11, 19, 37, 0.75);
+      --bg-panel-hover: rgba(16, 28, 54, 0.90);
+      --border-subtle: rgba(255, 255, 255, 0.10);
+      --border-glow: rgba(0, 243, 255, 0.35);
+      --accent-cyan: #00f3ff;
+      --accent-magenta: #ff0055;
+      --accent-amber: #ffb703;
+      --accent-green: #30d158;
+      --accent-blue: #38bdf8;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: radial-gradient(circle at 50% 0%, #0d1a33 0%, #050811 75%);
+      background-color: var(--bg-space);
+      color: var(--text-main);
+      font-family: 'Space Grotesk', -apple-system, sans-serif;
+      padding: 16px 14px 28px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    .launcher-frame {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Top Brand & Header */
+    .header-zone {
+      text-align: center;
+      padding: 6px 0 2px 0;
+    }
+
+    .brand-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: rgba(0, 243, 255, 0.08);
+      border: 1px solid rgba(0, 243, 255, 0.30);
+      border-radius: 999px;
+      font-size: 0.65rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      box-shadow: 0 0 14px rgba(0, 243, 255, 0.18);
+      margin-bottom: 8px;
+    }
+
+    .brand-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent-cyan);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-cyan);
+      animation: pulseDot 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.75); }
+    }
+
+    .main-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      line-height: 1.1;
+      margin-bottom: 3px;
+      text-shadow: 0 0 24px rgba(0, 243, 255, 0.30);
+    }
+
+    .subtitle {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+      margin-bottom: 8px;
+    }
+
+    .creator-tag {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .creator-tag a {
+      color: var(--accent-amber);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    /* Firmware Pill Banner */
+    .firmware-banner {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 6px auto;
+      padding: 5px 16px;
+      border-radius: 999px;
+      background: rgba(0, 212, 255, 0.10);
+      border: 1.5px solid rgba(0, 212, 255, 0.40);
+      color: var(--accent-cyan);
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      box-shadow: 0 0 16px rgba(0, 212, 255, 0.20);
+    }
+
+    /* GPS Avionics Heartbeat Bar */
+    .telemetry-heartbeat {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      background: rgba(11, 19, 37, 0.82);
+      border: 1.5px solid rgba(0, 243, 255, 0.28);
+      border-radius: 12px;
+      font-size: clamp(0.76rem, 2.5vw, 0.88rem);
+      font-family: 'JetBrains Mono', monospace;
+      color: #cbd5e1;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45), 0 0 10px rgba(0, 243, 255, 0.10);
+    }
+
+    .telemetry-fix-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent-green);
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .telemetry-fix-dot {
+      width: 9px;
+      height: 9px;
+      background: var(--accent-green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-green);
+    }
+
+    #tb-coords-val {
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      color: #94a3b8;
+    }
+
+    #tb-speed-val {
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 0.02em;
+    }
+
+    /* Section Headers */
+    .section-label {
+      font-size: 0.70rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--text-dim);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 4px;
+      margin-bottom: -4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* 3 Hero Cockpits Stack */
+    .cockpits-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .cockpit-hero-card {
+      position: relative;
+      background: var(--bg-panel);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 14px 16px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .cockpit-hero-card:hover {
+      background: var(--bg-panel-hover);
+      transform: translateY(-2px);
+    }
+
+    .cockpit-hero-card:active {
+      transform: scale(0.98);
+    }
+
+    /* Distinct Cockpit Accent Borders & Glows */
+    .cockpit-hero-card.card-digit {
+      border-color: rgba(48, 209, 88, 0.35);
+    }
+    .cockpit-hero-card.card-digit:hover {
+      border-color: var(--accent-green);
+      box-shadow: 0 6px 20px rgba(48, 209, 88, 0.25);
+    }
+    .cockpit-hero-card.card-digit.is-default {
+      border-color: var(--accent-green);
+      background: rgba(48, 209, 88, 0.08);
+      box-shadow: 0 0 18px rgba(48, 209, 88, 0.30);
+    }
+
+    .cockpit-hero-card.card-roadtrip {
+      border-color: rgba(0, 243, 255, 0.35);
+    }
+    .cockpit-hero-card.card-roadtrip:hover {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 6px 20px rgba(0, 243, 255, 0.25);
+    }
+    .cockpit-hero-card.card-roadtrip.is-default {
+      border-color: var(--accent-cyan);
+      background: rgba(0, 243, 255, 0.08);
+      box-shadow: 0 0 18px rgba(0, 243, 255, 0.30);
+    }
+
+    .cockpit-hero-card.card-hyperspace {
+      border-color: rgba(255, 0, 85, 0.40);
+    }
+    .cockpit-hero-card.card-hyperspace:hover {
+      border-color: var(--accent-magenta);
+      box-shadow: 0 6px 20px rgba(255, 0, 85, 0.28);
+    }
+    .cockpit-hero-card.card-hyperspace.is-default {
+      border-color: var(--accent-magenta);
+      background: rgba(255, 0, 85, 0.08);
+      box-shadow: 0 0 18px rgba(255, 0, 85, 0.35);
+    }
+
+    .cockpit-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .cockpit-avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .cockpit-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .cockpit-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cockpit-name {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: #ffffff;
+      line-height: 1.1;
+    }
+
+    .cockpit-tier-badge {
+      font-size: 0.60rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 6px;
+      border: 1px solid currentColor;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .cockpit-desc {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
+    .cockpit-tags {
+      font-size: 0.64rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    .cockpit-launch-action {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .launch-btn-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-subtle);
+      color: #ffffff;
+      letter-spacing: 0.04em;
+      transition: all 0.15s ease;
+    }
+
+    .cockpit-hero-card:hover .launch-btn-pill {
+      background: #ffffff;
+      color: #000000;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+    }
+
+    /* Interactive Default Boot Radio Selector on Card */
+    .boot-radio-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 6px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--text-dim);
+      transition: all 0.15s ease;
+      user-select: none;
+      margin-top: 2px;
+    }
+
+    .boot-radio-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      border-color: rgba(255, 255, 255, 0.20);
+    }
+
+    .radio-circle {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(148, 163, 184, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .radio-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: transparent;
+      transition: all 0.15s ease;
+    }
+
+    /* Active Default Radio State */
+    .cockpit-hero-card.is-default .boot-radio-btn {
+      background: rgba(255, 183, 3, 0.10);
+      border-color: rgba(255, 183, 3, 0.35);
+      color: var(--accent-amber);
+    }
+
+    .cockpit-hero-card.is-default .radio-circle {
+      border-color: var(--accent-amber);
+      box-shadow: 0 0 8px rgba(255, 183, 3, 0.5);
+    }
+
+    .cockpit-hero-card.is-default .radio-dot {
+      background: var(--accent-amber);
+    }
+
+    .cockpit-hero-card.is-default .radio-label {
+      font-weight: 800;
+      color: var(--accent-amber);
+    }
+
+    /* 6 Shared Utilities Deck */
+    .utilities-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .util-tile {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 12px 14px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      cursor: pointer;
+      text-align: left;
+      min-height: 46px;
+    }
+
+    .util-tile:hover {
+      transform: translateY(-1px);
+    }
+
+    .util-tile:active {
+      transform: scale(0.97);
+    }
+
+    .util-tile-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.03em;
+      margin-bottom: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Utility Color Identities Matching Screenshot */
+    .util-arcade {
+      background: rgba(255, 0, 127, 0.12);
+      border: 1.5px solid #ff007f;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(255, 0, 127, 0.25);
+    }
+    .util-arcade .util-tile-title { color: #ffffff; }
+
+    .util-stats {
+      background: rgba(255, 176, 0, 0.10);
+      border: 1.5px solid #ffb000;
+      color: #ffb000;
+      box-shadow: 0 0 10px rgba(255, 176, 0, 0.20);
+    }
+    .util-stats .util-tile-title { color: #ffb000; }
+
+    .util-guide {
+      background: rgba(56, 189, 248, 0.10);
+      border: 1.5px solid #38bdf8;
+      color: #38bdf8;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.20);
+    }
+    .util-guide .util-tile-title { color: #38bdf8; }
+
+    .util-download {
+      background: rgba(16, 185, 129, 0.14);
+      border: 1.5px solid #10b981;
+      color: #10b981;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.20);
+    }
+    .util-download .util-tile-title { color: #10b981; }
+
+    .util-purge {
+      background: rgba(255, 0, 79, 0.12);
+      border: 1.5px solid #ff004f;
+      color: #ff004f;
+      box-shadow: 0 0 10px rgba(255, 0, 79, 0.20);
+    }
+    .util-purge .util-tile-title { color: #ff004f; }
+
+    .util-about {
+      background: rgba(148, 163, 184, 0.08);
+      border: 1.5px solid rgba(148, 163, 184, 0.30);
+      color: #cbd5e1;
+    }
+    .util-about .util-tile-title { color: #cbd5e1; }
+
+    .diagnostic-link-wrap {
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    .diagnostic-link {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.72rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent-cyan);
+      text-decoration: none;
+      padding: 9px 16px;
+      background: rgba(0, 243, 255, 0.06);
+      border: 1.5px dashed rgba(0, 243, 255, 0.40);
+      border-radius: 10px;
+      transition: all 0.15s ease;
+      box-shadow: 0 0 12px rgba(0, 243, 255, 0.10);
+    }
+
+    .diagnostic-link:hover {
+      background: rgba(0, 243, 255, 0.14);
+      border-style: solid;
+      box-shadow: 0 0 18px rgba(0, 243, 255, 0.25);
+    }
+
+    .diagnostic-sub {
+      font-size: 0.60rem;
+      color: var(--text-dim);
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.66rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-dim);
+      margin-top: 10px;
+    }
+
+    footer a {
+      color: var(--accent-cyan);
+      text-decoration: none;
+    }
+
+    /* BRANDING ABOUT / INFO MODAL OVERLAY (ROAD TRIP SPEC) */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      background: rgba(5, 8, 17, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: #121826;
+      border: 1.5px solid rgba(0, 243, 255, 0.35);
+      border-radius: 18px;
+      padding: 22px 20px;
+      width: 100%;
+      max-width: 420px;
+      max-height: 85vh;
+      max-height: 85dvh;
+      overflow-y: auto;
+      text-align: center;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85), 0 0 24px rgba(0, 243, 255, 0.20);
+      transform: scale(0.92);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      -webkit-overflow-scrolling: touch;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .modal-overlay.active .modal-box {
+      transform: scale(1);
+    }
+
+    .modal-title-link {
+      text-decoration: none;
+      display: inline-block;
+      transition: transform 0.15s ease;
+    }
+
+    .modal-title-link:active {
+      transform: scale(0.96);
+    }
+
+    .modal-title {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .modal-features-hint {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 2px;
+    }
+
+    .modal-author {
+      font-size: 0.85rem;
+      color: var(--accent-amber);
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .modal-author a {
+      color: var(--accent-amber);
+      text-decoration: none;
+    }
+
+    .modal-version-banner {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 2px auto 6px auto;
+      padding: 5px 16px;
+      border-radius: 999px;
+      background: rgba(0, 212, 255, 0.10);
+      border: 1px solid rgba(0, 212, 255, 0.45);
+      color: #00d4ff;
+      font-size: 0.80rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      font-family: 'JetBrains Mono', monospace;
+      box-shadow: 0 0 14px rgba(0, 212, 255, 0.20);
+    }
+
+    .modal-body {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      text-align: left;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .modal-action-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .modal-vis-btn {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background: linear-gradient(90deg, rgba(255, 0, 127, 0.20), rgba(0, 212, 255, 0.20));
+      border: 1.5px solid #ff007f;
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      box-shadow: 0 0 12px rgba(255, 0, 127, 0.30);
+      transition: all 0.15s ease;
+      text-align: center;
+    }
+
+    .modal-vis-btn:active {
+      transform: scale(0.97);
+    }
+
+    .modal-stats-btn {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: rgba(255, 176, 0, 0.12);
+      border: 1.5px solid #ffb000;
+      color: #ffb000;
+      text-decoration: none;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      box-shadow: 0 0 10px rgba(255, 176, 0, 0.20);
+      font-family: 'JetBrains Mono', monospace;
+      transition: all 0.15s ease;
+      text-align: center;
+    }
+
+    .modal-stats-btn:active {
+      background-color: #ffb000;
+      color: #000000;
+      transform: scale(0.97);
+    }
+
+    .modal-download-btn {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background: #10b981;
+      color: #000000;
+      text-decoration: none;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      transition: all 0.15s ease;
+      text-align: center;
+      border: none;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.40);
+    }
+
+    .modal-download-btn:active {
+      transform: scale(0.97);
+      background: #059669;
+    }
+
+    .modal-purge-btn {
+      display: block;
+      width: 100%;
+      padding: 9px;
+      background: rgba(255, 0, 79, 0.12);
+      border: 1.5px solid #ff004f;
+      color: #ff004f;
+      border-radius: 10px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: center;
+    }
+
+    .modal-purge-btn:active {
+      background-color: #ff004f;
+      color: #ffffff;
+      transform: scale(0.97);
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      margin-top: 4px;
+    }
+
+    .modal-close-btn:hover {
+      border-color: #ffffff;
+      color: #ffffff;
+    }
+
+    .modal-version-tag {
+      font-size: 0.65rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent-cyan);
+      margin-top: 8px;
+      letter-spacing: 0.05em;
+    }
+
+    /* Interactive Toast */
+    .launch-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(40px);
+      background: #00f3ff;
+      color: #050811;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.74rem;
+      font-weight: 800;
+      padding: 8px 18px;
+      border-radius: 999px;
+      box-shadow: 0 8px 24px rgba(0, 243, 255, 0.5);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 3000;
+      white-space: nowrap;
+    }
+
+    .launch-toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="launcher-frame">
+    
+    <!-- Top Header -->
+    <div class="header-zone">
+      <div class="brand-pill">
+        <span class="brand-dot"></span>
+        <span>★ NOMAD AVIONICS SUITE</span>
+      </div>
+      <h1 class="main-title">LAUNCH CONTROL</h1>
+      <p class="subtitle">Select Cockpit to Begin Experience</p>
+    </div>
+
+    <!-- Live Telemetry Heartbeat -->
+    <div class="telemetry-heartbeat">
+      <div class="telemetry-fix-status">
+        <span class="telemetry-fix-dot"></span>
+        <span id="tb-lock-status">GPS LOCKED</span>
+      </div>
+      <div id="tb-coords-val">42.3601° N, 71.0589° W</div>
+      <div id="tb-speed-val" style="color: #ffffff; font-weight: 700;">0 MPH</div>
+    </div>
+
+    <!-- The 3 Hero Cockpits Stack -->
+    <div class="section-label">
+      <span>1. SELECT FLIGHT COCKPIT</span>
+      <span style="color: var(--accent-cyan); font-weight: 600;">3 INTERFACES</span>
+    </div>
+
+    <div class="cockpits-stack">
+
+      <!-- 1. HYPERSPACE -->
+      <a href="./hyperspace.html" class="cockpit-hero-card card-hyperspace" id="card-hud-hyperspace">
+        <div class="cockpit-left">
+          <div class="cockpit-avatar" style="border-color: rgba(255, 0, 85, 0.4); color: #ff0055;">🚀</div>
+          <div class="cockpit-meta">
+            <div class="cockpit-title-row">
+              <span class="cockpit-name">HYPERSPACE</span>
+            </div>
+            <div class="cockpit-desc">Kinetic vector canvas with floating telemetry</div>
+          </div>
+        </div>
+        <div class="cockpit-launch-action">
+          <span class="launch-btn-pill">LAUNCH ↗</span>
+          <button type="button" class="boot-radio-btn" id="radio-btn-hyperspace" onclick="setBootDefaultFromCard(event, 'hyperspace')" title="Set HYPERSPACE as Default Boot Cockpit">
+            <span class="radio-circle"><span class="radio-dot"></span></span>
+            <span class="radio-label">SET DEFAULT</span>
+          </button>
+        </div>
+      </a>
+
+      <!-- 2. ROAD TRIP -->
+      <a href="./roadtrip.html" class="cockpit-hero-card card-roadtrip" id="card-hud-roadtrip">
+        <div class="cockpit-left">
+          <div class="cockpit-avatar" style="border-color: rgba(0, 243, 255, 0.4); color: #00f3ff;">🚗</div>
+          <div class="cockpit-meta">
+            <div class="cockpit-title-row">
+              <span class="cockpit-name">ROAD TRIP</span>
+            </div>
+            <div class="cockpit-desc">High-contrast street level mapping accuracy</div>
+          </div>
+        </div>
+        <div class="cockpit-launch-action">
+          <span class="launch-btn-pill">LAUNCH ↗</span>
+          <button type="button" class="boot-radio-btn" id="radio-btn-roadtrip" onclick="setBootDefaultFromCard(event, 'roadtrip')" title="Set ROAD TRIP as Default Boot Cockpit">
+            <span class="radio-circle"><span class="radio-dot"></span></span>
+            <span class="radio-label">SET DEFAULT</span>
+          </button>
+        </div>
+      </a>
+
+      <!-- 3. DIGIT -->
+      <a href="./digit.html" class="cockpit-hero-card card-digit" id="card-hud-digit">
+        <div class="cockpit-left">
+          <div class="cockpit-avatar" style="border-color: rgba(48, 209, 88, 0.4); color: #30d158;">📟</div>
+          <div class="cockpit-meta">
+            <div class="cockpit-title-row">
+              <span class="cockpit-name">DIGIT</span>
+            </div>
+            <div class="cockpit-desc">Military monospace ASCII matrix</div>
+          </div>
+        </div>
+        <div class="cockpit-launch-action">
+          <span class="launch-btn-pill">LAUNCH ↗</span>
+          <button type="button" class="boot-radio-btn" id="radio-btn-digit" onclick="setBootDefaultFromCard(event, 'digit')" title="Set DIGIT as Default Boot Cockpit">
+            <span class="radio-circle"><span class="radio-dot"></span></span>
+            <span class="radio-label">SET DEFAULT</span>
+          </button>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- The 6 Shared Utilities -->
+    <div class="section-label">
+      <span>2. SHARED SENSORY &amp; UTILITY DECK</span>
+      <span style="color: var(--accent-amber); font-weight: 600;">ALL HUDS SHARE</span>
+    </div>
+
+    <div class="utilities-grid">
+
+      <!-- A: VISUALIZER ARCADE -->
+      <a href="./visualizer.html?from=launcher" class="util-tile util-arcade">
+        <div class="util-tile-title">✨ A: ARCADE ↗</div>
+      </a>
+
+      <!-- B: GEEK STATS (VT220) -->
+      <a href="./geek-stats.html?from=launcher" class="util-tile util-stats">
+        <div class="util-tile-title">&gt; B: GEEK STATS _</div>
+      </a>
+
+      <!-- C: USER GUIDE -->
+      <a href="./features.html?from=launcher" class="util-tile util-guide">
+        <div class="util-tile-title">📖 C: USER GUIDE ↗</div>
+      </a>
+
+      <!-- D: DOWNLOAD ALL FILES (.ZIP) -->
+      <a href="/api/download-zip" download="nomad_suite.zip" class="util-tile util-download">
+        <div class="util-tile-title">📦 D: DOWNLOAD ZIP</div>
+      </a>
+
+      <!-- E: PURGE CACHE AND HARD RELOAD -->
+      <div class="util-tile util-purge" onclick="handleDeepPurge()">
+        <div class="util-tile-title">⚠️ E: PURGE CACHE</div>
+      </div>
+
+      <!-- F: CREDITS & ABOUT -->
+      <div class="util-tile util-about" onclick="openAboutModal()">
+        <div class="util-tile-title">ℹ️ F: CREDITS</div>
+      </div>
+
+    </div>
+
+    <footer>
+      <div>NOMAD Avionics Architecture &bull; <span class="nomad-version" id="footer-firmware-val">v4.10072026.2006</span></div>
+      <div>Crafted by <a href="https://www.instagram.com/tony_bostony/" class="nomad-creator-link" target="_blank" rel="noopener noreferrer">BostonyFX</a></div>
+    </footer>
+
+  </div>
+
+  <!-- Unified About / Settings Modal Container (rendered dynamically by /js/nomad-menu.js) -->
+  <div class="modal-overlay" id="about-modal"></div>
+
+  <!-- Ephemeral Feedback Toast -->
+  <div class="launch-toast" id="launch-toast">Notification</div>
+
+  <!-- Engines & Logic -->
+  <script src="./version.js"></script>
+  <script src="./js/nomad-menu.js"></script>
+  <script src="./js/nomad-return.js"></script>
+  <script src="./js/nomad-telemetry-engine.js"></script>
+  <script src="./js/nomad-cockpit-engine.js"></script>
+
+  <script>
+    (function() {
+      const toastEl = document.getElementById('launch-toast');
+      let toastTimer = null;
+
+      function showToast(msg, duration = 2200) {
+        if (!toastEl) return;
+        toastEl.innerText = msg;
+        toastEl.classList.add('show');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toastEl.classList.remove('show');
+        }, duration);
+      }
+      window.showToast = showToast;
+
+      // Modal open/close via Unified NomadMenuEngine
+      window.openAboutModal = function() {
+        if (window.NomadMenuEngine && typeof window.NomadMenuEngine.open === 'function') {
+          window.NomadMenuEngine.open();
+          return;
+        }
+        const modal = document.getElementById('about-modal');
+        if (modal) modal.classList.add('active');
+      };
+
+      window.closeAboutModal = function(e) {
+        if (window.NomadMenuEngine && typeof window.NomadMenuEngine.close === 'function') {
+          window.NomadMenuEngine.close(e);
+          return;
+        }
+        const modal = document.getElementById('about-modal');
+        if (modal) modal.classList.remove('active');
+      };
+
+      window.showAboutToast = function() {
+        openAboutModal();
+      };
+
+      // Update version and creator tags from version.js
+      if (window.NOMAD_VERSION) {
+        const vFooterEl = document.getElementById('footer-firmware-val');
+        if (vFooterEl) vFooterEl.innerText = window.NOMAD_VERSION;
+        const vModalEl = document.getElementById('nomad-modal-version-val');
+        if (vModalEl) vModalEl.innerText = window.NOMAD_VERSION;
+      }
+      if (window.NOMAD_CREATOR) {
+        const creator = window.NOMAD_CREATOR;
+        document.querySelectorAll('.nomad-creator-link').forEach(el => {
+          el.href = creator.url;
+          el.innerText = creator.name;
+        });
+        document.querySelectorAll('.nomad-creator-handle').forEach(el => {
+          el.innerText = `(${creator.handle})`;
+        });
+      }
+
+      // Live Telemetry Hook
+      if (window.NomadTelemetryEngine && typeof window.NomadTelemetryEngine.onUpdate === 'function') {
+        window.NomadTelemetryEngine.onUpdate((snap) => {
+          if (!snap) return;
+          const coordsEl = document.getElementById('tb-coords-val');
+          const speedEl = document.getElementById('tb-speed-val');
+          const lockEl = document.getElementById('tb-lock-status');
+
+          if (snap.hasRealGpsLock && snap.latitude !== null) {
+            if (coordsEl) coordsEl.innerText = `${snap.latitude.toFixed(4)}° N, ${Math.abs(snap.longitude).toFixed(4)}° W`;
+            if (lockEl) lockEl.innerText = 'GPS LOCKED';
+          }
+          if (speedEl && snap.speedMph !== null) {
+            speedEl.innerText = `${Math.round(snap.speedMph)} MPH`;
+          }
+        });
+      }
+
+      // Startup Boot Preference Management (Card Radio Selectors)
+      function updateBootUI(cockpitId) {
+        const cockpits = ['digit', 'roadtrip', 'hyperspace'];
+        cockpits.forEach(id => {
+          const card = document.getElementById(`card-hud-${id}`);
+          const radioBtn = document.getElementById(`radio-btn-${id}`);
+          const isSelected = (id === cockpitId);
+
+          if (card) {
+            if (isSelected) {
+              card.classList.add('is-default');
+            } else {
+              card.classList.remove('is-default');
+            }
+          }
+
+          if (radioBtn) {
+            const label = radioBtn.querySelector('.radio-label');
+            if (label) {
+              label.innerText = isSelected ? '★ DEFAULT' : 'SET DEFAULT';
+            }
+          }
+        });
+      }
+
+      window.setBootDefaultFromCard = function(e, cockpitId) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        if (window.NomadCockpitEngine) {
+          window.NomadCockpitEngine.setDefaultCockpitId(cockpitId);
+        } else {
+          localStorage.setItem('nomad_default_cockpit', cockpitId);
+        }
+        updateBootUI(cockpitId);
+
+        const names = {
+          hyperspace: 'HYPERSPACE',
+          roadtrip: 'ROAD TRIP',
+          digit: 'DIGIT'
+        };
+        showToast(`★ ${names[cockpitId] || cockpitId.toUpperCase()} SET AS DEFAULT`);
+      };
+
+      window.setBootPreference = window.setBootDefaultFromCard;
+
+      // Deep purge execution
+      window.handleDeepPurge = function() {
+        showToast('⚠️ PURGING CACHES & RELOADING...');
+        if (window.NomadCockpitEngine) {
+          window.NomadCockpitEngine.purgeCacheAndReload();
+        } else {
+          const savedBlackbox = localStorage.getItem('nomad_blackbox_log');
+          localStorage.clear();
+          sessionStorage.clear();
+          if (savedBlackbox) localStorage.setItem('nomad_blackbox_log', savedBlackbox);
+          window.location.reload(true);
+        }
+      };
+
+      window.showAboutToast = function() {
+        const creatorName = (window.NOMAD_CREATOR && window.NOMAD_CREATOR.name) || 'BostonyFX';
+        showToast(`NOMAD ${window.NOMAD_VERSION || 'v4'} by ${creatorName}`);
+      };
+
+      // Initial state sync
+      const savedDefault = (window.NomadCockpitEngine && window.NomadCockpitEngine.getDefaultCockpitId()) ||
+                           localStorage.getItem('nomad_default_cockpit') ||
+                           'hyperspace';
+      updateBootUI(savedDefault);
+
+      // --- Screen Wake Lock ("Stay Awake") Engine ---
+      let wakeLock = null;
+      async function requestWakeLock() {
+        try {
+          if (typeof navigator !== 'undefined' && 'wakeLock' in navigator && document.visibilityState === 'visible' && (wakeLock === null || wakeLock.released)) {
+            wakeLock = await navigator.wakeLock.request('screen');
+          }
+        } catch (_) {}
+      }
+
+      requestWakeLock();
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') requestWakeLock();
+      });
+      ['touchstart', 'pointerdown', 'click'].forEach(evt => {
+        window.addEventListener(evt, () => requestWakeLock(), { passive: true });
+      });
+
+      // Service Worker Registration for PWA Installability
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .catch(err => console.warn('Service worker registration failed:', err));
+        });
+      }
+    })();
+  </script>
+
+</body>
+</html>

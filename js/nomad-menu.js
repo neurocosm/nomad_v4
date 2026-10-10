@@ -27,7 +27,16 @@
     if (path.includes('hyperspace') || search.includes('hyperspace')) {
       return 'hyperspace';
     }
-    if (path.includes('nomad_suite') || path.endsWith('/') || path.endsWith('index.html')) {
+    if (path.includes('launch') || search.includes('launch') || document.querySelector('.launcher-frame, .cockpits-stack, #card-hud-hyperspace')) {
+      return 'launcher';
+    }
+    if (path.includes('nomad_suite')) {
+      if (document.getElementById('speed-bubble') || document.getElementById('map-card')) {
+        return 'hyperspace';
+      }
+      return 'launcher';
+    }
+    if (path.endsWith('/') || path.endsWith('index.html')) {
       // Check if root index is acting as hyperspace or launcher
       if (document.getElementById('speed-bubble') || document.getElementById('map-card')) {
         return 'hyperspace';
@@ -35,6 +44,21 @@
       return 'launcher';
     }
     return 'launcher';
+  }
+
+  // Explicit helper to navigate strictly to Launch Control Home
+  function returnToNomadLauncher(e) {
+    if (e) {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      if (typeof e.stopPropagation === 'function') e.stopPropagation();
+    }
+    if (typeof window !== 'undefined') {
+      window.location.href = 'launch.html';
+    }
+  }
+  root.returnToNomadLauncher = returnToNomadLauncher;
+  if (typeof window !== 'undefined') {
+    window.returnToNomadLauncher = returnToNomadLauncher;
   }
 
   const COCKPIT_META = {
@@ -378,7 +402,7 @@
               📟 DIGIT
             </a>
           </div>
-          <a href="index.html" class="modal-home-launcher-btn" title="Return to Launch Control Home">
+          <a href="launch.html" class="modal-home-launcher-btn" title="Return to Launch Control Home" onclick="window.returnToNomadLauncher && window.returnToNomadLauncher(event)">
             <span>🛰️ LAUNCH CONTROL (HOME) ↗</span>
           </a>
           <div class="modal-default-cockpit-wrap">

@@ -23,9 +23,15 @@
       } else if (path.includes('hyperspace.html') || path.endsWith('/hyperspace')) {
         sessionStorage.setItem('nomad_active_hud', 'hyperspace.html');
         sessionStorage.setItem('nomad_active_hud_name', 'HYPERSPACE');
-      } else if (path.includes('index.html') || path.endsWith('/nomad_suite/') || path.endsWith('/nomad_suite') || path.endsWith('/')) {
-        sessionStorage.setItem('nomad_active_hud', 'index.html');
+      } else if (path.includes('launch.html') || path.endsWith('/launch') || path.includes('launcher')) {
+        sessionStorage.setItem('nomad_active_hud', 'launch.html');
         sessionStorage.setItem('nomad_active_hud_name', 'LAUNCH CONTROL');
+      } else if (path.includes('nomad_suite') && (path.endsWith('/') || path.endsWith('index.html'))) {
+        sessionStorage.setItem('nomad_active_hud', 'launch.html');
+        sessionStorage.setItem('nomad_active_hud_name', 'LAUNCH CONTROL');
+      } else if (path.endsWith('/') || path.endsWith('index.html')) {
+        sessionStorage.setItem('nomad_active_hud', 'hyperspace.html');
+        sessionStorage.setItem('nomad_active_hud_name', 'HYPERSPACE');
       }
     }
   } catch (_) {}
@@ -41,7 +47,7 @@
           if (fromParam.includes('digit')) return { target: 'digit.html', name: 'DIGIT' };
           if (fromParam.includes('hyperspace')) return { target: 'hyperspace.html', name: 'HYPERSPACE' };
           if (fromParam.includes('launcher') || fromParam.includes('suite') || fromParam.includes('home')) {
-            return { target: 'index.html', name: 'LAUNCH CONTROL' };
+            return { target: 'launch.html', name: 'LAUNCH CONTROL' };
           }
         }
 
@@ -51,12 +57,12 @@
 
           // Scrub any legacy 'nomad_suite/' or 'START HUD'
           if (storedHud) {
-            if (storedHud.includes('nomad_suite') || storedHud === 'nomad_suite/' || storedHud === 'nomad_suite') {
-              storedHud = 'index.html';
-              sessionStorage.setItem('nomad_active_hud', 'index.html');
+            if (storedHud.includes('nomad_suite') || storedHud === 'nomad_suite/' || storedHud === 'nomad_suite' || storedHud === 'index.html') {
+              storedHud = (storedName === 'LAUNCH CONTROL') ? 'launch.html' : 'hyperspace.html';
+              sessionStorage.setItem('nomad_active_hud', storedHud);
             }
             if (storedName === 'START HUD' || !storedName || storedName.includes('nomad_suite')) {
-              storedName = (storedHud === 'index.html') ? 'LAUNCH CONTROL' : 'COCKPIT';
+              storedName = (storedHud === 'launch.html') ? 'LAUNCH CONTROL' : 'COCKPIT';
               sessionStorage.setItem('nomad_active_hud_name', storedName);
             }
             return { target: storedHud, name: storedName };
@@ -75,18 +81,29 @@
           if (ref.includes('roadtrip.html')) return { target: 'roadtrip.html', name: 'ROAD TRIP' };
           if (ref.includes('digit.html')) return { target: 'digit.html', name: 'DIGIT' };
           if (ref.includes('hyperspace.html')) return { target: 'hyperspace.html', name: 'HYPERSPACE' };
-          if (ref.includes('index.html') || ref.includes('nomad_suite')) return { target: 'index.html', name: 'LAUNCH CONTROL' };
+          if (ref.includes('launch.html') || ref.includes('nomad_suite')) return { target: 'launch.html', name: 'LAUNCH CONTROL' };
         }
       }
     } catch (_) {}
 
-    return { target: 'index.html', name: 'LAUNCH CONTROL' };
+    return { target: 'launch.html', name: 'LAUNCH CONTROL' };
   }
 
   function returnToActiveHUD() {
     const info = getNomadReturnTarget();
     if (typeof window !== 'undefined') {
       window.location.href = info.target;
+    }
+  }
+
+  // Explicit return directly to Launch Control Home
+  function returnToNomadLauncher(e) {
+    if (e) {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      if (typeof e.stopPropagation === 'function') e.stopPropagation();
+    }
+    if (typeof window !== 'undefined') {
+      window.location.href = 'launch.html';
     }
   }
 
@@ -114,6 +131,13 @@
         }
       }
     });
+
+    // Wire any home / launcher buttons
+    document.querySelectorAll('.modal-home-launcher-btn, [data-nomad-launcher-btn]').forEach(btn => {
+      btn.onclick = (e) => {
+        returnToNomadLauncher(e);
+      };
+    });
   }
 
   if (typeof document !== 'undefined') {
@@ -127,7 +151,14 @@
   root.NomadReturnRouter = {
     getTarget: getNomadReturnTarget,
     returnToActiveHUD: returnToActiveHUD,
+    returnToNomadLauncher: returnToNomadLauncher,
     setupReturnButtons: setupReturnButtons
   };
   root.returnToActiveHUD = returnToActiveHUD;
+  root.returnToNomadLauncher = returnToNomadLauncher;
+  root.returnToLaunch = returnToNomadLauncher;
+  if (typeof window !== 'undefined') {
+    window.returnToNomadLauncher = returnToNomadLauncher;
+    window.returnToLaunch = returnToNomadLauncher;
+  }
 })(typeof globalThis !== 'undefined' ? globalThis : this);
