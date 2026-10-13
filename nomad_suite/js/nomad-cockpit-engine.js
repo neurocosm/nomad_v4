@@ -121,30 +121,29 @@
     if (typeof window === 'undefined') return;
 
     try {
-      // 1. Unregister all service workers
+      // 1. Send FORCE_PURGE message and unregister all service workers
       if ('serviceWorker' in navigator) {
         const registrations = await navigator.serviceWorker.getRegistrations();
         for (const reg of registrations) {
+          if (reg.active) {
+            reg.active.postMessage({ type: 'FORCE_PURGE' });
+          }
           await reg.unregister();
         }
       }
 
-      // 2. Clear Cache Storage
+      // 2. Clear all Cache Storage instances across origin
       if ('caches' in window) {
         const keys = await caches.keys();
-        for (const key of keys) {
-          await caches.delete(key);
-        }
+        await Promise.all(keys.map(k => caches.delete(k)));
       }
 
       // 3. Clear transient storage keys (preserve default cockpit preference & flight/collision logs)
       if (typeof localStorage !== 'undefined') {
         const savedDefault = localStorage.getItem(STORAGE_KEY_DEFAULT);
-        const savedVersion = localStorage.getItem('nomad_remote_version');
         const savedBlackbox = localStorage.getItem('nomad_blackbox_log');
         localStorage.clear();
         if (savedDefault) localStorage.setItem(STORAGE_KEY_DEFAULT, savedDefault);
-        if (savedVersion) localStorage.setItem('nomad_remote_version', savedVersion);
         if (savedBlackbox) localStorage.setItem('nomad_blackbox_log', savedBlackbox);
       }
 
@@ -155,8 +154,10 @@
       console.warn('Purge warning:', e);
     }
 
-    // 4. Force hard reload from server
-    window.location.reload(true);
+    // 4. Force hard reload from server bypassing browser and SW caches
+    const targetUrl = new URL(window.location.href);
+    targetUrl.searchParams.set('t', Date.now().toString());
+    window.location.replace(targetUrl.toString());
   }
 
   // Subscribers for reactive state

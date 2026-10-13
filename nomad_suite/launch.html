@@ -1123,17 +1123,34 @@
       window.setBootPreference = window.setBootDefaultFromCard;
 
       // Deep purge execution
-      window.handleDeepPurge = function() {
+      window.handleDeepPurge = async function() {
         showToast('⚠️ PURGING CACHES & RELOADING...');
-        if (window.NomadCockpitEngine) {
-          window.NomadCockpitEngine.purgeCacheAndReload();
-        } else {
+        try {
+          if ('serviceWorker' in navigator) {
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            for (const reg of registrations) {
+              if (reg.active) reg.active.postMessage({ type: 'FORCE_PURGE' });
+              await reg.unregister();
+            }
+          }
+          if ('caches' in window) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map(k => caches.delete(k)));
+          }
+          const savedDefault = localStorage.getItem('nomad_default_cockpit');
           const savedBlackbox = localStorage.getItem('nomad_blackbox_log');
           localStorage.clear();
           sessionStorage.clear();
+          if (savedDefault) localStorage.setItem('nomad_default_cockpit', savedDefault);
           if (savedBlackbox) localStorage.setItem('nomad_blackbox_log', savedBlackbox);
-          window.location.reload(true);
+        } catch (err) {
+          console.warn('Purge error:', err);
         }
+        setTimeout(() => {
+          const targetUrl = new URL(window.location.href);
+          targetUrl.searchParams.set('t', Date.now().toString());
+          window.location.replace(targetUrl.toString());
+        }, 300);
       };
 
       window.showAboutToast = function() {
