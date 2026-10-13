@@ -113,7 +113,7 @@
 
   function returnToLaunch() {
     if (typeof window === 'undefined') return;
-    window.location.href = 'launch.html';
+    window.location.href = 'index.html';
   }
 
   // Hardware-grade Purge Cache & Hard Reload

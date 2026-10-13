@@ -53,7 +53,7 @@
       if (typeof e.stopPropagation === 'function') e.stopPropagation();
     }
     if (typeof window !== 'undefined') {
-      window.location.href = 'launch.html';
+      window.location.href = 'index.html';
     }
   }
   root.returnToNomadLauncher = returnToNomadLauncher;
@@ -414,7 +414,7 @@
               📟 DIGIT
             </a>
           </div>
-          <a href="launch.html" class="modal-home-launcher-btn" title="Return to Launch Control Home" onclick="window.returnToNomadLauncher && window.returnToNomadLauncher(event)">
+          <a href="index.html" class="modal-home-launcher-btn" title="Return to Launch Control Home" onclick="window.returnToNomadLauncher && window.returnToNomadLauncher(event)">
             <span>🛰️ LAUNCH CONTROL (HOME) ↗</span>
           </a>
           <div class="modal-default-cockpit-wrap">

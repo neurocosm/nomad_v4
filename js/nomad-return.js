@@ -26,11 +26,8 @@
       } else if (path.includes('launch.html') || path.endsWith('/launch') || path.includes('launcher')) {
         sessionStorage.setItem('nomad_active_hud', 'launch.html');
         sessionStorage.setItem('nomad_active_hud_name', 'LAUNCH CONTROL');
-      } else if (path.includes('nomad_suite') && (path.endsWith('/') || path.endsWith('index.html'))) {
-        sessionStorage.setItem('nomad_active_hud', 'launch.html');
-        sessionStorage.setItem('nomad_active_hud_name', 'LAUNCH CONTROL');
       } else if (path.endsWith('/') || path.endsWith('index.html')) {
-        sessionStorage.setItem('nomad_active_hud', 'hyperspace.html');
+        sessionStorage.setItem('nomad_active_hud', 'index.html');
         sessionStorage.setItem('nomad_active_hud_name', 'HYPERSPACE');
       }
     }
@@ -57,8 +54,8 @@
 
           // Scrub any legacy 'nomad_suite/' or 'START HUD'
           if (storedHud) {
-            if (storedHud.includes('nomad_suite') || storedHud === 'nomad_suite/' || storedHud === 'nomad_suite' || storedHud === 'index.html') {
-              storedHud = (storedName === 'LAUNCH CONTROL') ? 'launch.html' : 'hyperspace.html';
+            if (storedHud.includes('nomad_suite') || storedHud === 'nomad_suite/' || storedHud === 'nomad_suite') {
+              storedHud = (storedName === 'LAUNCH CONTROL') ? 'launch.html' : 'index.html';
               sessionStorage.setItem('nomad_active_hud', storedHud);
             }
             if (storedName === 'START HUD' || !storedName || storedName.includes('nomad_suite')) {

@@ -24,14 +24,11 @@
         sessionStorage.setItem('nomad_active_hud', 'hyperspace.html');
         sessionStorage.setItem('nomad_active_hud_name', 'HYPERSPACE');
       } else if (path.includes('launch.html') || path.endsWith('/launch') || path.includes('launcher')) {
-        sessionStorage.setItem('nomad_active_hud', 'launch.html');
-        sessionStorage.setItem('nomad_active_hud_name', 'LAUNCH CONTROL');
-      } else if (path.includes('nomad_suite') && (path.endsWith('/') || path.endsWith('index.html'))) {
-        sessionStorage.setItem('nomad_active_hud', 'launch.html');
+        sessionStorage.setItem('nomad_active_hud', 'index.html');
         sessionStorage.setItem('nomad_active_hud_name', 'LAUNCH CONTROL');
       } else if (path.endsWith('/') || path.endsWith('index.html')) {
-        sessionStorage.setItem('nomad_active_hud', 'hyperspace.html');
-        sessionStorage.setItem('nomad_active_hud_name', 'HYPERSPACE');
+        sessionStorage.setItem('nomad_active_hud', 'index.html');
+        sessionStorage.setItem('nomad_active_hud_name', 'LAUNCH CONTROL');
       }
     }
   } catch (_) {}
@@ -47,7 +44,7 @@
           if (fromParam.includes('digit')) return { target: 'digit.html', name: 'DIGIT' };
           if (fromParam.includes('hyperspace')) return { target: 'hyperspace.html', name: 'HYPERSPACE' };
           if (fromParam.includes('launcher') || fromParam.includes('suite') || fromParam.includes('home')) {
-            return { target: 'launch.html', name: 'LAUNCH CONTROL' };
+            return { target: 'index.html', name: 'LAUNCH CONTROL' };
           }
         }
 
@@ -57,12 +54,12 @@
 
           // Scrub any legacy 'nomad_suite/' or 'START HUD'
           if (storedHud) {
-            if (storedHud.includes('nomad_suite') || storedHud === 'nomad_suite/' || storedHud === 'nomad_suite' || storedHud === 'index.html') {
-              storedHud = (storedName === 'LAUNCH CONTROL') ? 'launch.html' : 'hyperspace.html';
+            if (storedHud.includes('nomad_suite') || storedHud === 'nomad_suite/' || storedHud === 'nomad_suite' || storedHud === 'launch.html') {
+              storedHud = 'index.html';
               sessionStorage.setItem('nomad_active_hud', storedHud);
             }
             if (storedName === 'START HUD' || !storedName || storedName.includes('nomad_suite')) {
-              storedName = (storedHud === 'launch.html') ? 'LAUNCH CONTROL' : 'COCKPIT';
+              storedName = (storedHud === 'index.html') ? 'LAUNCH CONTROL' : 'COCKPIT';
               sessionStorage.setItem('nomad_active_hud_name', storedName);
             }
             return { target: storedHud, name: storedName };
@@ -81,12 +78,12 @@
           if (ref.includes('roadtrip.html')) return { target: 'roadtrip.html', name: 'ROAD TRIP' };
           if (ref.includes('digit.html')) return { target: 'digit.html', name: 'DIGIT' };
           if (ref.includes('hyperspace.html')) return { target: 'hyperspace.html', name: 'HYPERSPACE' };
-          if (ref.includes('launch.html') || ref.includes('nomad_suite')) return { target: 'launch.html', name: 'LAUNCH CONTROL' };
+          if (ref.includes('launch.html') || ref.includes('index.html') || ref.includes('nomad_suite')) return { target: 'index.html', name: 'LAUNCH CONTROL' };
         }
       }
     } catch (_) {}
 
-    return { target: 'launch.html', name: 'LAUNCH CONTROL' };
+    return { target: 'index.html', name: 'LAUNCH CONTROL' };
   }
 
   function returnToActiveHUD() {
@@ -103,7 +100,7 @@
       if (typeof e.stopPropagation === 'function') e.stopPropagation();
     }
     if (typeof window !== 'undefined') {
-      window.location.href = 'launch.html';
+      window.location.href = 'index.html';
     }
   }
 

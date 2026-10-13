@@ -116,9 +116,9 @@ app.get(['/nomad_digit', '/nomad_digit.html'], (req, res) => {
   res.redirect(301, '/digit.html');
 });
 
-// Dedicated routes for Launch Control
+// Dedicated routes for Launch Control -> redirect to index.html
 app.get(['/launch', '/launch.html', '/launcher', '/nomad_launch'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'launch.html'));
+  res.redirect(301, '/index.html');
 });
 
 // Serve static assets with html extension support
